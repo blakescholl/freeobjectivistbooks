@@ -32,6 +32,14 @@ Here's how to get yourself set up to develop the app:
 
 Let me know if you have any trouble at all getting set up; I'm happy to help, and I'll update these instructions for the next developer, as well.
 
+## In case you don't know Ruby or Rails
+
+A good quick-start intro to Ruby is [Ruby in Twenty Minutes](http://www.ruby-lang.org/en/documentation/quickstart/).
+
+For Rails, I recommend the official guide, [Getting Started with Rails](http://guides.rubyonrails.org/v3.1.3/getting_started.html).
+
+From each of those sites you can find more tutorials and other documentation, including books.
+
 ## Developer guidelines
 
 * Use GitHub to manage workflow: issues, pull requests, etc.

@@ -83,8 +83,10 @@ class Metrics
       {
         name: book.title,
         values: {
-          "Requested" => (request_counts[book.id] || 0),
-          "Donated" => (donation_counts[book.id] || 0),
+          # Hit a weird case against a PostgreSQL db where the keys were coming out as ints for the request
+          # counts but strings for the donations... going to be a little defensive here  -Jason 3 Nov 2012
+          "Requested" => (request_counts[book.id] || request_counts[book.id.to_s] || 0),
+          "Donated" => (donation_counts[book.id] || donation_counts[book.id.to_s] || 0),
         }
       }
     end

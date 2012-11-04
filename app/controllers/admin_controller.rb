@@ -1,10 +1,6 @@
 # Parent class for all admin controllers. Also manages the main admin dashboard at /admin.
 class AdminController < ApplicationController
-  before_filter do
-    authenticate_or_request_with_http_digest("Admin") do |username|
-      Rails.application.config.admin_password_hash
-    end
-  end
+  before_filter :require_admin
 
   def index
     @user_count = User.count

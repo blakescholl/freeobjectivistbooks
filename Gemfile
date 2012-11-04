@@ -2,11 +2,13 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.1.3'
 
+gem 'activeadmin'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'exception_notification'
 gem 'jquery-rails'
+gem 'meta_search', '>= 1.1.0.pre' # required by activeadmin
 gem 'redcarpet'
 gem 'rest-client'
 gem 'valid_email'

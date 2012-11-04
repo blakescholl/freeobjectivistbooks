@@ -81,6 +81,13 @@ class ApplicationController < ActionController::Base
   end
   private :require_user
 
+  # Uses HTTP digest authentication to validate admin credentials.
+  def require_admin
+    authenticate_or_request_with_http_digest("Admin") do |username|
+      Rails.application.config.admin_password_hash
+    end
+  end
+
   # Specifies who can access this page. Subclasses can override this to return a user or a list of
   # users, in order to restrict access to those users. The render_forbidden handler will be invoked
   # for all other users.

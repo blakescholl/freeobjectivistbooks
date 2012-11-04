@@ -9,3 +9,6 @@ en:
   time:
     formats:
       default: "%a %-d %b %Y %-l:%M%P"
+
+  active_admin:
+    dashboard: "Dashboard"

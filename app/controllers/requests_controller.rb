@@ -38,7 +38,7 @@ class RequestsController < ApplicationController
   #++
 
   def index
-    @requests = Request.not_granted.reorder('updated_at desc')
+    @requests = Request.not_granted.reorder('open_at desc')
     @donations = @current_user.donations.active if @current_user
     @pledge = @current_user.pledges.first if @current_user
   end

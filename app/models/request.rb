@@ -57,8 +57,13 @@ class Request < ActiveRecord::Base
   # Callbacks
   #++
 
-  after_initialize do |request|
-    request.book = "Atlas Shrugged" if request.book.blank?
+  after_initialize :populate
+
+  def populate
+    unless id
+      self.book = "Atlas Shrugged" if book.blank?
+      self.open_at = Time.now
+    end
   end
 
   before_validation do |request|

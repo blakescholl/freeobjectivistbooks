@@ -4,11 +4,13 @@ howard_wants_atlas:
   user: howard
   book: Atlas Shrugged
   reason: I've heard so much about this... can't wait to find out who is John Galt!
+  open_at: 2012-02-21 00:15:25
 
 quentin_wants_opar:
   user: quentin
   book: "Objectivism: The Philosophy of Ayn Rand"
   reason: The Virtue of Selfishness was great! I want to learn more about this philosophy.
+  open_at: 2012-01-22 00:15:25
 
 # Granted, not sent
 

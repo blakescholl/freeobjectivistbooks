@@ -237,6 +237,7 @@ class Donation < ActiveRecord::Base
     self.canceled = true
     if request.donation == self
       request.donation = nil
+      request.open_at = Time.now
       cancel_donation_events.build params[:event].merge(user: user)
     end
   end

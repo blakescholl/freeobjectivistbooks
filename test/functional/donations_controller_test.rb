@@ -210,6 +210,7 @@ class DonationsControllerTest < ActionController::TestCase
 
     @quentin_request_unsent.reload
     assert @quentin_request_unsent.open?, "request is not open"
+    assert_open_at_is_recent @quentin_request_unsent
 
     verify_event @quentin_donation_unsent, "cancel_donation", message: "Sorry!", notified?: true
   end
@@ -242,6 +243,7 @@ class DonationsControllerTest < ActionController::TestCase
 
     @quentin_request_unsent.reload
     assert @quentin_request_unsent.open?, "request is not open"
+    assert_open_at_is_recent @quentin_request_unsent
 
     verify_event @quentin_donation_unsent, "cancel_donation", detail: "not_received", notified?: true
   end

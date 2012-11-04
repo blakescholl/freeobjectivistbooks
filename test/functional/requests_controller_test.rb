@@ -93,7 +93,8 @@ class RequestsControllerTest < ActionController::TestCase
 
     assert_equal "Atlas Shrugged", request.book
     assert_equal "Heard it was great", request.reason
-    assert request.open?
+    assert request.open?, "request is not open"
+    assert_open_at_is_recent request
   end
 
   test "create with shipping info" do
@@ -108,7 +109,8 @@ class RequestsControllerTest < ActionController::TestCase
     assert_equal "Atlas Shrugged", request.book
     assert_equal "Heard it was great", request.reason
     assert_equal "123 Taggart St", request.address
-    assert request.open?
+    assert request.open?, "request is not open"
+    assert_open_at_is_recent request
   end
 
   test "create requires reason" do

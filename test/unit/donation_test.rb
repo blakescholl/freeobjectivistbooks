@@ -229,6 +229,7 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal @cameron, event.donor
     assert_equal "Sorry", event.message
     assert_not_nil event.happened_at
+    assert_open_at_is_recent @hank_donation.request
   end
 
   test "cancel by student" do
@@ -242,6 +243,7 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal @hugh, event.donor
     assert_nil event.message
     assert_not_nil event.happened_at
+    assert_open_at_is_recent @quentin_donation_unsent.request
   end
 
   test "cancel raises exception if can't cancel" do

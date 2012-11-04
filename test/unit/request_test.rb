@@ -10,18 +10,21 @@ class RequestTest < ActiveSupport::TestCase
   test "new" do
     request = User.new.requests.build
     assert_equal "Atlas Shrugged", request.book
+    assert_open_at_is_recent request
   end
 
   test "build" do
     request = @howard.requests.build book: "Atlas Shrugged", other_book: "", reason: reason, pledge: "1"
     assert request.valid?, request.errors.inspect
     assert_equal "Atlas Shrugged", request.book
+    assert_open_at_is_recent request
   end
 
   test "other book" do
     request = @howard.requests.build book: "other", other_book: "Ulysses", reason: reason, pledge: "1"
     assert request.valid?, request.errors.inspect
     assert_equal "Ulysses", request.book
+    assert_open_at_is_recent request
   end
 
   test "reason is required" do

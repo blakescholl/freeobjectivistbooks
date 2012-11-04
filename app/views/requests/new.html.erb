@@ -41,21 +41,7 @@
     <%= form_for @request do |f| %>
         <%= hidden_field_tag :from_read, @from_read %>
 
-        <h2>What book do you want to read?</h2>
-
-        <p class="field_with_errors"><%= @request.errors[:book].join(", ") %></p>
-        <% Request::BOOKS.each do |book| %>
-        <div><label><%= f.radio_button :book, book %> <%= book %> <%= Request::BOOK_NOTES[book] %></label></div>
-        <% end %>
-        <div>
-            <label><%= f.radio_button :book, "other" %> Other: </label>
-            <%= f.text_field :other_book, onfocus: "$('#request_book_other').attr('checked', true)" %>
-        </div>
-
-        <h2>Why do you want to read it?</h2>
-
-        <p class="field_with_errors"><%= @request.errors[:reason].join(", ") %></p>
-        <%= f.text_area :reason, rows: 6, cols: 60 %>
+        <%= render partial: 'book_selection', locals: {request: @request, form: f} %>
 
         <h2>Ship to</h2>
 

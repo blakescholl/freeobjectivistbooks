@@ -20,7 +20,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def request_attributes
-    { book: "The Fountainhead", other_book: "", reason: request_reason, pledge: "1" }
+    { book_id: @fountainhead.id, other_book: "", reason: request_reason, pledge: "1" }
   end
 
   def pledge_attributes
@@ -33,7 +33,7 @@ class UsersControllerTest < ActionController::TestCase
     get :read
     assert_response :success
 
-    assert_select '#request_book_atlas_shrugged[checked="checked"]'
+    assert_select "#request_book_id_#{@atlas.id}[checked=\"checked\"]"
     assert_select '.error', false
     assert_select '.sidebar h2', "Already signed up?"
   end
@@ -79,7 +79,7 @@ class UsersControllerTest < ActionController::TestCase
 
     request = user.requests.first
     assert_not_nil request
-    assert_equal "The Fountainhead", request.book
+    assert_equal @fountainhead, request.book
     assert_equal request_reason, request.reason
 
     assert_equal [], user.pledges

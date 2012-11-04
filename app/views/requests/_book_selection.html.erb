@@ -1,0 +1,19 @@
+<h2>What book do you want to read?</h2>
+
+<p class="field_with_errors"><%= request.errors[:book].join(", ") %></p>
+<% Book.featured.each do |book| %>
+<div><label>
+    <%= form.radio_button :book_id, book.id %> <%= book %>
+    <% if book.author %>(by <%= book.author %>)<% end %>
+    <% if book.rank <= 0 %>(start here if you don't know what to choose!)<% end %>
+</label></div>
+<% end %>
+<div>
+    <label><%= form.radio_button :book_id, nil %> Other: </label>
+    <%= form.text_field :other_book, onfocus: "$('#request_book_id').attr('checked', true)" %>
+</div>
+
+<h2>Why do you want to read it?</h2>
+
+<p class="field_with_errors"><%= request.errors[:reason].join(", ") %></p>
+<%= form.text_area :reason, rows: 6, cols: 60 %>

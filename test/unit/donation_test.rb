@@ -101,7 +101,7 @@ class DonationTest < ActiveSupport::TestCase
   end
 
   test "book" do
-    assert_equal "Atlas Shrugged", @hank_donation.book
+    assert_equal @atlas, @hank_donation.book
   end
 
   test "address" do

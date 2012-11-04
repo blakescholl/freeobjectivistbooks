@@ -74,7 +74,7 @@ $(document).ready(function () {
         donations += 1;
         $(this).fadeAndSlide();
         $('#promise-header').text("You just promised " + donations + " book" + (donations === 1 ? "" : "s") + ":");
-        $('#donations-list').append('<li><span class="title">' + donation.book + '</span> to ' +
+        $('#donations-list').append('<li><span class="title">' + donation.book.title + '</span> to ' +
             donation.user.name + ' in ' + donation.user.location + '</li>');
         $('#donations-list li').last().hide().fadeAndSlide();
         $('.no-donations:visible').fadeAndSlide();

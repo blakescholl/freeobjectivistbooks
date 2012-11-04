@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121104003854) do
+ActiveRecord::Schema.define(:version => 20121104024151) do
+
+  create_table "books", :force => true do |t|
+    t.string   "title"
+    t.string   "author"
+    t.boolean  "featured"
+    t.integer  "rank"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "campaign_targets", :force => true do |t|
     t.string   "name"
@@ -129,7 +138,7 @@ ActiveRecord::Schema.define(:version => 20121104003854) do
 
   create_table "requests", :force => true do |t|
     t.integer  "user_id"
-    t.string   "book"
+    t.string   "book_deprecated"
     t.text     "reason"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -141,6 +150,7 @@ ActiveRecord::Schema.define(:version => 20121104003854) do
     t.integer  "referral_id"
     t.boolean  "canceled",            :default => false, :null => false
     t.datetime "open_at"
+    t.integer  "book_id"
   end
 
   add_index "requests", ["donation_id"], :name => "index_requests_on_donation_id"
@@ -149,12 +159,13 @@ ActiveRecord::Schema.define(:version => 20121104003854) do
 
   create_table "reviews", :force => true do |t|
     t.integer  "user_id"
-    t.string   "book"
+    t.string   "book_deprecated"
     t.text     "text"
     t.boolean  "recommend"
     t.integer  "donation_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "book_id"
   end
 
   add_index "reviews", ["donation_id"], :name => "index_reviews_on_donation_id"

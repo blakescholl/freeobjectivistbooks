@@ -2,13 +2,13 @@
 
 howard_wants_atlas:
   user: howard
-  book: Atlas Shrugged
+  book: atlas
   reason: I've heard so much about this... can't wait to find out who is John Galt!
   open_at: 2012-02-21 00:15:25
 
 quentin_wants_opar:
   user: quentin
-  book: "Objectivism: The Philosophy of Ayn Rand"
+  book: opar
   reason: The Virtue of Selfishness was great! I want to learn more about this philosophy.
   open_at: 2012-01-22 00:15:25
 
@@ -16,7 +16,7 @@ quentin_wants_opar:
 
 quentin_wants_fountainhead:
   user: quentin
-  book: The Fountainhead
+  book: fountainhead
   reason: Heard this was a great story of independence
   donation: hugh_grants_quentin_wants_fountainhead
 
@@ -24,13 +24,13 @@ quentin_wants_fountainhead:
 
 dagny_wants_cui:
   user: dagny
-  book: "Capitalism: The Unknown Ideal"
+  book: cui
   reason: I need this to morally defend my business!
   donation: hugh_grants_dagny_wants_cui
 
 hank_wants_atlas:
   user: hank
-  book: Atlas Shrugged
+  book: atlas
   reason: I want to learn about this strike
   donation: cameron_grants_hank_wants_atlas
   referral: sfl_email
@@ -39,7 +39,7 @@ hank_wants_atlas:
 
 quentin_wants_vos:
   user: quentin
-  book: The Virtue of Selfishness
+  book: vos
   reason: Someone told me I need to read this before I figure out the secret of the motor.
   donation: hugh_grants_quentin_wants_vos
 
@@ -47,7 +47,7 @@ quentin_wants_vos:
 
 hank_wants_fountainhead:
   user: hank
-  book: The Fountainhead
+  book: fountainhead
   reason: Want to read more by this author; heard this was one of her best books
   donation: cameron_grants_hank_wants_fountainhead
 
@@ -55,7 +55,7 @@ hank_wants_fountainhead:
 
 quentin_wants_atlas:
   user: quentin
-  book: "Atlas Shrugged"
+  book: atlas
   reason: I was told this is the book to start with
   donation: cameron_grants_quentin_wants_atlas
 
@@ -63,12 +63,12 @@ quentin_wants_atlas:
 
 howard_wants_fountainhead:
   user: howard
-  book: The Fountainhead
+  book: fountainhead
   reason: Feels like this would resonate with me
   canceled: true
 
 dagny_wants_atlas:
   user: dagny
-  book: Atlas Shrugged
+  book: atlas
   reason: Really curious about the heroine
   canceled: true

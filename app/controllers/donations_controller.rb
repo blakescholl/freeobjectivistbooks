@@ -46,7 +46,7 @@ class DonationsController < ApplicationController
     if save @request, @event
       respond_to do |format|
         format.html { redirect_to @request }
-        format.json { render json: @request, include: :user }
+        format.json { render json: @request, include: [:user, :book] }
       end
     else
       message = @request.donation.errors.full_messages.join ", "

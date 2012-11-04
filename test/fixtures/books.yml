@@ -1,0 +1,42 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+atlas:
+  title: Atlas Shrugged
+  author:
+  featured: true
+  rank: 0
+
+fountainhead:
+  title: The Fountainhead
+  author:
+  featured: true
+  rank: 1
+
+wtl:
+  title: We the Living
+  author:
+  featured: true
+  rank: 2
+
+vos:
+  title: The Virtue of Selfishness
+  author:
+  featured: true
+  rank: 3
+
+cui:
+  title: "Capitalism: The Unknown Ideal"
+  author:
+  featured: true
+  rank: 4
+
+opar:
+  title: "Objectivism: The Philosophy of Ayn Rand"
+  author: Leonard Peikoff
+  featured: true
+  rank: 5
+
+anthem:
+  title: Anthem
+  author:
+  featured: false

@@ -1,19 +1,5 @@
 # Represents a student's request for a given book.
 class Request < ActiveRecord::Base
-  BOOKS = [
-    "Atlas Shrugged",
-    "The Fountainhead",
-    "We the Living",
-    "The Virtue of Selfishness",
-    "Capitalism: The Unknown Ideal",
-    "Objectivism: The Philosophy of Ayn Rand",
-  ]
-
-  BOOK_NOTES = {
-    "Atlas Shrugged" => "(start here if you don't know what to choose!)",
-    "Objectivism: The Philosophy of Ayn Rand" => "(by Leonard Peikoff)",
-  }
-
   attr_accessor :other_book
 
   #--
@@ -21,6 +7,7 @@ class Request < ActiveRecord::Base
   #++
 
   belongs_to :user, autosave: true
+  belongs_to :book
   belongs_to :donation
   has_many :donations, dependent: :destroy
   has_many :events, dependent: :destroy
@@ -57,17 +44,14 @@ class Request < ActiveRecord::Base
   # Callbacks
   #++
 
-  after_initialize :populate
-
-  def populate
-    unless id
-      self.book = "Atlas Shrugged" if book.blank?
-      self.open_at = Time.now
+  before_validation do |request|
+    if request.book.nil? && request.other_book.present?
+      request.book = Book.find_or_create_by_title request.other_book
     end
   end
 
-  before_validation do |request|
-    request.book = request.other_book if request.book == "other"
+  before_create do |request|
+    request.open_at = Time.now
   end
 
   #--

@@ -44,7 +44,7 @@ class RequestsController < ApplicationController
   end
 
   def new
-    @request = @current_user.requests.build
+    @request = @current_user.new_request
   end
 
   def create

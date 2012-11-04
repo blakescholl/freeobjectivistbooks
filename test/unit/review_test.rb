@@ -25,7 +25,7 @@ class ReviewTest < ActiveSupport::TestCase
   end
 
   test "validates book" do
-    @quentin_review.book = ""
+    @quentin_review.book_id = nil
     assert @quentin_review.invalid?
     assert @quentin_review.errors[:book].any?
   end

@@ -4,6 +4,7 @@ class Review < ActiveRecord::Base
   # Associations
   #++
 
+  belongs_to :book
   belongs_to :user
   belongs_to :donation
   has_one :testimonial, as: :source

@@ -31,7 +31,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'h1', /Get a free Objectivist book/
-    assert_select '#request_book_atlas_shrugged[checked="checked"]'
+    assert_select "#request_book_id_#{@atlas.id}[checked=\"checked\"]"
     assert_select 'p', /No address given/
     assert_select 'a', /Add/
     assert_select 'a', /Cancel/
@@ -42,7 +42,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'h1', /Get a free Objectivist book/
-    assert_select '#request_book_atlas_shrugged[checked="checked"]'
+    assert_select "#request_book_id_#{@atlas.id}[checked=\"checked\"]"
     assert_select 'p', /987 Steel Way/
     assert_select 'a', /Edit/
     assert_select 'a', /Cancel/
@@ -53,7 +53,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'h1', /Get your next Objectivist book/
-    assert_select '#request_book_atlas_shrugged[checked="checked"]'
+    assert_select "#request_book_id_#{@atlas.id}[checked=\"checked\"]"
     assert_select 'p', /No address given/
     assert_select 'a', /Add/
     assert_select 'a', /Skip/
@@ -72,7 +72,8 @@ class RequestsControllerTest < ActionController::TestCase
 
   def new_request(user, options = {})
     request = {
-      book: "Atlas Shrugged",
+      book_id: @atlas.id,
+      other_book: "",
       reason: "Heard it was great",
       user_name: user.name,
       address: user.address,
@@ -91,7 +92,7 @@ class RequestsControllerTest < ActionController::TestCase
     request = @dagny.requests.first
     assert_redirected_to request
 
-    assert_equal "Atlas Shrugged", request.book
+    assert_equal @atlas, request.book
     assert_equal "Heard it was great", request.reason
     assert request.open?, "request is not open"
     assert_open_at_is_recent request
@@ -106,9 +107,25 @@ class RequestsControllerTest < ActionController::TestCase
     request = @dagny.requests.first
     assert_redirected_to request
 
-    assert_equal "Atlas Shrugged", request.book
+    assert_equal @atlas, request.book
     assert_equal "Heard it was great", request.reason
     assert_equal "123 Taggart St", request.address
+    assert request.open?, "request is not open"
+    assert_open_at_is_recent request
+  end
+
+  test "create with other book" do
+    title = "The DIM Hypothesis"
+    assert_difference "@dagny.requests.count" do
+      post :create, new_request(@dagny, book_id: "", other_book: title), session_for(@dagny)
+    end
+
+    @dagny.reload
+    request = @dagny.requests.first
+    assert_redirected_to request
+
+    assert_equal title, request.book.title
+    assert_equal "Heard it was great", request.reason
     assert request.open?, "request is not open"
     assert_open_at_is_recent request
   end

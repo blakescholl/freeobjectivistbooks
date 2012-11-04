@@ -7,40 +7,41 @@ class RequestTest < ActiveSupport::TestCase
 
   # Creating
 
-  test "new" do
-    request = User.new.requests.build
-    assert_equal "Atlas Shrugged", request.book
-    assert_open_at_is_recent request
-  end
-
   test "build" do
-    request = @howard.requests.build book: "Atlas Shrugged", other_book: "", reason: reason, pledge: "1"
+    request = @howard.requests.build book: @atlas, other_book: "", reason: reason, pledge: "1"
     assert request.valid?, request.errors.inspect
-    assert_equal "Atlas Shrugged", request.book
-    assert_open_at_is_recent request
+    assert_equal @atlas, request.book
   end
 
   test "other book" do
-    request = @howard.requests.build book: "other", other_book: "Ulysses", reason: reason, pledge: "1"
+    request = @howard.requests.build book: nil, other_book: "Ulysses", reason: reason, pledge: "1"
     assert request.valid?, request.errors.inspect
-    assert_equal "Ulysses", request.book
-    assert_open_at_is_recent request
+    assert_equal "Ulysses", request.book.title
   end
 
   test "reason is required" do
-    request = @howard.requests.build book: "Atlas Shrugged", other_book: "", reason: "", pledge: "1"
+    request = @howard.requests.build book: @atlas, other_book: "", reason: "", pledge: "1"
     assert request.invalid?
   end
 
   test "pledge is required" do
-    request = @howard.requests.build book: "Atlas Shrugged", other_book: "", reason: reason
+    request = @howard.requests.build book: @atlas, other_book: "", reason: reason
     assert request.invalid?
+  end
+
+  test "create" do
+    request = @howard.requests.create! book: @atlas, other_book: "", reason: reason, pledge: "1"
+    assert_open_at_is_recent request
   end
 
   # Associations
 
   test "user" do
     assert_equal @howard, @howard_request.user
+  end
+
+  test "book" do
+    assert_equal @atlas, @howard_request.book
   end
 
   test "donor" do

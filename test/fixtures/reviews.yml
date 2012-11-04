@@ -2,13 +2,13 @@
 
 quentin_reviews_atlas:
   user: quentin
-  book: Atlas Shrugged
+  book: atlas
   text: It was great! Especially the physics.
   recommend: true
   donation: cameron_grants_quentin_wants_atlas
 
 stadler_reviews_atlas:
   user: stadler
-  book: Atlas Shrugged
+  book: atlas
   text: I found it unrealistic and ill-suited to the problems of our modern age
   recommend: false

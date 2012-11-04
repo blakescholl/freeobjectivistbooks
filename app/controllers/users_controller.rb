@@ -13,7 +13,7 @@ class UsersController < ApplicationController
   end
 
   def read
-    @request ||= @user.requests.build
+    @request ||= @user.new_request
   end
 
   def donate

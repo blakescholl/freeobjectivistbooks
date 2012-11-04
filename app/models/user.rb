@@ -132,6 +132,10 @@ class User < ActiveRecord::Base
     requests.not_granted.empty?
   end
 
+  def new_request
+    requests.build book: Book.default_book
+  end
+
   #--
   # Actions
   #++

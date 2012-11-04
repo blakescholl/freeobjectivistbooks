@@ -39,22 +39,9 @@
 
 <div class="grid_12">
 <%= form_for @user do |f| %>
-    <h2>What book do you want to read?</h2>
 
     <%= fields_for @request do |r| %>
-    <p class="field_with_errors"><%= @request.errors[:book].join(", ") %></p>
-    <% Request::BOOKS.each do |book| %>
-    <div><label><%= r.radio_button :book, book %> <%= book %> <%= Request::BOOK_NOTES[book] %></label></div>
-    <% end %>
-    <div>
-        <label><%= r.radio_button :book, "other" %> Other: </label>
-        <%= r.text_field :other_book, onfocus: "$('#request_book_other').attr('checked', true)" %>
-    </div>
-
-    <h2>Why do you want to read it?</h2>
-
-    <p class="field_with_errors"><%= @request.errors[:reason].join(", ") %></p>
-    <%= r.text_area :reason, rows: 6, cols: 60 %>
+    <%= render partial: 'requests/book_selection', locals: {request: @request, form: r} %>
     <% end %>
 
     <h2>Public profile</h2>

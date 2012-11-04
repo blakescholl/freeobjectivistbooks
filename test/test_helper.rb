@@ -20,6 +20,12 @@ class ActiveSupport::TestCase
   end
 
   def setup
+    @atlas = books :atlas
+    @fountainhead = books :fountainhead
+    @vos = books :vos
+    @cui = books :cui
+    @opar = books :opar
+
     @howard = users :howard
     @quentin = users :quentin
     @dagny = users :dagny

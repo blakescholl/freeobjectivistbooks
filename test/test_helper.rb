@@ -110,7 +110,7 @@ class ActiveSupport::TestCase
   def assert_open_at_is_recent(request)
     assert_not_nil request.open_at
     time_since_open_at = Time.since(request.open_at)
-    assert time_since_open_at < 1, "time since open_at: #{time_since_open_at}"
+    assert time_since_open_at < 2, "time since open_at: #{time_since_open_at}"
   end
 end
 

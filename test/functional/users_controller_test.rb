@@ -39,7 +39,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "read when logged in" do
-    get :read, params, session_for(users :howard)
+    get :read, params, session_for(@howard)
     assert_response :success
     assert_select '.sidebar h2', "Already signed in"
     assert_select '.sidebar p', /already signed in as Howard Roark/
@@ -55,7 +55,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "donate when logged in" do
-    get :donate, params, session_for(users :howard)
+    get :donate, params, session_for(@howard)
     assert_response :success
     assert_select '.sidebar h2', "Already signed in"
     assert_select '.sidebar p', /already signed in as Howard Roark/

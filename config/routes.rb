@@ -1,4 +1,6 @@
 FreeBooks::Application.routes.draw do
+  ActiveAdmin.routes(self)
+
   # User-facing
 
   root to: "home#index"

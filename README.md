@@ -12,12 +12,11 @@ This README is a guide for developers who want to help out.
 
 1. Read this README
 2. Fork the repo
-3. Browse [issues](https://github.com/jasoncrawford/freeobjectivistbooks/issues) and [milestones](https://github.com/jasoncrawford/freeobjectivistbooks/issues/milestones); find an issue to tackle, or add one of your own
-4. Assign the issue to yourself
+3. Get your development environment set up (see below)
+4. Browse [milestones](https://github.com/jasoncrawford/freeobjectivistbooks/issues/milestones) and [issues](https://github.com/jasoncrawford/freeobjectivistbooks/issues); find an issue to tackle, or choose a goal of your own
 5. Code it up, including tests
-6. Send me a pull request
-7. I'll review it, pull it, and deploy
-8. Go to step 3
+6. Send me a pull request—I'll review it, pull it, and deploy
+7. Go to step 4
 
 ## Developer setup
 

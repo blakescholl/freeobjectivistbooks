@@ -52,5 +52,9 @@ module FreeBooks
     config.assets.initialize_on_precompile = false
 
     config.email_recipient_override = nil
+
+    config.after_initialize do |app|
+      I18n.reload!
+    end
   end
 end

@@ -47,6 +47,14 @@ module FreeBooks
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    # Disabled to try to fix a bug with ActiveAdmin as per
+    # https://devcenter.heroku.com/articles/rails3x-asset-pipeline-cedar#troubleshooting
+    config.assets.initialize_on_precompile = false
+
     config.email_recipient_override = nil
+
+    config.after_initialize do |app|
+      I18n.reload!
+    end
   end
 end

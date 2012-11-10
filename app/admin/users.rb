@@ -9,31 +9,22 @@ ActiveAdmin.register User do
 
   index do
     selectable_column
-    column :id
     column :name
     column :email
-    column :studying
-    column :school
     column :location
-    column :donor_mode do |user|
-      user.donor_mode.humanize
-    end
-    column :blocked
     default_actions
   end
 
   show do |user|
     attributes_table do
-      row :id
       row :name
       row :email
       row :studying
       row :school
       row :location
       row :address
-      row :donor_mode do
-        user.donor_mode.humanize
-      end
+      row(:donor_mode) {user.donor_mode.humanize}
+      row(:balance) {humanized_money_with_symbol user.balance}
       row :blocked
       row :created_at
       row :updated_at

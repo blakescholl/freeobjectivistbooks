@@ -4,7 +4,7 @@
 <% Book.featured.each do |book| %>
 <div><label>
     <%= form.radio_button :book_id, book.id %> <%= book %>
-    <% if book.author %>(by <%= book.author %>)<% end %>
+    <% if book.author.present? %>(by <%= book.author %>)<% end %>
     <% if book.rank <= 0 %>(start here if you don't know what to choose!)<% end %>
 </label></div>
 <% end %>

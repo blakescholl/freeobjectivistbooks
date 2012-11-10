@@ -112,6 +112,10 @@ class User < ActiveRecord::Base
   # Derived attributes
   #++
 
+  def donor_mode
+    ActiveSupport::StringInquirer.new(self[:donor_mode])
+  end
+
   def is_duplicate?
     query = User.with_email(email)
     query = query.where('id != ?', id) if id

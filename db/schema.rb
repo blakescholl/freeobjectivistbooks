@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121110031554) do
+ActiveRecord::Schema.define(:version => 20121110054240) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -209,7 +209,8 @@ ActiveRecord::Schema.define(:version => 20121110031554) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "referral_id"
-    t.boolean  "blocked",         :default => false, :null => false
+    t.boolean  "blocked",         :default => false,        :null => false
+    t.string   "donor_mode",      :default => "send_books", :null => false
   end
 
   add_index "users", ["referral_id"], :name => "index_users_on_referral_id"

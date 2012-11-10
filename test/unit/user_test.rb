@@ -225,6 +225,11 @@ class UserTest < ActiveSupport::TestCase
     assert !@howard.can_request?
   end
 
+  test "donor mode" do
+    assert @hugh.donor_mode.send_books?, "donor mode is not send_books"
+    assert !@hugh.donor_mode.send_money?, "donor mode is send_money"
+  end
+
   # Auth token
 
   test "auth token" do

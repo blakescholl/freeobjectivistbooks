@@ -42,12 +42,14 @@ hugh:
   email: akston@patrickhenry.edu
   password_digest: <%= BCrypt::Password.create "akston" %>
   location: "Boston, MA"
+  donor_mode: send_books
 
 cameron:
   name: Henry Cameron
   email: henry@cameron.com
   password_digest: <%= BCrypt::Password.create "cameron" %>
   location: "New York, NY"
+  donor_mode: send_money
 
 stadler:
   name: Robert Stadler
@@ -55,3 +57,4 @@ stadler:
   password_digest: <%= BCrypt::Password.create "stadler" %>
   location: "Ithaca, NY"
   referral: sfl_fb
+  donor_mode: send_books

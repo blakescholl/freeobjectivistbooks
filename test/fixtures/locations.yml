@@ -1,8 +1,9 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
+---
 san_francisco:
   name: "San Francisco, CA"
-  geocoder_results: ---
+  geocoder_results:
   - address_components:
     - long_name: San Francisco
       short_name: SF

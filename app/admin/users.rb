@@ -4,6 +4,7 @@ ActiveAdmin.register User do
   filter :studying
   filter :school
   filter :location
+  filter :donor_mode
   filter :blocked, as: :check_boxes
 
   index do
@@ -14,6 +15,9 @@ ActiveAdmin.register User do
     column :studying
     column :school
     column :location
+    column :donor_mode do |user|
+      user.donor_mode.humanize
+    end
     column :blocked
     default_actions
   end
@@ -27,6 +31,9 @@ ActiveAdmin.register User do
       row :school
       row :location
       row :address
+      row :donor_mode do
+        user.donor_mode.humanize
+      end
       row :blocked
       row :created_at
       row :updated_at
@@ -42,6 +49,7 @@ ActiveAdmin.register User do
       f.input :school
       f.input :location
       f.input :address
+      f.input :donor_mode, as: :radio, collection: User::DONOR_MODES
       f.input :blocked
     end
     f.buttons

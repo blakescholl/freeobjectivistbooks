@@ -1,5 +1,7 @@
 # Represents a book that students can request.
 class Book < ActiveRecord::Base
+  monetize :price_cents, allow_nil: true
+
   scope :featured, where(featured: true).order(:rank)
 
   # The default book for new requests.

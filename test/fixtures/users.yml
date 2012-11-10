@@ -50,6 +50,7 @@ cameron:
   password_digest: <%= BCrypt::Password.create "cameron" %>
   location: "New York, NY"
   donor_mode: send_money
+  balance_cents: 5000
 
 stadler:
   name: Robert Stadler

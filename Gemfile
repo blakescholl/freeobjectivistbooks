@@ -9,6 +9,7 @@ gem 'dynamic_form'
 gem 'exception_notification'
 gem 'jquery-rails'
 gem 'meta_search', '>= 1.1.0.pre' # required by activeadmin
+gem 'money-rails'
 gem 'redcarpet'
 gem 'rest-client'
 gem 'valid_email'

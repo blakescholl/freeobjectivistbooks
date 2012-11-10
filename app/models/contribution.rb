@@ -17,4 +17,8 @@ class Contribution < ActiveRecord::Base
     user.balance -= amount
     user.save!
   end
+
+  def title
+    "#{user.name}, #{amount.format}"
+  end
 end

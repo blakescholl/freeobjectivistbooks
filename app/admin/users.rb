@@ -29,6 +29,17 @@ ActiveAdmin.register User do
       row :created_at
       row :updated_at
     end
+    panel "Contributions" do
+      table_for user.contributions do
+        column :created_at do |contribution|
+          link_to I18n.l(contribution.created_at), admin2_contribution_path(contribution)
+        end
+        column(:amount) {|contribution| contribution.amount.format}
+      end
+      div do
+        link_to "Add contribution", new_admin2_user_contribution_path(user), class: "button"
+      end
+    end
     active_admin_comments
   end
 

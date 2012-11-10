@@ -4,10 +4,13 @@ class UnauthorizedException < StandardError; end
 # Thrown when a session wiwth a current user tries something that is not allowed for that user.
 class ForbiddenException < StandardError; end
 
+# Thrown when a blocked user tries to access any page or action.
+class BlockedUserException < StandardError; end
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  before_filter :find_current_user, :store_referral, :parse_params, :load_models, :check_user
+  before_filter :find_current_user, :reject_blocked_users, :store_referral, :parse_params, :load_models, :check_user
 
   def initialize
     super
@@ -40,6 +43,10 @@ class ApplicationController < ActionController::Base
     reset_session
     session[:user_id] = user && user.id
     @current_user = user
+  end
+
+  def reject_blocked_users
+    raise BlockedUserException if @current_user && @current_user.blocked?
   end
 
   # Creates a Referral object to track this referral/landing; stores it in the session so it can be
@@ -152,6 +159,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from UnauthorizedException, with: :render_unauthorized
   rescue_from ForbiddenException, with: :render_forbidden
+  rescue_from BlockedUserException, with: :render_blocked_user
 
   # Renders an HTTP 401 Unauthorized response for HTML or JSON.
   def render_unauthorized
@@ -176,6 +184,19 @@ class ApplicationController < ActionController::Base
       end
       format.json do
         render json: {message: 'Sorry, something went wrong. Try logging in again.'}, status: 403
+      end
+    end
+  end
+
+  # Renders a response for a blocked user.
+  def render_blocked_user
+    respond_to do |format|
+      format.html do
+        @destination = request.url
+        render template: "errors/blocked", status: 403
+      end
+      format.json do
+        render json: {message: 'Something is wrong with your account.'}, status: 403
       end
     end
   end

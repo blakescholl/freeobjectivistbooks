@@ -1,0 +1,20 @@
+<% content_for :title do %>Something is Wrong<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+img {
+    margin-top: 20px;
+}
+.quote {
+    font-style: italic;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+</style>
+<% end %>
+
+<img class="grid_4" src="http://ecx.images-amazon.com/images/I/5139Z9VGNGL.jpg">
+<div class="grid_12">
+    <h1>Something is wrong with your account.</h1>
+    <p>If you need help, <%= mail_to 'jason@rationalegoist.com', 'contact Jason' %>.</p>
+</div>

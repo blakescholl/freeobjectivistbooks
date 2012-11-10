@@ -144,4 +144,14 @@ class ProfileControllerTest < ActionController::TestCase
     assert_response :unauthorized
     assert_select 'h1', 'Log in'
   end
+
+  # Blocked user
+
+  test "blocked user" do
+    @stadler.update_attributes! blocked: true
+
+    get :show, params, session_for(@stadler)
+    assert_response :forbidden
+    assert_select 'h1', 'Something is wrong with your account.'
+  end
 end

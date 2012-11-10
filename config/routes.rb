@@ -68,7 +68,7 @@ FreeBooks::Application.routes.draw do
   # Test
   match "test/noop"
   match "test/exception"
-  get "test/buttons"
+  match "test/blocked"
 
   # Catchall to send unknown routes to 404
   match "*path" => "errors#not_found"

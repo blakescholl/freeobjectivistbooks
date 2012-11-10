@@ -9,4 +9,9 @@ class TestController < ApplicationController
   def exception
     raise "Barf!"
   end
+
+  # Simulates the experience of a blocked user.
+  def blocked
+    raise BlockedUserException
+  end
 end

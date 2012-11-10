@@ -1,4 +1,6 @@
 ActiveAdmin.register User do
+  actions :all, except: [:new, :destroy]
+
   filter :name
   filter :email
   filter :studying

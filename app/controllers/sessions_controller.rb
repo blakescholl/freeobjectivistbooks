@@ -1,5 +1,7 @@
 # Manages login and logout.
 class SessionsController < ApplicationController
+  skip_before_filter :reject_blocked_users
+
   def parse_params
     @destination = params[:destination]
   end

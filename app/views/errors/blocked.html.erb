@@ -16,5 +16,9 @@ img {
 <img class="grid_4" src="http://ecx.images-amazon.com/images/I/5139Z9VGNGL.jpg">
 <div class="grid_12">
     <h1>Something is wrong with your account.</h1>
-    <p>If you need help, <%= mail_to 'jason@rationalegoist.com', 'contact Jason' %>.</p>
+    <p>Your account is not available right now.</p>
+    <ul>
+        <li>If you are not <%= @current_user.name %>, <%= link_to 'log in to your account', login_path %>.</li>
+        <li>If you need help, <%= mail_to 'jason@rationalegoist.com', 'contact Jason' %>.</li>
+    </ul>
 </div>

@@ -4,7 +4,7 @@ ActiveAdmin.register User do
   filter :studying
   filter :school
   filter :location
-  filter :blocked
+  filter :blocked, as: :check_boxes
 
   index do
     selectable_column

@@ -31,8 +31,8 @@
 
     $.fn.fadeAndSlide = function (duration, direction) {
         if (!duration && duration !== 0) duration = 600;
-		direction = direction || 'toggle';
-		animation = {height: direction, opacity: direction, 'padding-top': direction, 'padding-bottom': direction};
+		var direction = direction || 'toggle';
+		var animation = {height: direction, opacity: direction, 'padding-top': direction, 'padding-bottom': direction};
         return this.animate(animation, {duration: duration});
     };
 })(jQuery);

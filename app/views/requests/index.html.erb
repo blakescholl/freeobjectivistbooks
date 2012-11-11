@@ -70,14 +70,14 @@ $(document).ready(function () {
     var donations = <%= raw @unsent_donations.to_json(methods: [:student, :book]) %>;
 
     function addDonationToList(donation, animated) {
-        item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
+        var item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
             ' in ' + donation.student.location + '</li>');
         $('#donations-list').append(item);
         if (animated) item.hide().fadeAndSlideIn();
     }
 
     function render(animated) {
-        duration = animated ? null : 0;
+        var duration = animated ? null : 0;
 
         if (donations.length == 0) {
             $('.no-donations').fadeAndSlideIn(duration);
@@ -95,7 +95,7 @@ $(document).ready(function () {
     }
 
     $('div.request').handleAjax(function (event, response, status, xhr) {
-        donation = response;
+        var donation = response;
 
         var first = donations.length === 0;
         donations.push(donation);

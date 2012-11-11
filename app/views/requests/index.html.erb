@@ -60,7 +60,16 @@
             </p>
             <p id="promise-header" class="any-donations"></p>
             <ul id="donations-list" class="any-donations"></ul>
+            <% if @current_user.donor_mode.send_money? %>
+                <p class="any-donations">The total of these donations is <span id="donation-total" class="money"></span>.</p>
+                <% if @balance > 0 %>
+                <p class="any-donations">Your contribution balance is
+                    <span id="contribution-balance" class="money"><%= humanized_money_with_symbol @balance %></span>.
+                </p>
+                <% end %>
+            <% else %>
             <p class="any-donations"><%= link_to 'See student addresses and send books', donations_path %></p>
+            <% end %>
         </div>
         <div class="bottom_5">&nbsp;</div>
     </div>
@@ -71,11 +80,24 @@
 $(document).ready(function () {
     var donations = <%= raw @unsent_donations.to_json(methods: [:student, :book]) %>;
 
+    function donationTotal() {
+        var sum = 0;
+        $.each(donations, function (i, donation) {
+            sum += donation.book.price_cents;
+        });
+        return sum/100;
+    }
+
     function addDonationToList(donation, animated) {
         var item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
             ' in ' + donation.student.location + '</li>');
         $('#donations-list').append(item);
         if (animated) item.hide().fadeAndSlideIn();
+    }
+
+    function updateTotals() {
+        $('#promise-header').text("You have promised " + donations.length + " book" + (donations.length === 1 ? "" : "s") + ":");
+        $('#donation-total').text('$' + donationTotal().toFixed(2));
     }
 
     function render(animated) {
@@ -87,11 +109,11 @@ $(document).ready(function () {
             return;
         }
 
-        $('#promise-header').text("You have promised " + donations.length + " book" + (donations.length === 1 ? "" : "s") + ":");
         $('#donations-list').empty();
         $.each(donations, function (i, donation) {
             addDonationToList(donation);
         });
+        updateTotals();
         $('.no-donations').fadeAndSlideOut(duration);
         $('.any-donations').fadeAndSlideIn(duration);
     }
@@ -108,6 +130,7 @@ $(document).ready(function () {
             render(true);
         } else {
             addDonationToList(donation, true);
+            updateTotals();
         }
     });
 

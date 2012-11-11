@@ -21,8 +21,18 @@
         });
     };
 
-    $.fn.fadeAndSlide = function (duration) {
-        duration = duration || 600
-        return this.animate({height: 'toggle', opacity: 'toggle', 'padding-top': 'toggle', 'padding-bottom': 'toggle'}, {duration: duration});
+    $.fn.fadeAndSlideIn = function (duration) {
+        return this.filter(':not(:visible)').fadeAndSlide(duration, 'show');
+    };
+
+    $.fn.fadeAndSlideOut = function (duration) {
+        return this.filter(':visible').fadeAndSlide(duration, 'hide');
+    };
+
+    $.fn.fadeAndSlide = function (duration, direction) {
+        if (!duration && duration !== 0) duration = 600;
+		direction = direction || 'toggle';
+		animation = {height: direction, opacity: direction, 'padding-top': direction, 'padding-bottom': direction};
+        return this.animate(animation, {duration: duration});
     };
 })(jQuery);

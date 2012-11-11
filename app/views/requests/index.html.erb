@@ -19,7 +19,7 @@
     padding: 3px 0;
 }
 
-.any-donations {
+.any-donations, .no-donations {
     display: none;
 }
 </style>
@@ -50,13 +50,13 @@
             <p>You have pledged to donate <%= @pledge.quantity %> books.</p>
             <% end %>
             <p class="no-donations">
-                <% if @donations.any? %>
-                You previously donated <%= pluralize @donations.count, 'book' %>.
+                <% if @donation_count > 0 %>
+                You have donated <%= pluralize @donation_count, 'book' %> so far.
                 <% else %>
                 You haven't donated any books yet.
                 <% end %>
             </p>
-            <p id="promise-header" class="any-donations">You just promised:</p>
+            <p id="promise-header" class="any-donations"></p>
             <ul id="donations-list" class="any-donations"></ul>
             <p class="any-donations"><%= link_to 'See student addresses and send books', donations_path %></p>
         </div>
@@ -67,19 +67,49 @@
 <% content_for :javascript do %>
 <script>
 $(document).ready(function () {
-    var donations = 0;
+    var donations = <%= raw @unsent_donations.to_json(methods: [:student, :book]) %>;
+
+    function addDonationToList(donation, animated) {
+        item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
+            ' in ' + donation.student.location + '</li>');
+        $('#donations-list').append(item);
+        if (animated) item.hide().fadeAndSlideIn();
+    }
+
+    function render(animated) {
+        duration = animated ? null : 0;
+
+        if (donations.length == 0) {
+            $('.no-donations').fadeAndSlideIn(duration);
+            $('.any-donations').fadeAndSlideOut(duration);
+            return;
+        }
+
+        $('#promise-header').text("You have promised " + donations.length + " book" + (donations.length === 1 ? "" : "s") + ":");
+        $('#donations-list').empty();
+        $.each(donations, function (i, donation) {
+            addDonationToList(donation);
+        });
+        $('.no-donations').fadeAndSlideOut(duration);
+        $('.any-donations').fadeAndSlideIn(duration);
+    }
 
     $('div.request').handleAjax(function (event, response, status, xhr) {
-        var donation = response;
-        donations += 1;
-        $(this).fadeAndSlide();
-        $('#promise-header').text("You just promised " + donations + " book" + (donations === 1 ? "" : "s") + ":");
-        $('#donations-list').append('<li><span class="title">' + donation.book.title + '</span> to ' +
-            donation.user.name + ' in ' + donation.user.location + '</li>');
-        $('#donations-list li').last().hide().fadeAndSlide();
-        $('.no-donations:visible').fadeAndSlide();
-        $('.any-donations:not(:visible)').fadeAndSlide();
+        donation = response;
+
+        var first = donations.length === 0;
+        donations.push(donation);
+
+        $(this).fadeAndSlideOut();
+
+        if (first) {
+            render(true);
+        } else {
+            addDonationToList(donation, true);
+        }
     });
+
+    render();
 });
 </script>
 <% end %>

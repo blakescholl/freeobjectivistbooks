@@ -39,6 +39,8 @@ class RequestsController < ApplicationController
 
   def index
     @requests = Request.not_granted.reorder('open_at desc')
+    @requests = @requests.with_prices if @current_user.donor_mode.send_money?
+
     donations = @current_user.donations.active
     @donation_count = donations.count
     @unsent_donations = donations.not_sent.reorder(:created_at)

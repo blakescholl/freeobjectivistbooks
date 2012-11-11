@@ -40,6 +40,8 @@ class Request < ActiveRecord::Base
   scope :granted, active.where('donation_id is not null')
   scope :not_granted, active.where(donation_id: nil)
 
+  scope :with_prices, joins(:book).where('books.price_cents is not null').where('books.price_cents > 0')
+
   #--
   # Callbacks
   #++

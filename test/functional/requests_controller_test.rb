@@ -6,8 +6,9 @@ class RequestsControllerTest < ActionController::TestCase
   test "index" do
     get :index, params, session_for(@hugh)
     assert_response :success
-    count = @hugh.donations.not_sent.count
+
     assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
+    assert_select '.request .headline', "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand"
 
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
@@ -16,6 +17,23 @@ class RequestsControllerTest < ActionController::TestCase
       assert_select 'ul'
     end
 
+    assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
+  end
+
+  test "index for send-money donor" do
+    get :index, params, session_for(@cameron)
+    assert_response :success
+
+    assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
+
+    assert_select '.sidebar' do
+      assert_select 'h2', "Your donations"
+      assert_select 'p', "You have pledged to donate 1 book."
+      assert_select 'p', "You previously donated 3 books."
+      assert_select 'ul'
+    end
+
+    assert_select '.request .headline', text: "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand", count: 0
     assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
   end
 

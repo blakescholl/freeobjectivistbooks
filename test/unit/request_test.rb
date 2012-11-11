@@ -86,6 +86,10 @@ class RequestTest < ActiveSupport::TestCase
     verify_scope(:not_granted) {|request| request.open?}
   end
 
+  test "with prices" do
+    verify_scope(:with_prices) {|request| request.book.price && request.book.price > 0}
+  end
+
   # Derived attributes
 
   test "active?" do

@@ -5,18 +5,21 @@ atlas:
   author:
   featured: true
   rank: 0
+  price_cents: 999
 
 fountainhead:
   title: The Fountainhead
   author:
   featured: true
   rank: 1
+  price_cents: 899
 
 wtl:
   title: We the Living
   author:
   featured: true
   rank: 2
+  price_cents: 799
 
 vos:
   title: The Virtue of Selfishness

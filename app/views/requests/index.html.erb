@@ -58,18 +58,20 @@
                 You haven't donated any books yet.
                 <% end %>
             </p>
-            <p id="promise-header" class="any-donations"></p>
-            <ul id="donations-list" class="any-donations"></ul>
-            <% if @current_user.donor_mode.send_money? %>
-                <p class="any-donations">The total of these donations is <span id="donation-total" class="money"></span>.</p>
-                <% if @balance > 0 %>
-                <p class="any-donations">Your contribution balance is
-                    <span id="contribution-balance" class="money"><%= humanized_money_with_symbol @balance %></span>.
-                </p>
+            <div class="any-donations">
+                <p>You have promised <span id="donation-count"></span>:</p>
+                <ul id="donations-list"></ul>
+                <% if @current_user.donor_mode.send_money? %>
+                    <p>The total of these donations is <span id="donation-total" class="money"></span>.</p>
+                    <% if @balance > 0 %>
+                    <p>Your contribution balance is
+                        <span id="contribution-balance" class="money"><%= humanized_money_with_symbol @balance %></span>.
+                    </p>
+                    <% end %>
+                <% else %>
+                <p><%= link_to 'See student addresses and send books', donations_path %></p>
                 <% end %>
-            <% else %>
-            <p class="any-donations"><%= link_to 'See student addresses and send books', donations_path %></p>
-            <% end %>
+            </div>
         </div>
         <div class="bottom_5">&nbsp;</div>
     </div>
@@ -96,7 +98,7 @@ $(document).ready(function () {
     }
 
     function updateTotals() {
-        $('#promise-header').text("You have promised " + donations.length + " book" + (donations.length === 1 ? "" : "s") + ":");
+        $('#donation-count').text(donations.length + " book" + (donations.length === 1 ? "" : "s"));
         $('#donation-total').text('$' + donationTotal().toFixed(2));
     }
 

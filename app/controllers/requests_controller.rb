@@ -41,7 +41,7 @@ class RequestsController < ApplicationController
     @requests = Request.not_granted.reorder('open_at desc')
     donations = @current_user.donations.active
     @donation_count = donations.count
-    @unsent_donations = donations.not_sent
+    @unsent_donations = donations.not_sent.reorder(:created_at)
     @pledge = @current_user.pledges.first
     @balance = @current_user.balance
   end

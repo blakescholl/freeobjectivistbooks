@@ -9,8 +9,8 @@
         <div class="grid_1 loading">&nbsp;</div>
         <div class="grid_3 omega">
             <%= f.submit "", class: "grid_3 alpha omega donate button" %>
-            <% if request.book.price %>
-            <p class="money book_price">About <%= request.book.price.format %></p>
+            <% if @current_user.donor_mode.send_money? && request.book.price %>
+            <p class="money book_price"><%= request.book.price.format %></p>
             <% end %>
         </div>
     <% end %>

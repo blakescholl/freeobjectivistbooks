@@ -65,7 +65,7 @@ class DonationsControllerTest < ActionController::TestCase
 
     hash = decode_json_response
     assert_equal "Objectivism: The Philosophy of Ayn Rand", hash['book']['title']
-    assert_equal "Quentin Daniels", hash['user']['name']
+    assert_equal "Quentin Daniels", hash['student']['name']
 
     request.reload
     assert request.granted?
@@ -83,7 +83,7 @@ class DonationsControllerTest < ActionController::TestCase
 
     hash = decode_json_response
     assert_equal "Atlas Shrugged", hash['book']['title']
-    assert_equal "Howard Roark", hash['user']['name']
+    assert_equal "Howard Roark", hash['student']['name']
 
     request.reload
     assert request.granted?

@@ -42,6 +42,18 @@ class Request < ActiveRecord::Base
 
   scope :with_prices, joins(:book).where('books.price_cents is not null').where('books.price_cents > 0')
 
+  def self.for_mode(donor_mode)
+    requests = not_granted.reorder('open_at desc')
+    if donor_mode.send_money?
+      requests = requests.with_prices
+      requests = requests.select do |request|
+        location = Location.find_by_name request.user.location
+        location && location.country == "United States"
+      end
+    end
+    requests
+  end
+
   #--
   # Callbacks
   #++

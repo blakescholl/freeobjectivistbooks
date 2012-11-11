@@ -15,7 +15,7 @@ class ReminderMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hi Hugh/
       assert_select 'p', /Thank you for\s+donating 3 books so far/
       assert_select 'p', /On Jan 15, you pledged to donate 5 books/
-      assert_select 'p', /Right now there are 2 students waiting/
+      assert_select 'p', /Right now there are #{Request.not_granted.count} students waiting/
       assert_select 'a', /Read their appeals/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end
@@ -35,7 +35,7 @@ class ReminderMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hi Robert/
       assert_select 'p', /Thank you for\s+signing up to donate books/
       assert_select 'p', /On Jan 17, you pledged to donate 3 books/
-      assert_select 'p', /Right now there are 2 students waiting/
+      assert_select 'p', /Right now there are #{Request.not_granted.count} students waiting/
       assert_select 'a', /Read their appeals/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end

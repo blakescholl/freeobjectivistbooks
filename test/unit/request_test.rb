@@ -90,6 +90,32 @@ class RequestTest < ActiveSupport::TestCase
     verify_scope(:with_prices) {|request| request.book.price && request.book.price > 0}
   end
 
+  # Pseudo-scopes
+
+  test "for send-books mode" do
+    requests = Request.for_mode(ActiveSupport::StringInquirer.new("send_books"))
+    assert requests.any?, "no requests for send-books mode"
+    requests.each do |request|
+      assert request.active?, "request #{request.id} is not active"
+      assert request.open?, "request #{request.id} is not open"
+    end
+  end
+
+  test "for send-money mode" do
+    requests = Request.for_mode(ActiveSupport::StringInquirer.new("send_money"))
+    assert requests.any?, "no requests for send-money mode"
+    requests.each do |request|
+      assert request.active?, "request #{request.id} is not active"
+      assert request.open?, "request #{request.id} is not open"
+      assert request.book.price, "request #{request.id} has no price for #{request.book}"
+      assert request.book.price > 0, "request #{request.id} has price of zero for #{request.book}"
+
+      location = Location.find_by_name request.user.location
+      assert_not_nil location
+      assert_equal "United States", location.country
+    end
+  end
+
   # Derived attributes
 
   test "active?" do

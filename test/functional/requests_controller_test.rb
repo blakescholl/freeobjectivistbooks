@@ -9,6 +9,7 @@ class RequestsControllerTest < ActionController::TestCase
 
     assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
     assert_select '.request .headline', "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand"
+    assert_select '.request .headline', "Francisco d'Anconia wants We the Living"
 
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
@@ -34,6 +35,7 @@ class RequestsControllerTest < ActionController::TestCase
     end
 
     assert_select '.request .headline', text: "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand", count: 0
+    assert_select '.request .headline', text: "Francisco d'Anconia wants We the Living", count: 0
     assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
   end
 

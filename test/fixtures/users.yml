@@ -35,6 +35,14 @@ hank:
   address: "987 Steel Way\nPhiladelphia, PA 12345"
   referral: sfl_email
 
+frisco:
+  name: Francisco d'Anconia
+  email: francisco@danconiacopper.com
+  password_digest: <%= BCrypt::Password.create "frisco" %>
+  location: "Madrid, Spain"
+  school: Patrick Henry University
+  studying: metallurgy
+
 # Donors
 
 hugh:

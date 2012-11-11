@@ -12,6 +12,12 @@ quentin_wants_opar:
   reason: The Virtue of Selfishness was great! I want to learn more about this philosophy.
   open_at: 2012-01-22 00:15:25
 
+frisco_wants_wtl:
+  user: frisco
+  book: wtl
+  reason: It's the only one I haven't read.
+  open_at: 2012-03-22 00:15:25
+
 # Granted, not sent
 
 quentin_wants_fountainhead:

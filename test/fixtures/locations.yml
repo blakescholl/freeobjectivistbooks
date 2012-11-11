@@ -25,7 +25,7 @@ san_francisco:
       types:
       - country
       - political
-    formatted_address: San Francisco, CA, USA
+    formatted_address: "San Francisco, CA, USA"
     geometry:
       bounds:
         northeast:
@@ -45,6 +45,145 @@ san_francisco:
         southwest:
           lat: 37.70339999999999
           lng: -122.527
+    types:
+    - locality
+    - political
+
+new_york:
+  name: "New York, NY"
+  geocoder_results:
+  - address_components:
+    - long_name: New York
+      short_name: New York
+      types:
+      - locality
+      - political
+    - long_name: New York
+      short_name: NY
+      types:
+      - administrative_area_level_1
+      - political
+    - long_name: United States
+      short_name: US
+      types:
+      - country
+      - political
+    formatted_address: "New York, NY, USA"
+    geometry:
+      bounds:
+        northeast:
+          lat: 40.9152414
+          lng: -73.70027209999999
+        southwest:
+          lat: 40.495908
+          lng: -74.2590879
+      location:
+        lat: 40.7143528
+        lng: -74.00597309999999
+      location_type: APPROXIMATE
+      viewport:
+        northeast:
+          lat: 40.9152414
+          lng: -73.70027209999999
+        southwest:
+          lat: 40.495908
+          lng: -74.2557349
+    types:
+    - locality
+    - political
+
+boston:
+  name: "Boston, MA"
+  geocoder_results:
+  - address_components:
+    - long_name: Boston
+      short_name: Boston
+      types:
+      - locality
+      - political
+    - long_name: Suffolk
+      short_name: Suffolk
+      types:
+      - administrative_area_level_2
+      - political
+    - long_name: Massachusetts
+      short_name: MA
+      types:
+      - administrative_area_level_1
+      - political
+    - long_name: United States
+      short_name: US
+      types:
+      - country
+      - political
+    formatted_address: "Boston, MA, USA"
+    geometry:
+      bounds:
+        northeast:
+          lat: 42.3988669
+          lng: -70.9232011
+        southwest:
+          lat: 42.22788
+          lng: -71.191113
+      location:
+        lat: 42.3584308
+        lng: -71.0597732
+      location_type: APPROXIMATE
+      viewport:
+        northeast:
+          lat: 42.3988669
+          lng: -70.9232011
+        southwest:
+          lat: 42.22788
+          lng: -71.191113
+    types:
+    - locality
+    - political
+
+madrid:
+  name: "Madrid, Spain"
+  geocoder_results:
+  - address_components:
+    - long_name: Madrid
+      short_name: Madrid
+      types:
+      - locality
+      - political
+    - long_name: Community of Madrid
+      short_name: M
+      types:
+      - administrative_area_level_2
+      - political
+    - long_name: Madrid
+      short_name: Madrid
+      types:
+      - administrative_area_level_1
+      - political
+    - long_name: Spain
+      short_name: ES
+      types:
+      - country
+      - political
+    formatted_address: "Madrid, Community of Madrid, Spain"
+    geometry:
+      bounds:
+        northeast:
+          lat: 40.6435181
+          lng: -3.5180103
+        southwest:
+          lat: 40.3120713
+          lng: -3.8890048
+      location:
+        lat: 40.4166909
+        lng: -3.700345399999999
+      location_type: APPROXIMATE
+      viewport:
+        northeast:
+          lat: 40.6435181
+          lng: -3.5180103
+        southwest:
+          lat: 40.3120713
+          lng: -3.8890048
     types:
     - locality
     - political

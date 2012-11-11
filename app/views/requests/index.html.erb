@@ -62,12 +62,7 @@
                 <p>You have promised <span id="donation-count"></span>:</p>
                 <ul id="donations-list"></ul>
                 <% if @current_user.donor_mode.send_money? %>
-                    <p>The total of these donations is <span id="donation-total" class="money"></span>.</p>
-                    <% if @balance > 0 %>
-                    <p>Your contribution balance is
-                        <span id="contribution-balance" class="money"><%= humanized_money_with_symbol @balance %></span>.
-                    </p>
-                    <% end %>
+                <p>The total of these donations is <span id="donation-total" class="money"></span>.</p>
                 <% else %>
                 <p><%= link_to 'See student addresses and send books', donations_path %></p>
                 <% end %>

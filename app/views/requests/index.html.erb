@@ -49,11 +49,11 @@
         <div class="content_5">
             <h2>Your donations</h2>
             <% if @pledge %>
-            <p>You have pledged to donate <%= @pledge.quantity %> books.</p>
+            <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
             <% end %>
             <p class="no-donations">
                 <% if @donation_count > 0 %>
-                You have donated <%= pluralize @donation_count, 'book' %> so far.
+                You previously donated <%= pluralize @donation_count, 'book' %>.
                 <% else %>
                 You haven't donated any books yet.
                 <% end %>
@@ -62,7 +62,7 @@
                 <p>You have promised <span id="donation-count"></span>:</p>
                 <ul id="donations-list"></ul>
                 <% if @current_user.donor_mode.send_money? %>
-                <p>The total of these donations is <span id="donation-total" class="money"></span>.</p>
+                <p>Total: <span id="donation-total" class="money"></span></p>
                 <% else %>
                 <p><%= link_to 'See student addresses and send books', donations_path %></p>
                 <% end %>

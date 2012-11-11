@@ -7,7 +7,12 @@
     </div>
     <%= form_for request.build_donation, url: request_donation_path(request), remote: true, html: {"data-type" => :json} do |f| %>
         <div class="grid_1 loading">&nbsp;</div>
-        <%= f.submit "", class: "grid_3 omega donate button" %>
+        <div class="grid_3 omega">
+            <%= f.submit "", class: "grid_3 alpha omega donate button" %>
+            <% if request.book.price %>
+            <p class="money book_price">About <%= request.book.price.format %></p>
+            <% end %>
+        </div>
     <% end %>
     <div class="clear"></div>
     <img class="grid_11 alpha omega hr" src="/assets/hr.png">

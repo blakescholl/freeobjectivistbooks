@@ -92,7 +92,8 @@ class User < ActiveRecord::Base
   end
 
   def self.donors_with_unsent_books
-    Donation.needs_sending.includes(:user).map {|donation| donation.user}.uniq
+    donations = Donation.unscoped.needs_sending.includes(:user).where(users: {donor_mode: 'send_books'})
+    donations.map {|donation| donation.user}.uniq
   end
 
   #--

@@ -26,6 +26,12 @@ quentin_wants_fountainhead:
   reason: Heard this was a great story of independence
   donation: hugh_grants_quentin_wants_fountainhead
 
+frisco_wants_opar:
+  user: frisco
+  book: opar
+  reason: Looking forward to getting deeper into this philosophy
+  donation: cameron_grants_frisco_wants_opar
+
 # Flagged
 
 dagny_wants_cui:

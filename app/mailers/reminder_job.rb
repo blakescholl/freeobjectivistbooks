@@ -53,7 +53,7 @@ class ReminderJob
   # Sends all reminders.
   def send_all_reminders
     logger.info "Sending all reminders..."
-    TYPES.inject([]) {|reminders,type| reminders += send_reminders type}
+    reminders = TYPES.inject([]) {|reminders,type| reminders += send_reminders type}
     logger.info "All reminders sent"
     reminders
   end

@@ -46,13 +46,16 @@ class ReminderJob
     else
       logger.info "No #{method} reminders to send"
     end
+
+    reminders
   end
 
   # Sends all reminders.
   def send_all_reminders
     logger.info "Sending all reminders..."
-    TYPES.each {|type| send_reminders type}
+    TYPES.inject([]) {|reminders,type| reminders += send_reminders type}
     logger.info "All reminders sent"
+    reminders
   end
 
   # Performs reminder sending (invoked by the Delayed::Job subsystem).

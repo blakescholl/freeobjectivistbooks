@@ -13,6 +13,7 @@ class User < ActiveRecord::Base
   attr_reader :password
 
   monetize :balance_cents
+  serialize :roles, JSON
 
   #--
   # Associations
@@ -100,6 +101,10 @@ class User < ActiveRecord::Base
   # Callbacks
   #++
 
+  after_initialize do |user|
+    user.roles ||= []
+  end
+
   before_validation do |user|
     [:name, :email, :location, :school, :studying].each do |attribute|
       value = user.send attribute
@@ -144,6 +149,22 @@ class User < ActiveRecord::Base
 
   def new_request
     requests.build book: Book.default_book
+  end
+
+  def is_volunteer?
+    is_volunteer
+  end
+
+  def is_volunteer
+    roles.include? "volunteer"
+  end
+
+  def is_volunteer=(is_volunteer)
+    if is_volunteer.to_bool
+      self.roles << "volunteer" unless self.is_volunteer?
+    else
+      self.roles -= ["volunteer"]
+    end
   end
 
   #--

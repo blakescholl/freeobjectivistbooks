@@ -27,6 +27,7 @@ ActiveAdmin.register User do
       row :address
       row(:donor_mode) {user.donor_mode.humanize}
       row(:balance) {humanized_money_with_symbol user.balance}
+      row :roles
       row :blocked
       row :created_at
       row :updated_at
@@ -54,6 +55,7 @@ ActiveAdmin.register User do
       f.input :location
       f.input :address
       f.input :donor_mode, as: :radio, collection: User::DONOR_MODES
+      f.input :is_volunteer, as: :boolean
       f.input :blocked
     end
     f.buttons

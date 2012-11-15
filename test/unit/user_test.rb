@@ -230,6 +230,20 @@ class UserTest < ActiveSupport::TestCase
     assert !@hugh.donor_mode.send_money?, "donor mode is send_money"
   end
 
+  test "is volunteer?" do
+    assert !@howard.is_volunteer?
+
+    @howard.is_volunteer = true
+    @howard.save!
+    @howard.reload
+    assert @howard.is_volunteer?
+
+    @howard.is_volunteer = false
+    @howard.save!
+    @howard.reload
+    assert !@howard.is_volunteer?
+  end
+
   # Auth token
 
   test "auth token" do

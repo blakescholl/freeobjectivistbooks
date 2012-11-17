@@ -1,6 +1,6 @@
 # Manages user signup of both students and donors.
 class UsersController < ApplicationController
-  before_filter :seen_signup, only: [:read, :donate]
+  before_filter :seen_signup, only: [:read, :donate, :volunteer]
 
   def seen_signup
     session[:seen_signup] = true
@@ -28,12 +28,11 @@ class UsersController < ApplicationController
 
     if save @user
       set_current_user @user
-      if @user.pledges.any?
-        redirect_to donate_url
-      elsif @user.requests.any?
-        redirect_to @user.requests.first
-      else
-        redirect_to profile_path
+      redirect_to case params[:from_action]
+      when "donate" then donate_url
+      when "read" then @user.requests.first
+      when "volunteer" then volunteer_thanks_url
+      else profile_url
       end
     else
       render params[:from_action], status: :unprocessable_entity

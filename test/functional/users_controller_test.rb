@@ -61,6 +61,14 @@ class UsersControllerTest < ActionController::TestCase
     assert_select '.sidebar p', /already signed in as Howard Roark/
   end
 
+  # Volunteer
+
+  test "volunteer" do
+    get :volunteer
+    assert_response :success
+    assert_select '.error', false
+  end
+
   # Create
 
   test "create student" do
@@ -176,6 +184,25 @@ class UsersControllerTest < ActionController::TestCase
     assert_select '.message.error .headline', /problems with your signup/
     assert_select '.field_with_errors', /already an account/
     assert_select 'form a', /log in/i
+  end
+
+  test "create volunteer" do
+    user = user_attributes
+
+    post :create, user: user, from_action: "volunteer"
+
+    user = User.find_by_name "John Galt"
+    assert_not_nil user
+    assert_equal "galt@gulch.com", user.email
+    assert_equal "Atlantis, CO", user.location
+    assert user.authenticate "dagny"
+
+    assert_equal user.id, session[:user_id]
+
+    assert_equal [], user.requests
+    assert_equal [], user.pledges
+
+    assert_redirected_to volunteer_thanks_url
   end
 
   # Referral tracking

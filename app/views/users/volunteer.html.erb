@@ -1,0 +1,90 @@
+<% content_for :title do %>Sign Up to Volunteer<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.overview {
+    padding-top: 12px;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.overview li {
+    margin: 0;
+}
+
+.sidebar {
+    margin-top: 24px;
+}
+
+.sidebar p {
+    font-size: 1.2em;
+}
+
+.submit {
+    height: 56px;
+    margin-top: 24px;
+    background-image: url(/assets/signup-button.png);
+}
+</style>
+<% end %>
+
+<% unless @user.errors.empty? %>
+<div class="grid_12 message error">
+    <p class="headline">There were problems with your signup</p>
+    <p class="detail">Please see below and make corrections.</p>
+</div>
+<% end %>
+
+<h1 class="grid_16">Sign up to send Objectivist books</h1>
+<ul class="grid_12 overview">
+    <li>We'll show you a list of books that donors have pledged to students.</li>
+    <li>You'll enter the information on Amazon.</li>
+    <li>You'll purchaset the books using a special account we'll give you access to.</li>
+</ul>
+<div class="clear"></div>
+
+<div class="grid_12">
+<%= form_for @user do |f| %>
+    <h2>Public profile</h2>
+
+    <%= f.label :name, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= f.text_field :name, class: "grid_5 alpha", placeholder: "Individual or couple" %>
+    <span class="grid_4 field_with_errors"><%= @user.errors[:name].join(", ") %></span>
+    <div class="clear"></div>
+
+    <%= f.label :location, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= f.text_field :location, class: "grid_5 alpha", placeholder: "City and state or country" %>
+    <span class="grid_4 field_with_errors"><%= @user.errors[:location].join(", ") %></span>
+    <div class="clear"></div>
+
+    <h2>Private account info</h2>
+
+    <%= f.label :email, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= f.text_field :email, class: "grid_5 alpha" %>
+    <% if @user.errors[:email].any? %>
+    <div class="grid_6 omega">
+        <p class="field_with_errors"><%= @user.errors[:email].join(", ") %></p>
+        <% if @user.is_duplicate? %>
+        <p><%= link_to 'Log in', login_path(email: @user.email) %> if you've already signed up.</p>
+        <% end %>
+    </div>
+    <% end %>
+    <div class="clear"></div>
+
+    <%= f.label :password, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= f.password_field :password, class: "grid_5 alpha", placeholder: "So you can log in later" %>
+    <span class="grid_4 field_with_errors"><%= @user.errors[:password].join(", ") %></span>
+    <div class="clear"></div>
+
+    <%= f.label :password_confirmation, "Confirm password", class: "grid_5 alpha" %><div class="clear"></div>
+    <%= f.password_field :password_confirmation, class: "grid_5 alpha" %>
+    <span class="grid_4 field_with_errors"><%= @user.errors[:password_confirmation].join(", ") %></span>
+    <div class="clear"></div>
+
+    <%= hidden_field_tag :from_action, "volunteer" %>
+    <%= f.submit "", class: "grid_4 alpha submit button" %><div class="clear"></div>
+<% end %>
+</div>
+
+<%= render "login_sidebar" %>
+<%= render "feedback_sidebar" %>

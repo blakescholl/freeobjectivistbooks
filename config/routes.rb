@@ -41,6 +41,8 @@ FreeBooks::Application.routes.draw do
   resources :users, only: [:create]
   get "signup/read" => "users#read"
   get "signup/donate" => "users#donate"
+  get "signup/volunteer" => "users#volunteer"
+  get "volunteer/thanks" => "users#volunteer_thanks"
 
   resource :password, only: [:edit, :update], path_names: {edit: "reset"} do
     member do

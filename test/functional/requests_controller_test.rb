@@ -202,8 +202,9 @@ class RequestsControllerTest < ActionController::TestCase
     verify_link 'back', present
   end
 
-  def verify_sent_button(present = true)
+  def verify_sent_button(present = true, options = {})
     assert_select '.sidebar form', present
+    verify_link 'Amazon', (present && options[:amazon_link].to_bool)
   end
 
   def verify_status(status)
@@ -227,10 +228,10 @@ class RequestsControllerTest < ActionController::TestCase
     verify_link 'cancel this donation', present
   end
 
-  def verify_donor_links(status)
+  def verify_donor_links(status, options = {})
     verify_back_link
     verify_flag_link (status == :not_sent)
-    verify_sent_button (status.in? [:not_sent, :flagged])
+    verify_sent_button (status.in? [:not_sent, :flagged]), options
     verify_cancel_donation_link (status.in? [:not_sent, :sent, :flagged])
 
     verify_thank_link false
@@ -402,7 +403,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'h1', "Hank Rearden wants Atlas Shrugged"
     assert_select '.address', /987 Steel Way/i
     assert_select '.flagged', /Shipping info flagged/i
-    verify_donor_links :flagged
+    verify_donor_links :flagged, amazon_link: true
   end
 
   test "show canceled" do

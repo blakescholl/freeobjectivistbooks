@@ -13,6 +13,9 @@
             <div class="grid_1 omega loading"></div>
             <div class="clear"></div>
         <% end %>
+        <% if donation.book.asin %>
+        <p><%= link_to donation.book.amazon_url do %><%= title donation.book %> on Amazon<% end %></p>
+        <% end %>
         <% else %>
         <p class="status"><%= status_headline donation.request %></p>
         <% end %>

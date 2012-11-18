@@ -90,6 +90,9 @@
                     "You flagged this request. Are you sending the book anyway? If you mark this book sent, it will be unflagged." : nil) %>
                 <div class="clear"></div>
             <% end %>
+            <% if @request.book.asin %>
+            <p><%= link_to @request.book.amazon_url do %><%= title @request.book %> on Amazon<% end %></p>
+            <% end %>
             <% end %>
             <% if @request.can_flag? %>
             <p><%= link_to 'Flag problem with shipping info', new_donation_flag_path(@request.donation) %></p>

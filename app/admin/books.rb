@@ -15,7 +15,7 @@ ActiveAdmin.register Book do
     default_actions
   end
 
-  show do |book|
+  show title: :title do |book|
     attributes_table do
       row :title
       row :author

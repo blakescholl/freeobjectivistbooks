@@ -10,4 +10,9 @@ class BookTest < ActiveSupport::TestCase
     sorted = featured.sort_by {|book| book.rank}
     assert_equal sorted, featured
   end
+
+  test "Amazon URL" do
+    assert_equal "http://www.amazon.com/dp/0451191145/", @atlas.amazon_url
+    assert_nil @fountainhead.amazon_url
+  end
 end

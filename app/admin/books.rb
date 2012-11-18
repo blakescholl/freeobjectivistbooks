@@ -21,6 +21,7 @@ ActiveAdmin.register Book do
       row :author
       row :featured
       row :rank
+      row(:asin) {link_to book.asin, book.amazon_url}
       row(:price) {book.price.format if book.price}
       row :created_at
       row :updated_at
@@ -34,6 +35,7 @@ ActiveAdmin.register Book do
       f.input :author
       f.input :featured
       f.input :rank
+      f.input :asin, label: "ASIN"
       f.input :price
     end
     f.buttons

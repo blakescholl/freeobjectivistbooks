@@ -9,6 +9,10 @@ class Book < ActiveRecord::Base
     find_or_create_by_title "Atlas Shrugged"
   end
 
+  def amazon_url
+    "http://www.amazon.com/dp/#{asin}/" if asin
+  end
+
   def to_s
     title
   end

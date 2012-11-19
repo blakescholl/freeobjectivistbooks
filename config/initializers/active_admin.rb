@@ -146,4 +146,14 @@ ActiveAdmin.setup do |config|
   #
   # Set the CSV builder separator (default is ",")
   # config.csv_column_separator = ','
+
+
+  # Workaround for a problem with ActiveAdmin caching classes even when config.cache_classes = false,
+  # as per https://github.com/gregbell/active_admin/issues/835
+  if !Rails.application.config.cache_classes
+    ActionDispatch::Callbacks.to_prepare do
+      ActiveAdmin.application.unload!
+      Rails.application.reload_routes!
+    end
+  end
 end

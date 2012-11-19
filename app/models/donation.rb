@@ -61,6 +61,8 @@ class Donation < ActiveRecord::Base
 
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
+  scope :needs_payment, active.not_sent.unpaid
+  scope :needs_fulfillment, active.needs_sending.paid
 
   #--
   # Callbacks

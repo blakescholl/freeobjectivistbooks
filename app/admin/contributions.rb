@@ -25,6 +25,6 @@ ActiveAdmin.register Contribution do
       f.input :user
       f.input :amount
     end
-    f.buttons
+    f.actions
   end
 end

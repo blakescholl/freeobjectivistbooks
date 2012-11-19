@@ -38,6 +38,6 @@ ActiveAdmin.register Book do
       f.input :asin, label: "ASIN"
       f.input :price
     end
-    f.buttons
+    f.actions
   end
 end

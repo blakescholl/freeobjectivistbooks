@@ -58,6 +58,6 @@ ActiveAdmin.register User do
       f.input :is_volunteer, as: :boolean
       f.input :blocked
     end
-    f.buttons
+    f.actions
   end
 end

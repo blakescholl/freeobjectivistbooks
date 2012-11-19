@@ -216,6 +216,14 @@ class DonationTest < ActiveSupport::TestCase
     assert !@quentin_donation_unsent.can_cancel?(@dagny)
   end
 
+  # Create
+
+  test "price recorded on create" do
+    @howard_request.grant! @cameron
+    @howard_request.reload
+    assert_equal @atlas.price, @howard_request.donation.price
+  end
+
   # Cancel
 
   test "cancel by donor" do

@@ -1,5 +1,7 @@
 # Represents a donor's granting of a student's request (or stated intention to do so).
 class Donation < ActiveRecord::Base
+  monetize :price_cents, allow_nil: true
+
   #--
   # Associations
   #++
@@ -47,6 +49,9 @@ class Donation < ActiveRecord::Base
   scope :flagged, active.where(flagged: true)
   scope :not_flagged, active.where(flagged: false)
 
+  scope :paid, active.where(paid: true)
+  scope :unpaid, active.where(paid: false)
+
   scope :not_sent, active.scoped_by_status("not_sent")
   scope :sent, active.scoped_by_status(%w{sent received read})
   scope :in_transit, active.scoped_by_status("sent")
@@ -66,6 +71,10 @@ class Donation < ActiveRecord::Base
       donation.status = "not_sent"
       donation.status_updated_at = donation.created_at
     end
+  end
+
+  before_create do |donation|
+    donation.price = donation.book.price
   end
 
   #--

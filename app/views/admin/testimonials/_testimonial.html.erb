@@ -12,7 +12,12 @@
             &ndash; From
                 <% case testimonial.source %>
                 <% when Review %>
-                review of <%= link_to (title testimonial.source.book), admin_request_path(testimonial.source.donation.request) %>
+                review of
+                    <% if testimonial.source.donation %>
+                    <%= link_to (title testimonial.source.book), admin_request_path(testimonial.source.donation.request) %>
+                    <% else %>
+                    <%= title testimonial.source.book %>
+                    <% end %>
                 <% when Pledge %>
                 <%= admin_user_link(testimonial.source.user) %>'s pledge
                 <% when Event %>

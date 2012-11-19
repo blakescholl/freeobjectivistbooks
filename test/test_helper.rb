@@ -155,3 +155,22 @@ class User
     auth_token (AUTH_TOKEN_EXPIRATION + 1.hour).ago
   end
 end
+
+class Request
+  def grant!(donor)
+    event = grant donor
+    save!
+    event.save!
+    reload
+    donation
+  end
+end
+
+class Donation
+  def cancel!(user)
+    params = {event: {message: "Sorry"}}
+    event = cancel params, user
+    save!
+    event.save! if event
+  end
+end

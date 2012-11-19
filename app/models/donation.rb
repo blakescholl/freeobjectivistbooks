@@ -215,6 +215,25 @@ class Donation < ActiveRecord::Base
   # Actions
   #++
 
+  def pay_if_covered
+    return unless user.donor_mode.send_money? && price.present?
+    return if paid?
+    if user.balance >= price
+      user.balance -= price
+      user.save!
+      self.paid = true
+      save!
+    end
+  end
+
+  def unpay
+    return if !paid?
+    user.balance += price
+    user.save!
+    self.paid = false
+    save!
+  end
+
   def update_status(params, time = Time.now)
     self.status = params[:status]
     self.status_updated_at = time

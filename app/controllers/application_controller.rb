@@ -76,7 +76,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Invokes render_unauthorized if there is no current logged-in user.
-  # Optional before_filter that subclasses can use. Has the effect
+  # Optional before_filter that subclasses can use.
   def require_login
     raise UnauthorizedException if !@current_user
   end

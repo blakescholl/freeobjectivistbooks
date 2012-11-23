@@ -43,7 +43,7 @@ class Request < ActiveRecord::Base
   scope :with_prices, joins(:book).where('books.price_cents is not null').where('books.price_cents > 0')
 
   def self.for_mode(donor_mode)
-    requests = not_granted.reorder('open_at desc')
+    requests = not_granted.includes(:user).includes(:book).reorder('open_at desc')
     if donor_mode.send_money?
       requests = requests.with_prices
       requests = requests.select do |request|

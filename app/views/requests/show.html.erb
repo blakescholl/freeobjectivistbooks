@@ -80,72 +80,7 @@
 <div class="grid_5 sidebar">
     <div class="top_5">&nbsp;</div>
     <div class="content_5">
-        <% if current_is_donor? %>
-            <% if @request.can_send? %>
-            <h2>Update status</h2>
-            <p>Let <%= @request.user.name %> know when you have sent <%= title @request.book %>:</p>
-            <%= form_for @request.donation, url: donation_status_path(@request.donation) do |f| %>
-                <%= f.hidden_field :status, value: "sent" %>
-                <%= f.submit "", class: "grid_3 alpha button sent", confirm: (@request.flagged? ?
-                    "You flagged this request. Are you sending the book anyway? If you mark this book sent, it will be unflagged." : nil) %>
-                <div class="clear"></div>
-            <% end %>
-            <% if @request.book.asin %>
-            <p><%= link_to @request.book.amazon_url do %><%= title @request.book %> on Amazon<% end %></p>
-            <% end %>
-            <% end %>
-            <% if @request.can_flag? %>
-            <p><%= link_to 'Flag problem with shipping info', new_donation_flag_path(@request.donation) %></p>
-            <% end %>
-        <% end %>
-
-        <% if current_is_student? %>
-            <% if @request.granted? %>
-                <% if !@request.read? %>
-                <h2>Update status</h2>
-                <p>Let <%= @request.donor.name %> know when you have <%= @request.received? ? "finished reading" : "received" %>
-                    <%= title @request.book %>:
-                </p>
-                <%= link_to edit_donation_status_path(@request.donation, status: (@request.received? ? "read" : "received")),
-                        class: "grid_3 alpha" do %>
-                    <div class="button update"></div>
-                <% end %>
-                <div class="clear"></div>
-                <% end %>
-
-                <% if @request.donation.student_can_cancel? %>
-                <p><%= link_to cancel_donation_path(@request.donation, reason: "not_received") do %>
-                    Report book <em>not</em> received
-                <% end %></p>
-                <% end %>
-            <% end %>
-
-            <% if @request.needs_thanks? %>
-            <p><%= link_to "Thank #{@request.donor.name}", new_donation_thank_url(@request.donation) %></p>
-            <% end %>
-
-            <% if @request.address.blank? %>
-            <p><%= link_to 'Add your address', edit_request_path(@request) %></p>
-            <% elsif !@request.sent? %>
-            <p><%= link_to 'Update shipping info', edit_request_path(@request) %></p>
-            <% end %>
-        <% end %>
-
-        <% if @request.donation %>
-            <p><%= link_to "Send a message to #{other_user.name}", new_donation_message_path(@request.donation) %></p>
-        <% end %>
-
-        <% if current_is_student? %>
-            <% if @request.can_cancel? %>
-            <p><%= link_to 'Cancel this request', cancel_request_path(@request) %></p>
-            <% end %>
-        <% end %>
-
-        <% if current_is_donor? %>
-            <% if @request.donation.donor_can_cancel? %>
-            <p><%= link_to 'Cancel this donation', cancel_donation_path(@request.donation) %></p>
-            <% end %>
-        <% end %>
+        <%= render @request.actions_for @current_user %>
     </div>
     <div class="bottom_5">&nbsp;</div>
 </div>

@@ -1,0 +1,52 @@
+<% if actions.prompted_status.present? %>
+    <h2>Update status</h2>
+    <% case actions.prompted_status %>
+    <% when :sent %>
+        <p>Let <%= actions.student %> know when you have sent <%= title actions.book %>:</p>
+        <%= form_for actions.donation, url: donation_status_path(actions.donation) do |f| %>
+            <%= f.hidden_field :status, value: "sent" %>
+            <%= f.submit "", class: "grid_3 alpha button sent", confirm: (actions.request.flagged? ?
+                "You flagged this request. Are you sending the book anyway? If you mark this book sent, it will be unflagged." : nil) %>
+            <div class="clear"></div>
+        <% end %>
+    <% when :received %>
+        <p>Let <%= actions.donor %> know when you have received <%= title actions.book %>:</p>
+        <%= link_to edit_donation_status_path(actions.donation, status: "received"), class: "grid_3 alpha" do %>
+            <div class="button update"></div>
+        <% end %>
+        <div class="clear"></div>
+    <% when :read %>
+        <p>Let <%= actions.donor %> know when you have finished reading <%= title actions.book %>:</p>
+        <%= link_to edit_donation_status_path(actions.donation, status: "read"), class: "grid_3 alpha" do %>
+            <div class="button update"></div>
+        <% end %>
+        <div class="clear"></div>
+    <% end %>
+<% end %>
+
+<% actions.other_actions.each do |action| %>
+    <p>
+    <% case action %>
+    <% when :amazon_link %>
+        <%= link_to actions.book.amazon_url do %><%= title actions.book %> on Amazon<% end %>
+    <% when :cancel_donation %>
+        <%= link_to 'Cancel this donation', cancel_donation_path(actions.donation) %>
+    <% when :cancel_donation_not_received %>
+        <%= link_to cancel_donation_path(actions.donation, reason: "not_received") do %>
+            Report book <em>not</em> received
+        <% end %>
+    <% when :cancel_request %>
+        <%= link_to 'Cancel this request', cancel_request_path(actions.request) %>
+    <% when :flag %>
+        <%= link_to 'Flag problem with shipping info', new_donation_flag_path(actions.donation) %>
+    <% when :message %>
+        <%= link_to "Send a message to #{other_user}", new_donation_message_path(actions.donation) %>
+    <% when :thank %>
+        <%= link_to "Thank #{actions.donor}", new_donation_thank_url(actions.donation) %>
+    <% when :update_address %>
+        <%= link_to edit_request_path(actions.request) do %>
+            <% if actions.request.address.blank? %>Add your address<% else %>Update shipping info<% end %>
+        <% end %>
+    <% end %>
+    </p>
+<% end %>

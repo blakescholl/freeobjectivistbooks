@@ -192,4 +192,8 @@ class User < ActiveRecord::Base
   def self.verifier
     @@verifier ||= ActiveSupport::MessageVerifier.new Rails.application.config.secret_token
   end
+
+  def to_s
+    name
+  end
 end

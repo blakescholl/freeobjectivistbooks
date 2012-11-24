@@ -81,13 +81,6 @@ class ApplicationController < ActionController::Base
     raise UnauthorizedException if !@current_user
   end
 
-  def require_user(*users)
-    require_login
-    users = users.flatten.compact
-    raise ForbiddenException if !@current_user.in?(users)
-  end
-  private :require_user
-
   # Uses HTTP digest authentication to validate admin credentials.
   def require_admin
     authenticate_or_request_with_http_digest("Admin") do |username|
@@ -106,8 +99,10 @@ class ApplicationController < ActionController::Base
   # Invokes render_forbidden if there are allowed_users and the current user is not one of them.
   # Automatically invoked as a before_filter on all requests.
   def check_user
-    users = Array(allowed_users)
-    require_user users unless users.empty?
+    users = Array(allowed_users).flatten.compact
+    return if users.empty?
+    require_login
+    raise ForbiddenException if !@current_user.in?(users)
   end
 
   #--

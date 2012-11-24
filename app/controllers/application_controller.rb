@@ -88,6 +88,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Invokes render_forbidden if the current_user is not a volunteer.
+  # Optional before_filter that subclasses can use.
+  def require_volunteer
+    require_login
+    raise ForbiddenException if !@current_user.is_volunteer?
+  end
+
   # Specifies who can access this page. Subclasses can override this to return a user or a list of
   # users, in order to restrict access to those users. The render_forbidden handler will be invoked
   # for all other users.

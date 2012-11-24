@@ -1,0 +1,36 @@
+<% content_for :title do %>Send Books<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.request, .actions {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.button {
+    height: 46px;
+    margin-bottom: 6px;
+    background-position-x: left;
+}
+
+.sent {
+    background-image: url(/assets/send-button.png);
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Send books</h1>
+<div class="grid_16 overview">
+    <% if @donations.any? %>
+    <p>These books have been chosen by donors who have sent in contributions.</p>
+    <p>Please send as many as you can using the Amazon login Jason gave you.</p>
+    <p><%= mail_to 'jason@rationalegoist.com', 'Contact Jason' %> if you need help.</p>
+    <% else %>
+    <p>No books need to be sent right now. Check back soon!</p>
+    <% end %>
+</div>
+
+<div class="grid_12">
+    <%= render partial: 'fulfillments/donation', collection: @donations %>
+</div>
+<div class="clear"></div>

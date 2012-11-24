@@ -30,10 +30,12 @@ class ActiveSupport::TestCase
     @quentin = users :quentin
     @dagny = users :dagny
     @hank = users :hank
-
+    @frisco = users :frisco
     @hugh = users :hugh
     @cameron = users :cameron
     @stadler = users :stadler
+    @kira = users :kira
+    @irina = users :irina
 
     @hugh_pledge = pledges :hugh_pledge
     @cameron_pledge = pledges :cameron_pledge
@@ -43,6 +45,7 @@ class ActiveSupport::TestCase
     @quentin_request = requests :quentin_wants_vos
     @dagny_request = requests :dagny_wants_cui
     @hank_request = requests :hank_wants_atlas
+    @frisco_request = requests :frisco_wants_opar
     @quentin_request_unsent = requests :quentin_wants_fountainhead
     @hank_request_received = requests :hank_wants_fountainhead
     @quentin_request_open = requests :quentin_wants_opar
@@ -53,6 +56,7 @@ class ActiveSupport::TestCase
     @quentin_donation = donations :hugh_grants_quentin_wants_vos
     @dagny_donation = donations :hugh_grants_dagny_wants_cui
     @hank_donation = donations :cameron_grants_hank_wants_atlas
+    @frisco_donation = donations :cameron_grants_frisco_wants_opar
     @quentin_donation_unsent = donations :hugh_grants_quentin_wants_fountainhead
     @hank_donation_received = donations :cameron_grants_hank_wants_fountainhead
     @quentin_donation_read = donations :cameron_grants_quentin_wants_atlas

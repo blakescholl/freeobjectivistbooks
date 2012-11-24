@@ -23,7 +23,11 @@ FreeBooks::Application.routes.draw do
     resource :flag, only: [:new, :create, :destroy] do
       get "fix", on: :member
     end
+    resource :fulfillment, only: [:create]
   end
+
+  resources :fulfillments, only: [:show]
+  get "volunteer" => "fulfillments#volunteer"
 
   resources :testimonials, only: [:index, :show] do
     collection do

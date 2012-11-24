@@ -1,0 +1,71 @@
+<% content_for :title do %><%= @fulfillment.book %> to <%= @fulfillment.student.name %><% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.content {
+    font-size: 1.4em;
+}
+
+.request {
+    color: #006000;
+}
+
+.name {
+    margin-bottom: 0;
+}
+
+.sidebar {
+    margin-top: 24px;
+}
+
+.button {
+    height: 46px;
+    margin: 6px 0;
+    background-position-x: left;
+}
+
+.sent {
+    background-image: url(/assets/sent-button.png);
+}
+</style>
+<% end %>
+
+<div class="grid_16">
+    <h1><%= title @fulfillment.book %> to <%= @fulfillment.student.name %></h1>
+    <p class="overview">On behalf of <%= @fulfillment.donor.name %> in <%= @fulfillment.donor.location%></p>
+</div>
+
+<div class="grid_11 overview">
+    <h2>1. Go to Amazon</h2>
+    <p><%= link_to @fulfillment.book.amazon_url, @fulfillment.book.amazon_url, target: "_blank" %></p>
+    <p>Put one copy in the shopping cart.</p>
+
+    <h2>2. Check out</h2>
+    <p>Log in with email: donations@freeobjectivistbooks.org</p>
+    <p>Ship to:</p>
+    <div class="request">
+        <p class="name"><%= @fulfillment.student.name %></p>
+        <p class="address"><%= format_address @fulfillment.address %></p>
+    </div>
+
+    <h2>3. Confirm</h3>
+    <p>Let us know when you have sent the book:</p>
+    <%= form_for @fulfillment.donation, url: donation_status_path(@fulfillment.donation) do |f| %>
+        <%= f.hidden_field :status, value: "sent" %>
+        <%= f.submit "", class: "grid_3 alpha button sent" %>
+        <div class="clear"></div>
+    <% end %>
+    <p>This will also notify the student and the donor.</p>
+</div>
+
+<div class="grid_5 sidebar">
+    <div class="top_5">&nbsp;</div>
+    <div class="content_5">
+        <p><%= link_to 'Flag problem with shipping info',
+            new_donation_flag_path(@fulfillment.donation, redirect: volunteer_url) %>
+        </p>
+    </div>
+    <div class="bottom_5">&nbsp;</div>
+</div>
+
+<div class="clear"></div>

@@ -42,6 +42,7 @@ frisco:
   location: "Madrid, Spain"
   school: Patrick Henry University
   studying: metallurgy
+  address: "8234 Copper Drive"
 
 # Donors
 
@@ -67,3 +68,19 @@ stadler:
   location: "Ithaca, NY"
   referral: sfl_fb
   donor_mode: send_books
+
+# Volunteers
+
+kira:
+  name: Kira Argounova
+  email: kira@argounova.ru
+  password_digest: <%= BCrypt::Password.create "kira" %>
+  location: "Leningrad, Russia"
+  roles: '["volunteer"]'
+
+irina:
+  name: Irina Dunaev
+  email: irina@dunaev.ru
+  password_digest: <%= BCrypt::Password.create "irina" %>
+  location: "Leningrad, Russia"
+  roles: '["volunteer"]'

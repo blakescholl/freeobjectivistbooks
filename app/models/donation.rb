@@ -1,5 +1,8 @@
 # Represents a donor's granting of a student's request (or stated intention to do so).
 class Donation < ActiveRecord::Base
+  # Thrown when we try to fulfill a donation that is already fulfilled.
+  class AlreadyFulfilled < StandardError; end
+
   monetize :price_cents, allow_nil: true
 
   #--
@@ -9,6 +12,7 @@ class Donation < ActiveRecord::Base
   belongs_to :request, autosave: true
   belongs_to :user
   has_many :events, dependent: :destroy
+  has_one :fulfillment
   has_one :review
   has_many :reminder_entities, as: :entity
   has_many :reminders, through: :reminder_entities
@@ -100,6 +104,11 @@ class Donation < ActiveRecord::Base
   # Student the donation is for.
   def student
     request.user
+  end
+
+  # User who fulfilled this donation, if not the donor.
+  def fulfiller
+    fulfillment.user if fulfillment
   end
 
   # Status of the donation: not_sent, sent, received, or read, as a StringInquirer.
@@ -234,6 +243,16 @@ class Donation < ActiveRecord::Base
     user.save!
     self.paid = false
     save!
+  end
+
+  def fulfill(user)
+    if !fulfillment
+      create_fulfillment user: user
+    elsif fulfillment.user == user
+      fulfillment
+    else
+      raise AlreadyFulfilled
+    end
   end
 
   def update_status(params, time = Time.now)

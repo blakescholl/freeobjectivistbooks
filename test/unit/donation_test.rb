@@ -86,6 +86,10 @@ class DonationTest < ActiveSupport::TestCase
     verify_scope(:needs_sending) {|donation| donation.active? && donation.needs_sending?}
   end
 
+  test "needs fulfillment" do
+    verify_scope(:needs_fulfillment) {|donation| donation.active? && donation.needs_sending? && donation.paid?}
+  end
+
   # Callbacks
 
   test "default status is not_sent" do

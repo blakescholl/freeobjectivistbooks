@@ -14,7 +14,7 @@ class RequestsController < ApplicationController
 
   def allowed_users
     case params[:action]
-    when "show" then [@request.user, @request.donor]
+    when "show" then [@request.user, @request.donor, @request.fulfiller]
     when "edit", "update", "cancel", "destroy" then @request.user
     end
   end

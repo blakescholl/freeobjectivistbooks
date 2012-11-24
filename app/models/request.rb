@@ -75,7 +75,7 @@ class Request < ActiveRecord::Base
   delegate :address, :address=, to: :user
   delegate :name, :name=, to: :user, prefix: true
   delegate :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
-    :flag_message, :needs_fix?, to: :donation, allow_nil: true
+    :flag_message, :needs_fix?, :fulfiller, to: :donation, allow_nil: true
 
   # Alias for the user who created the request.
   def student

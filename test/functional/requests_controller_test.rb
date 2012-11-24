@@ -228,12 +228,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_link 'cancel this donation', present
   end
 
-  def verify_donor_links(status, options = {})
-    verify_back_link
-    verify_flag_link (status == :not_sent)
-    verify_sent_button (status.in? [:not_sent, :flagged]), options
-    verify_cancel_donation_link (status.in? [:not_sent, :sent, :flagged])
-
+  def verify_no_student_links
     verify_thank_link false
     verify_add_address_link false
     verify_update_shipping_link false
@@ -246,6 +241,24 @@ class RequestsControllerTest < ActionController::TestCase
     verify_flag_link false
     verify_sent_button false
     verify_cancel_donation_link false
+  end
+
+  def verify_donor_links(status, options = {})
+    verify_back_link
+    verify_flag_link (status == :not_sent)
+    verify_sent_button (status.in? [:not_sent, :flagged]), options
+    verify_cancel_donation_link (status.in? [:not_sent, :sent, :flagged])
+
+    verify_no_student_links
+  end
+
+  def verify_fulfiller_links(status, options = {})
+    verify_back_link false
+    verify_flag_link (status == :not_sent)
+    verify_sent_button (status.in? [:not_sent, :flagged]), options
+    verify_cancel_donation_link false
+
+    verify_no_student_links
   end
 
   test "show no donor" do
@@ -288,6 +301,18 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'h1', "Hank Rearden wants The Fountainhead"
     verify_status 'book received'
     verify_donor_links :received
+  end
+
+  test "show to fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :show, {id: @frisco_request.id}, session_for(@kira)
+    assert_response :success
+    assert_select 'h1', "Francisco d'Anconia wants Objectivism: The Philosophy of Ayn Rand"
+    assert_select '.tagline', /Studying metallurgy at Patrick Henry University/
+    assert_select '.address', /8234 Copper Drive/
+    verify_status 'donor found'
+    verify_fulfiller_links :not_sent
   end
 
   test "show unsent" do

@@ -58,6 +58,23 @@ class DonationTest < ActiveSupport::TestCase
     verify_scope(:not_flagged) {|donation| donation.active? && !donation.flagged?}
   end
 
+  test "paid" do
+    verify_scope(:paid) {|donation| donation.paid?}
+  end
+
+  test "unpaid" do
+    verify_scope(:unpaid) {|donation| !donation.paid?}
+  end
+
+  test "fulfilled" do
+    @frisco_donation.fulfill @kira
+    verify_scope(:fulfilled) {|donation| donation.fulfilled?}
+  end
+
+  test "unfulfilled" do
+    verify_scope(:unfulfilled) {|donation| !donation.fulfilled?}
+  end
+
   test "not sent" do
     verify_scope(:not_sent) {|donation| donation.active? && !donation.sent?}
   end
@@ -87,7 +104,15 @@ class DonationTest < ActiveSupport::TestCase
   end
 
   test "needs fulfillment" do
-    verify_scope(:needs_fulfillment) {|donation| donation.active? && donation.needs_sending? && donation.paid?}
+    verify_scope(:needs_fulfillment) do |donation|
+      donation.active? && donation.needs_sending? && donation.paid? && !donation.fulfilled?
+    end
+  end
+
+  test "needs fulfillment scope excludes fulfilled donations" do
+    assert Donation.needs_fulfillment.include?(@frisco_donation)
+    @frisco_donation.fulfill @kira
+    assert !Donation.needs_fulfillment.include?(@frisco_donation)
   end
 
   # Callbacks

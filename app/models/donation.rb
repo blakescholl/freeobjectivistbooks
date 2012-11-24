@@ -56,6 +56,9 @@ class Donation < ActiveRecord::Base
   scope :paid, active.where(paid: true)
   scope :unpaid, active.where(paid: false)
 
+  scope :fulfilled, joins(:fulfillment)
+  scope :unfulfilled, joins('left join fulfillments on fulfillments.donation_id = donations.id').where('fulfillments.id is null')
+
   scope :not_sent, active.scoped_by_status("not_sent")
   scope :sent, active.scoped_by_status(%w{sent received read})
   scope :in_transit, active.scoped_by_status("sent")
@@ -66,7 +69,7 @@ class Donation < ActiveRecord::Base
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
   scope :needs_payment, active.not_sent.unpaid
-  scope :needs_fulfillment, active.needs_sending.paid
+  scope :needs_fulfillment, active.needs_sending.paid.unfulfilled
 
   #--
   # Callbacks
@@ -109,6 +112,10 @@ class Donation < ActiveRecord::Base
   # User who fulfilled this donation, if not the donor.
   def fulfiller
     fulfillment.user if fulfillment
+  end
+
+  def fulfilled?
+    fulfillment.present?
   end
 
   # Status of the donation: not_sent, sent, received, or read, as a StringInquirer.

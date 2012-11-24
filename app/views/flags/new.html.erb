@@ -35,6 +35,8 @@
         <%= f.text_area :message, rows: 6, cols: 60 %>
         <div class="clear"></div>
 
+        <%= hidden_field_tag :redirect, params[:redirect] %>
+
         <%= f.submit "", class: "grid_3 alpha submit button" %><div class="clear"></div>
     <% end %>
 </div>

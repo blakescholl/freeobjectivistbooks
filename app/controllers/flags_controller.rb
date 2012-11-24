@@ -2,7 +2,7 @@
 class FlagsController < ApplicationController
   def allowed_users
     case params[:action]
-    when "new", "create" then @donation.donor
+    when "new", "create" then [@donation.donor, @donation.fulfiller]
     when "fix", "destroy" then @donation.student
     end
   end
@@ -15,7 +15,7 @@ class FlagsController < ApplicationController
     @event = @donation.flag params[:event]
     if save @donation, @event
       flash[:notice] = "The request has been flagged, and your message has been sent to #{@donation.student.name}."
-      redirect_to @donation.request
+      redirect_to params[:redirect] || @donation.request
     else
       render :new
     end

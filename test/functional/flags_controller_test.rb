@@ -13,17 +13,33 @@ class FlagsControllerTest < ActionController::TestCase
     assert_select 'input[type="submit"]'
   end
 
+  test "new for fulfiller" do
+    @frisco_donation.fulfill @kira
+    get :new, {donation_id: @frisco_donation.id}, session_for(@kira)
+    assert_response :success
+  end
+
   test "new requires login" do
     get :new, donation_id: @quentin_donation.id
     verify_login_page
   end
 
-  test "new requires donor" do
+  test "new requires donor or fulfiller" do
     get :new, {donation_id: @quentin_donation.id}, session_for(@howard)
     verify_wrong_login_page
   end
 
   # Create
+
+  def verify_flagged(donation, message)
+    donation.reload
+    assert donation.flagged?
+
+    donation.request.reload
+    assert donation.request.flagged?
+
+    verify_event donation, "flag", message: message, notified?: true
+  end
 
   test "create" do
     assert_difference "@quentin_donation.events.count" do
@@ -33,13 +49,20 @@ class FlagsControllerTest < ActionController::TestCase
     assert_redirected_to @quentin_request
     assert_match /has been flagged/i, flash[:notice]
 
-    @quentin_donation.reload
-    assert @quentin_donation.flagged?
+    verify_flagged @quentin_donation, "Fix this"
+  end
 
-    @quentin_request.reload
-    assert @quentin_request.flagged?
+  test "create by fulfiller" do
+    @frisco_donation.fulfill @kira
+    assert_difference "@frisco_donation.events.count" do
+      params = {donation_id: @frisco_donation.id, event: {message: "Fix this"}, redirect: volunteer_url}
+      post :create, params, session_for(@kira)
+    end
 
-    verify_event @quentin_donation, "flag", message: "Fix this", notified?: true
+    assert_redirected_to volunteer_url
+    assert_match /has been flagged/i, flash[:notice]
+
+    verify_flagged @frisco_donation, "Fix this"
   end
 
   test "create requires message" do

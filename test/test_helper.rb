@@ -171,6 +171,13 @@ class Request
 end
 
 class Donation
+  def flag!
+    params = {message: "Fix this"}
+    event = flag params
+    save!
+    event.save! if event
+  end
+
   def cancel!(user)
     params = {event: {message: "Sorry"}}
     event = cancel params, user

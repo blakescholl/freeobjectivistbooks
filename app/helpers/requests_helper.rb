@@ -17,12 +17,21 @@ module RequestsHelper
     donation && donation.user
   end
 
+  def current_fulfiller
+    donation = current_donation
+    donation && donation.fulfiller
+  end
+
   def current_is_donor?
     @current_user == current_donor
   end
 
   def current_is_student?
     @current_user == current_student
+  end
+
+  def current_is_fulfiller?
+    @current_user == current_fulfiller
   end
 
   def other_user

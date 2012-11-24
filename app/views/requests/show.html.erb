@@ -55,7 +55,7 @@
     <p class="name"><%= @request.user.name %></p>
     <p class="address"><%= format_address @request.address %></p>
 
-    <% if current_is_donor? && @request.needs_fix? %>
+    <% if (current_is_donor? || current_is_fulfiller?) && @request.needs_fix? %>
     <p class="flagged">
         <% if @request.address.present? %>
         Shipping info flagged

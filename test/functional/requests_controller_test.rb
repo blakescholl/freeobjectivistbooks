@@ -431,6 +431,19 @@ class RequestsControllerTest < ActionController::TestCase
     verify_donor_links :flagged, amazon_link: true
   end
 
+  test "show to fulfiller with flagged address" do
+    @frisco_donation.fulfill @kira
+    @frisco_donation.flag!
+
+    get :show, {id: @frisco_request.id}, session_for(@kira)
+    assert_response :success
+    assert_select '.message.error', false
+    assert_select 'h1', "Francisco d'Anconia wants Objectivism: The Philosophy of Ayn Rand"
+    assert_select '.address', /8234 Copper Drive/
+    assert_select '.flagged', /Shipping info flagged/i
+    verify_fulfiller_links :flagged
+  end
+
   test "show canceled" do
     get :show, {id: @howard_request_canceled.id}, session_for(@howard)
     assert_response :success

@@ -4,6 +4,9 @@ class EventMailer < ApplicationMailer
   end
 
   def notification(subject, options = {})
+    template = options[:template_name] || "#{@event.type}_event"
+    role = @event.to_student? ? "student" : "donor"
+    options[:template_name] = "#{role}/#{template}"
     mail_to_user @event.to, options.merge(subject: subject)
   end
 

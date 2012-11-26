@@ -96,6 +96,10 @@ class Event < ActiveRecord::Base
     donation && donation.user
   end
 
+  def fulfiller
+    donation && donation.fulfiller
+  end
+
   def from
     user
   end

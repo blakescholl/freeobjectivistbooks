@@ -1,5 +1,9 @@
-<p><%= @event.donor.name %> has sent you <%= @event.book %>!</p>
+<% if @event.fulfiller %>
+<p><i><%= @event.book %></i> is on its way! <%= @event.donor %> donated this book and volunteer <%= @event.fulfiller %> has sent it.</p>
+<% else %>
+<p><%= @event.donor %> has sent you <i><%= @event.book %></i>!</p>
+<% end %>
 
-<p><strong><%= link_to "Let #{@event.donor.name} know when you have received this book",
+<p><strong><%= link_to "Let us know when you have received this book",
     edit_donation_status_url(@event.donation, status: "received") %></strong>
 </p>

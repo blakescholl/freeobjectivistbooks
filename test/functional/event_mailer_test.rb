@@ -119,14 +119,51 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "sent" do
     mail = EventMailer.mail_for_event events(:hugh_updates_quentin), :student
-    assert_equal "Hugh Akston has sent The Virtue of Selfishness", mail.subject
+    assert_equal "The Virtue of Selfishness is on its way", mail.subject
     assert_equal [@quentin.email], mail.to
 
     verify_mail_body mail do
       assert_select 'p', /Hi Quentin/
       assert_select 'p', /Hugh Akston has sent you The Virtue of Selfishness!/
-      assert_select 'a', /Let Hugh Akston know/
+      assert_select 'a', /Let us know/
       assert_select 'p', /Happy reading,/
+    end
+  end
+
+  test "sent by fulfiller, to student" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.update_status status: "sent"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :student
+    assert_equal "Objectivism: The Philosophy of Ayn Rand is on its way", mail.subject
+    assert_equal [@frisco.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Francisco/
+      assert_select 'p', /Objectivism: The Philosophy of Ayn Rand is on its way!/
+      assert_select 'p', /Henry Cameron donated/
+      assert_select 'p', /Kira Argounova has sent/
+      assert_select 'a', /Let us know/
+      assert_select 'p', /Happy reading,/
+    end
+  end
+
+  test "sent by fulfiller, cc to donor" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.update_status status: "sent"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :donor
+    assert_equal "Objectivism: The Philosophy of Ayn Rand is on its way to Francisco d'Anconia", mail.subject
+    assert_equal [@cameron.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Henry/
+      assert_select 'p', /Objectivism: The Philosophy of Ayn Rand, which you donated to Francisco d'Anconia,/
+      assert_select 'p', /Volunteer Kira Argounova has sent/
+      assert_select 'p', /confirmed that Francisco d'Anconia has received/
+      assert_select 'p', /Thanks,/
     end
   end
 

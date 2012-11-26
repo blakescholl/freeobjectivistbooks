@@ -1,4 +1,8 @@
-<%= @event.donor.name %> has sent you <%= @event.book %>!
+<% if @event.fulfiller %>
+<%= @event.book %> is on its way! <%= @event.donor %> donated this book and volunteer <%= @event.fulfiller %> has sent it.
+<% else %>
+<%= @event.donor %> has sent you <%= @event.book %>!
+<% end %>
 
-Let <%= @event.donor.name %> know when you have received this book:
+Let us know when you have received this book:
 <%= edit_donation_status_url(@event.donation, status: "received") %>

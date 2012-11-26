@@ -40,8 +40,19 @@ class EventMailer < ApplicationMailer
   def update_status_event(event, role)
     @event = event
     @review = event.donation.review
-    @closer = "Happy reading" if event.to_student? && event.donation.sent?
-    notification role, "#{@event.user.name} has #{@event.detail} #{@event.book}", template: "#{@event.detail}_event"
+
+    if @event.detail == "sent"
+      subject = "#{@event.book} is on its way"
+      if role == :student
+        @closer = "Happy reading"
+      else
+        subject += " to #{@event.student}"
+      end
+    else
+      subject = "#{@event.user} has #{@event.detail} #{@event.book}"
+    end
+
+    notification role, subject, template: "#{@event.detail}_event"
   end
 
   def cancel_donation_event(event, role)

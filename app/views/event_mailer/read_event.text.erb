@@ -2,6 +2,8 @@
 
 "<%= @review.text %>"<% end %>
 
-Thank you for being a donor on Free Objectivist Books.
+Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.
 
+<% if @role == :donor %>
 Find more students to donate to: <%= donate_url %>
+<% end %>

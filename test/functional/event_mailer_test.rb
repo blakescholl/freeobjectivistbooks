@@ -201,6 +201,24 @@ class EventMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "received, to fulfiller" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.update_status status: "received"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :fulfiller
+    assert_equal "Francisco d'Anconia has received Objectivism: The Philosophy of Ayn Rand", mail.subject
+    assert_equal [@kira.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Kira/
+      assert_select 'p', /Francisco d'Anconia has received Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Thank you for being a volunteer for/
+      assert_select 'a', text: /Find more students/, count: 0
+      assert_select 'p', /Thanks,/
+    end
+  end
+
   test "thank" do
     mail = EventMailer.mail_for_event events(:quentin_thanks_hugh), :donor
     assert_equal "Quentin Daniels sent you a thank-you note for The Virtue of Selfishness", mail.subject
@@ -239,6 +257,24 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hank Rearden has finished reading The Fountainhead!/
       assert_select 'p', text: /Here's what they thought/, count: 0
       assert_select 'a', /Find more students/
+      assert_select 'p', /Thanks,/
+    end
+  end
+
+  test "read, to fulfiller" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.update_status status: "read"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :fulfiller
+    assert_equal "Francisco d'Anconia has read Objectivism: The Philosophy of Ayn Rand", mail.subject
+    assert_equal [@kira.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Kira/
+      assert_select 'p', /Francisco d'Anconia has finished reading Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Thank you for being a volunteer for/
+      assert_select 'a', text: /Find more students/, count: 0
       assert_select 'p', /Thanks,/
     end
   end

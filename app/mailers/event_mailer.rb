@@ -47,6 +47,7 @@ class EventMailer < ApplicationMailer
 
   def update_status_event(event, role)
     @event = event
+    @role = role
     @review = event.donation.review
 
     if @event.detail == "sent"

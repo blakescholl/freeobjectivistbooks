@@ -5,7 +5,9 @@ They said: "<%= @event.message %>"
 
 Reply to <%= @event.from.name %>: <%= new_donation_message_url(@event.donation) %>
 <% else %>
-Thank you for being a donor on Free Objectivist Books.
+Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.
 <% end %>
 
+<% if @role == :donor %>
 Find more students to donate to: <%= donate_url %>
+<% end %>

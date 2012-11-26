@@ -5,7 +5,9 @@
 
 <p><%= link_to "Reply to #{@event.from.name}", new_donation_message_url(@event.donation) %></p>
 <% else %>
-<p>Thank you for being a donor on Free Objectivist Books.</p>
+<p>Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.</p>
 <% end %>
 
+<% if @role == :donor %>
 <p><%= link_to 'Find more students to donate to', donate_url %></p>
+<% end %>

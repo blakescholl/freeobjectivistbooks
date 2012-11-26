@@ -144,7 +144,8 @@ class Event < ActiveRecord::Base
   def notify
     return if !to || notified?
     Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{to.name} (#{to.email})"
-    mail = EventMailer.mail_for_event self
+    role = to_donor? ? :donor : :student
+    mail = EventMailer.mail_for_event self, role
     mail.deliver
     self.notified!
   end

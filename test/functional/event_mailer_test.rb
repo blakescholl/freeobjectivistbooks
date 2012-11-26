@@ -9,7 +9,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "grant" do
-    mail = EventMailer.mail_for_event events(:hugh_grants_quentin)
+    mail = EventMailer.mail_for_event events(:hugh_grants_quentin), :student
     assert_equal "We found a donor to send you The Virtue of Selfishness!", mail.subject
     assert_equal [@quentin.email], mail.to
 
@@ -25,7 +25,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "grant no address" do
-    mail = EventMailer.mail_for_event events(:hugh_grants_dagny)
+    mail = EventMailer.mail_for_event events(:hugh_grants_dagny), :student
     assert_equal "We found a donor to send you Capitalism: The Unknown Ideal!", mail.subject
     assert_equal [@dagny.email], mail.to
 
@@ -38,7 +38,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "flag" do
-    mail = EventMailer.mail_for_event events(:hugh_flags_dagny)
+    mail = EventMailer.mail_for_event events(:hugh_flags_dagny), :student
     assert_equal "Problem with your shipping info for Capitalism: The Unknown Ideal", mail.subject
     assert_equal [@dagny.email], mail.to
 
@@ -50,7 +50,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "add name" do
-    mail = EventMailer.mail_for_event events(:quentin_adds_name)
+    mail = EventMailer.mail_for_event events(:quentin_adds_name), :donor
     assert_equal "Quentin Daniels added their full name for The Virtue of Selfishness", mail.subject
     assert_equal [@hugh.email], mail.to
 
@@ -68,7 +68,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "add address" do
-    mail = EventMailer.mail_for_event events(:quentin_adds_address)
+    mail = EventMailer.mail_for_event events(:quentin_adds_address), :donor
     assert_equal "Quentin Daniels added a shipping address for The Virtue of Selfishness", mail.subject
     assert_equal [@hugh.email], mail.to
 
@@ -86,7 +86,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "fix with message" do
-    mail = EventMailer.mail_for_event events(:quentin_fixes)
+    mail = EventMailer.mail_for_event events(:quentin_fixes), :donor
     assert_equal "Quentin Daniels responded to your flag for The Virtue of Selfishness", mail.subject
     assert_equal [@hugh.email], mail.to
 
@@ -104,7 +104,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "message" do
-    mail = EventMailer.mail_for_event events(:hugh_messages_quentin)
+    mail = EventMailer.mail_for_event events(:hugh_messages_quentin), :student
     assert_equal "Hugh Akston sent you a message about The Virtue of Selfishness", mail.subject
     assert_equal [@quentin.email], mail.to
 
@@ -118,7 +118,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "sent" do
-    mail = EventMailer.mail_for_event events(:hugh_updates_quentin)
+    mail = EventMailer.mail_for_event events(:hugh_updates_quentin), :student
     assert_equal "Hugh Akston has sent The Virtue of Selfishness", mail.subject
     assert_equal [@quentin.email], mail.to
 
@@ -131,7 +131,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "received" do
-    mail = EventMailer.mail_for_event events(:hank_updates_cameron)
+    mail = EventMailer.mail_for_event events(:hank_updates_cameron), :donor
     assert_equal "Hank Rearden has received The Fountainhead", mail.subject
     assert_equal [@cameron.email], mail.to
 
@@ -149,7 +149,7 @@ class EventMailerTest < ActionMailer::TestCase
     event = events(:hank_updates_cameron)
     event.update_attributes message: ""
 
-    mail = EventMailer.mail_for_event event
+    mail = EventMailer.mail_for_event event, :donor
     assert_equal "Hank Rearden has received The Fountainhead", mail.subject
     assert_equal [@cameron.email], mail.to
 
@@ -165,7 +165,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "thank" do
-    mail = EventMailer.mail_for_event events(:quentin_thanks_hugh)
+    mail = EventMailer.mail_for_event events(:quentin_thanks_hugh), :donor
     assert_equal "Quentin Daniels sent you a thank-you note for The Virtue of Selfishness", mail.subject
     assert_equal [@hugh.email], mail.to
 
@@ -178,7 +178,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "read" do
-    mail = EventMailer.mail_for_event events(:quentin_updates_cameron)
+    mail = EventMailer.mail_for_event events(:quentin_updates_cameron), :donor
     assert_equal "Quentin Daniels has read Atlas Shrugged", mail.subject
     assert_equal [@cameron.email], mail.to
 
@@ -193,7 +193,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "read no review" do
     event = @hank_donation_received.update_status status: "read"
-    mail = EventMailer.mail_for_event event
+    mail = EventMailer.mail_for_event event, :donor
     assert_equal "Hank Rearden has read The Fountainhead", mail.subject
     assert_equal [@cameron.email], mail.to
 
@@ -207,7 +207,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "cancel donation" do
-    mail = EventMailer.mail_for_event events(:stadler_cancels_quentin)
+    mail = EventMailer.mail_for_event events(:stadler_cancels_quentin), :student
     assert_equal "We need to find you a new donor for Objectivism: The Philosophy of Ayn Rand", mail.subject
     assert_equal [@quentin.email], mail.to
 
@@ -220,7 +220,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "cancel donation not received" do
-    mail = EventMailer.mail_for_event events(:howard_cancels_stadler)
+    mail = EventMailer.mail_for_event events(:howard_cancels_stadler), :donor
     assert_equal "Your donation of Atlas Shrugged to Howard Roark has been canceled", mail.subject
     assert_equal [@stadler.email], mail.to
 
@@ -233,7 +233,7 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "cancel request" do
-    mail = EventMailer.mail_for_event events(:dagny_cancels)
+    mail = EventMailer.mail_for_event events(:dagny_cancels), :donor
     assert_equal "Dagny has canceled their request for Atlas Shrugged", mail.subject
     assert_equal [@hugh.email], mail.to
 

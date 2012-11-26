@@ -1,12 +1,20 @@
 class EventMailer < ApplicationMailer
+  TEMPLATE_PATH = Rails.root.join('app', 'views', mailer_name)
+
   def self.mail_for_event(event, role)
     self.send "#{event.type}_event", event, role
   end
 
+  def template_name_for(role, template_basename)
+    path = TEMPLATE_PATH.join(role.to_s, "#{template_basename}.*")
+    Dir.glob(path).any? ? "#{role}/#{template_basename}" : template_basename
+  end
+
   def notification(role, subject, options = {})
     @recipient = @event.send role
-    template = options[:template] || "#{@event.type}_event"
-    mail_to_user @recipient, subject: subject, template_name: "#{role}/#{template}"
+    template_basename = options[:template_basename] || "#{@event.type}_event"
+    template_name = template_name_for role, template_basename
+    mail_to_user @recipient, subject: subject, template_name: template_name
   end
 
   def grant_event(event, role)
@@ -52,7 +60,7 @@ class EventMailer < ApplicationMailer
       subject = "#{@event.user} has #{@event.detail} #{@event.book}"
     end
 
-    notification role, subject, template: "#{@event.detail}_event"
+    notification role, subject, template_basename: "#{@event.detail}_event"
   end
 
   def cancel_donation_event(event, role)
@@ -63,7 +71,7 @@ class EventMailer < ApplicationMailer
       notification role, "We need to find you a new donor for #{@event.book}"
     when @event.donor
       notification role, "Your donation of #{@event.book} to #{@event.student.name} has been canceled",
-        template: "#{event.detail}_event"
+        template_basename: "#{event.detail}_event"
     end
   end
 

@@ -201,7 +201,8 @@ class DonationTest < ActiveSupport::TestCase
   test "donor can cancel?" do
     assert @hank_donation.donor_can_cancel?
     assert @quentin_donation.donor_can_cancel?
-    assert !@hank_donation_received.donor_can_cancel?
+    assert !@hank_donation_received.donor_can_cancel? # already received
+    assert !@frisco_donation.donor_can_cancel?        # already paid for
   end
 
   test "student can cancel?" do
@@ -228,6 +229,12 @@ class DonationTest < ActiveSupport::TestCase
 
   test "student can't cancel if no reminders" do
     @quentin_donation_unsent.reminders.destroy_all
+    assert !@quentin_donation_unsent.student_can_cancel?
+  end
+
+  test "student can't cancel if donation paid for" do
+    @quentin_donation_unsent.paid = true
+    @quentin_donation_unsent.save!
     assert !@quentin_donation_unsent.student_can_cancel?
   end
 

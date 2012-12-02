@@ -64,17 +64,4 @@ class BalanceObserverTest < ActiveSupport::TestCase
     donation.reload
     assert donation.paid?
   end
-
-  test "price returned to balance when donation canceled" do
-    donation = @howard_request.grant! @cameron
-    @cameron.reload
-
-    assert_difference "@cameron.balance", donation.price do
-      donation.cancel! @cameron
-      @cameron.reload
-    end
-
-    donation.reload
-    assert !donation.paid?
-  end
 end

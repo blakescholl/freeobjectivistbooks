@@ -177,12 +177,12 @@ class Donation < ActiveRecord::Base
 
   # True if the donor can cancel the donation.
   def donor_can_cancel?
-    !received?
+    !received? && !paid?
   end
 
   # True if the student is allowed to cancel the donation.
   def student_can_cancel?
-    return false if sent? || flagged? || Time.since(created_at) < 3.weeks
+    return false if sent? || flagged? || paid? || Time.since(created_at) < 3.weeks
     reminder = reminders.where(type: Reminders::SendBooks).reorder(:created_at).first
     reminder && Time.since(reminder.created_at) >= 1.week
   end

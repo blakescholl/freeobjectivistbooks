@@ -12,6 +12,7 @@ gem 'meta_search', '>= 1.1.0.pre' # required by activeadmin
 gem 'money-rails'
 gem 'redcarpet'
 gem 'rest-client'
+gem 'thin'
 gem 'valid_email'
 
 group :production do

@@ -44,8 +44,44 @@ class EventMailerTest < ActionMailer::TestCase
 
     verify_mail_body mail do
       assert_select 'p', /Hi Dagny/
-      assert_select 'p', 'Your donor (Hugh Akston) says: "Please add your full name and address"'
-      assert_select 'a', /Respond to Hugh Akston to get your copy of Capitalism: The Unknown Ideal/
+      assert_select 'p', 'Hugh Akston (the donor) says: "Please add your full name and address"'
+      assert_select 'a', /Respond to get your copy of Capitalism: The Unknown Ideal/
+    end
+  end
+
+  test "flag by fulfiller, to student" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :student
+    assert_equal "Problem with your shipping info for Objectivism: The Philosophy of Ayn Rand", mail.subject
+    assert_equal [@frisco.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Francisco/
+      assert_select 'p', 'Kira Argounova (Free Objectivist Books volunteer) says: "Fix this"'
+      assert_select 'a', /Respond to get your copy of Objectivism: The Philosophy of Ayn Rand/
+    end
+  end
+
+  test "flag by fulfiller, to donor" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+
+    mail = EventMailer.mail_for_event event, :donor
+    assert_equal "Delay in sending Objectivism: The Philosophy of Ayn Rand to Francisco d'Anconia", mail.subject
+    assert_equal [@cameron.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Henry/
+      assert_select 'p', /FYI/
+      assert_select 'p', /your donation of Objectivism: The Philosophy of Ayn Rand to Francisco d'Anconia/
+      assert_select 'p', /Kira Argounova \(Free Objectivist Books volunteer\) has flagged/
+      assert_select 'p', 'Kira Argounova says: "Fix this"'
+      assert_select 'p', /We'll follow up with Francisco/
+      assert_select 'a', text: /Respond/, count: 0
     end
   end
 
@@ -132,7 +168,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "sent by fulfiller, to student" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.update_status status: "sent"
+    event = @frisco_donation.update_status status: "sent", event: {user: @kira}
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, :student
@@ -151,7 +187,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "sent by fulfiller, cc to donor" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.update_status status: "sent"
+    event = @frisco_donation.update_status status: "sent", event: {user: @kira}
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, :donor

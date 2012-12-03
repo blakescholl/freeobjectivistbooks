@@ -31,14 +31,14 @@ class FlagsControllerTest < ActionController::TestCase
 
   # Create
 
-  def verify_flagged(donation, message)
+  def verify_flagged(donation, user, message)
     donation.reload
     assert donation.flagged?
 
     donation.request.reload
     assert donation.request.flagged?
 
-    verify_event donation, "flag", message: message, notified?: true
+    verify_event donation, "flag", user: user, message: message, notified?: true
   end
 
   test "create" do
@@ -49,7 +49,7 @@ class FlagsControllerTest < ActionController::TestCase
     assert_redirected_to @quentin_request
     assert_match /sent to Quentin Daniels/i, flash[:notice]
 
-    verify_flagged @quentin_donation, "Fix this"
+    verify_flagged @quentin_donation, @hugh, "Fix this"
   end
 
   test "create by fulfiller" do
@@ -62,7 +62,7 @@ class FlagsControllerTest < ActionController::TestCase
     assert_redirected_to volunteer_url
     assert_match /sent to Francisco d'Anconia/i, flash[:notice]
 
-    verify_flagged @frisco_donation, "Fix this"
+    verify_flagged @frisco_donation, @kira, "Fix this"
   end
 
   test "create requires message" do

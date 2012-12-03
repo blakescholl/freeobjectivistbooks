@@ -1,6 +1,4 @@
 class EventMailer < ApplicationMailer
-  helper :event_mailer
-
   TEMPLATE_PATH = Rails.root.join('app', 'views', mailer_name)
 
   def self.mail_for_event(event, role)
@@ -32,10 +30,6 @@ class EventMailer < ApplicationMailer
 
   def flag_event(event, role)
     @event = event
-    @flagger_role = case event.user
-    when event.donor then :donor
-    when event.fulfiller then :fulfiller
-    end
     subject = case role
     when :student then "Problem with your shipping info for #{@event.book}"
     when :donor then "Delay in sending #{@event.book} to #{@event.student}"

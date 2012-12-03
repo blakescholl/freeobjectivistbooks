@@ -1,6 +1,6 @@
 There seems to be a problem with your shipping info on Free Objectivist Books.
 
-<%= @event.user %> (<%= role_description @flagger_role %>) says: "<%= format_block @event.message %>"
+<%= @event.user %> (<%= role_description @event.user_role %>) says: "<%= format_block @event.message %>"
 
 Respond to get your copy of <%= @event.book %>:
 <%= fix_donation_flag_url @event.donation %>

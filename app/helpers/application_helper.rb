@@ -113,6 +113,13 @@ module ApplicationHelper
     raw "#{name} in #{location} #{action} you #{book}"
   end
 
+  def role_description(role)
+    case role
+    when :donor then "the donor"
+    when :fulfiller then "Free Objectivist Books volunteer"
+    end
+  end
+
   # Pagination
 
   def has_more?

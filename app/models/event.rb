@@ -112,6 +112,12 @@ class Event < ActiveRecord::Base
     user == fulfiller
   end
 
+  def user_role
+    return :student if from_student?
+    return :donor if from_donor?
+    return :fulfiller if from_fulfiller?
+  end
+
   def roles_to_notify
     roles = []
     roles << :student unless from_student?

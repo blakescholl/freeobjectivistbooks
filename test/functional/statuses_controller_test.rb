@@ -38,7 +38,7 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form" do
     get :edit, {donation_id: @quentin_donation.id, status: "received"}, session_for(@quentin)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA\s+sent you The Virtue of Selfishness/
+    assert_select 'p', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
     assert_select 'h2', /Add a thank-you message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks[type="hidden"][value=true]'
     assert_select 'textarea#donation_event_message'
@@ -49,7 +49,7 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form for an unsent donation" do
     get :edit, {donation_id: @quentin_donation_unsent.id, status: "received"}, session_for(@quentin)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA\s+agreed to send you The Fountainhead/
+    assert_select 'p', /Hugh Akston in Boston, MA donated The Fountainhead/
     assert_select 'h2', /Add a thank-you message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks[type="hidden"][value=true]'
     assert_select 'textarea#donation_event_message'
@@ -61,7 +61,7 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form for an already-thanked donation" do
     get :edit, {donation_id: @dagny_donation.id, status: "received"}, session_for(@dagny)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA\s+agreed to send you Capitalism: The Unknown Ideal/
+    assert_select 'p', /Hugh Akston in Boston, MA donated Capitalism: The Unknown Ideal/
     assert_select 'h2', /Add a message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks', false
     assert_select 'textarea#donation_event_message'

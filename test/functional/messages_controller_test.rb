@@ -33,7 +33,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, params(@quentin_donation), session_for(@quentin)
     assert_response :success
     assert_select 'h1', /Send a message to Hugh Akston/
-    assert_select '.overview', /Hugh Akston in Boston, MA\s+sent you\s+The Virtue of Selfishness/
+    assert_select '.overview', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
@@ -43,7 +43,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, params(@dagny_donation), session_for(@dagny)
     assert_response :success
     assert_select 'h1', /Send a message to Hugh Akston/
-    assert_select '.overview', /Hugh Akston in Boston, MA\s+agreed to send you\s+Capitalism: The Unknown Ideal/
+    assert_select '.overview', /Hugh Akston in Boston, MA donated Capitalism: The Unknown Ideal/
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
@@ -65,7 +65,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, thank_params(@hank_donation), session_for(@hank)
     assert_response :success
     assert_select 'h1', /Thank/
-    assert_select 'p', /Henry Cameron in New York, NY\s+agreed to send you\s+Atlas Shrugged/
+    assert_select 'p', /Henry Cameron in New York, NY donated Atlas Shrugged/
     assert_select 'textarea#event_message'
     assert_select 'input[type="radio"]'
     assert_select 'input[type="submit"]'
@@ -75,7 +75,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, thank_params(@quentin_donation), session_for(@quentin)
     assert_response :success
     assert_select 'h1', /Thank/
-    assert_select 'p', /Hugh Akston in Boston, MA\s+sent you\s+The Virtue of Selfishness/
+    assert_select 'p', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     assert_select 'input[type="radio"]'
     assert_select 'input[type="submit"]'

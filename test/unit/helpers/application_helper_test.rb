@@ -79,9 +79,7 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "donation summary" do
-    assert_equal 'Henry Cameron in New York, NY agreed to send you <span class="title">Atlas Shrugged</span>',
+    assert_equal 'Henry Cameron in New York, NY donated <span class="title">Atlas Shrugged</span> to you',
       donation_summary(@hank_request)
-    assert_equal 'Hugh Akston in Boston, MA sent you <span class="title">The Virtue of Selfishness</span>',
-      donation_summary(@quentin_request)
   end
 end

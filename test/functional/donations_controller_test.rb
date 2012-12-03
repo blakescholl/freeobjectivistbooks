@@ -160,7 +160,7 @@ class DonationsControllerTest < ActionController::TestCase
     get :cancel, {id: @quentin_donation_unsent.id, reason: "not_received"}, session_for(@quentin)
     assert_response :success
     assert_select 'h1', /I have not received/i
-    assert_select '.overview', /Hugh Akston in Boston, MA agreed to send you The Fountainhead/
+    assert_select '.overview', /Hugh Akston in Boston, MA donated The Fountainhead/
     assert_select '.overview', /we have not confirmed/i
     assert_select 'input#donation_event_detail[type="hidden"][value="not_received"]'
     assert_select 'input[type="submit"]'

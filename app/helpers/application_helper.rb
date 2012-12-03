@@ -108,9 +108,8 @@ module ApplicationHelper
     donor = donation.donor
     name = h donor.name
     location = h donor.location
-    action = donation.sent? ? "sent" : "agreed to send"
     book = title donation.book
-    raw "#{name} in #{location} #{action} you #{book}"
+    raw "#{name} in #{location} donated #{book} to you"
   end
 
   def role_description(role)

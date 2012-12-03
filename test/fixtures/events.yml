@@ -32,6 +32,15 @@ hugh_grants_quentin:
   happened_at: 2012-01-16 00:14:25
   notified_at: 2012-01-16 00:14:25
 
+hugh_flags_quentin:
+  type: flag
+  request: quentin_wants_vos
+  user: hugh
+  donation: hugh_grants_quentin_wants_vos
+  message: Please fix your address
+  happened_at: 2012-01-16 00:15:25
+  notified_at: 2012-01-16 00:15:25
+
 quentin_adds_name:
   type: fix
   request: quentin_wants_vos

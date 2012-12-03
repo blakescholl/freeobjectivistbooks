@@ -47,7 +47,7 @@ class FlagsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to @quentin_request
-    assert_match /has been flagged/i, flash[:notice]
+    assert_match /sent to Quentin Daniels/i, flash[:notice]
 
     verify_flagged @quentin_donation, "Fix this"
   end
@@ -60,7 +60,7 @@ class FlagsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to volunteer_url
-    assert_match /has been flagged/i, flash[:notice]
+    assert_match /sent to Francisco d'Anconia/i, flash[:notice]
 
     verify_flagged @frisco_donation, "Fix this"
   end
@@ -128,7 +128,13 @@ class FlagsControllerTest < ActionController::TestCase
 
   def verify_destroy(donation, params)
     assert_redirected_to donation.request
-    assert_match /notified your donor \(#{donation.user.name}\)/, flash[:notice], flash.inspect
+
+    expected_notice = if params[:role] == :fulfiller
+      /notified #{donation.fulfiller} \(Free Objectivist Books volunteer\)/
+    else
+      /notified #{donation.user} \(the donor\)/
+    end
+    assert_match expected_notice, flash[:notice], flash.inspect
 
     donation.reload
     assert_equal params[:student_name], donation.student_name
@@ -157,6 +163,19 @@ class FlagsControllerTest < ActionController::TestCase
     destroy @quentin_donation, options
     verify_destroy @quentin_donation, options
     verify_event @quentin_donation, "fix", detail: nil, message: "No changes here", notified?: true
+  end
+
+  test "destroy flagged by fulfiller" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+    event.happened_at = Time.now - 1.minute
+    event.save!
+
+    options = {student_name: "Francisco d'Anconia", address: @frisco.address, message: "It's all good", role: :fulfiller}
+    destroy @frisco_donation, options
+    verify_destroy @frisco_donation, options
+    verify_event @frisco_donation, "fix", detail: nil, message: "It's all good", notified?: true
   end
 
   test "destroy requires address" do

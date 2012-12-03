@@ -1,5 +1,7 @@
 # Manages flagging Donations and clearing those flags.
 class FlagsController < ApplicationController
+  include ApplicationHelper
+
   def allowed_users
     case params[:action]
     when "new", "create" then [@donation.donor, @donation.fulfiller]
@@ -14,7 +16,7 @@ class FlagsController < ApplicationController
   def create
     @event = @donation.flag params[:event]
     if save @donation, @event
-      flash[:notice] = "The request has been flagged, and your message has been sent to #{@donation.student.name}."
+      flash[:notice] = "The request has been flagged, and your message has been sent to #{@donation.student}."
       redirect_to params[:redirect] || @donation.request
     else
       render :new
@@ -26,9 +28,12 @@ class FlagsController < ApplicationController
   end
 
   def destroy
+    @flag_event = @donation.flag_events.last
     @event = @donation.fix params[:donation], params[:event]
     if save @donation, @event
-      flash[:notice] = "Thank you. We've notified your donor (#{@donation.user.name})."
+      user = @flag_event.user
+      role = role_description @flag_event.user_role
+      flash[:notice] = "Thank you. We've notified #{user} (#{role}), who will send your book."
       redirect_to @donation.request
     else
       render :fix

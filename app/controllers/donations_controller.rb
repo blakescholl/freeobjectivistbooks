@@ -28,6 +28,8 @@ class DonationsController < ApplicationController
     unless @donation.can_cancel? @current_user
       flash[:error] = if @donation.sent?
         "This donation cannot be canceled because the book has already been sent."
+      elsif @donation.paid?
+        "This donation cannot be canceled because the book has already been paid for."
       else
         "You have clicked an old link, or you have hit a bug. Email us if you need help."
       end

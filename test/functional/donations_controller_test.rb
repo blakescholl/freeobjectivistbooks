@@ -174,6 +174,12 @@ class DonationsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "cancel requires unpaid donation" do
+    get :cancel, {id: @frisco_donation.id}, session_for(@cameron)
+    assert_redirected_to @frisco_request
+    assert_not_nil flash[:error]
+  end
+
   test "cancel by student requires unsent donation" do
     get :cancel, {id: @quentin_donation.id, reason: "not_received"}, session_for(@quentin)
     assert_redirected_to @quentin_request
@@ -257,6 +263,17 @@ class DonationsControllerTest < ActionController::TestCase
 
     @hank_donation_received.reload
     assert !@hank_donation_received.canceled?, "donation was canceled"
+  end
+
+  test "destroy requires unpaid donation" do
+    assert_no_difference "@frisco_donation.events.count" do
+      delete :destroy, {id: @frisco_donation.id, donation: {event: {message: "Sorry!"}}}, session_for(@cameron)
+    end
+    assert_redirected_to @frisco_request
+    assert_not_nil flash[:error]
+
+    @frisco_donation.reload
+    assert !@frisco_donation.canceled?, "donation was canceled"
   end
 
   test "destroy by student requires unsent donation" do

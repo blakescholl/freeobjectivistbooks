@@ -16,7 +16,7 @@
 </style>
 <% end %>
 
-<h1 class="grid_16">Send a message to <%= @event.to.name %></h1>
+<h1 class="grid_16">Send a message to <%= @event.recipients.to_sentence %></h1>
 
 <div class="grid_12">
     <p class="overview"><%= current_is_student? ? donation_summary(@donation) : request_summary(@donation.request) %></p>

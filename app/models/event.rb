@@ -100,28 +100,28 @@ class Event < ActiveRecord::Base
     donation && donation.fulfiller
   end
 
-  def from
-    user
-  end
-
   def from_student?
-    from == student
+    user == student
   end
 
   def from_donor?
-    from == donor
+    user == donor
   end
 
-  def to_donor?
-    from_student?
+  def from_fulfiller?
+    user == fulfiller
   end
 
-  def to_student?
-    from_donor?
+  def roles_to_notify
+    roles = []
+    roles << :student unless from_student?
+    roles << :donor if donor && !from_donor?
+    roles << :fulfiller if fulfiller && !from_fulfiller?
+    roles
   end
 
-  def to
-    to_donor? ? donor : student
+  def recipients
+    roles_to_notify.map {|role| self.send role}
   end
 
   # True if the notification for this event has been sent.
@@ -146,11 +146,12 @@ class Event < ActiveRecord::Base
 
   # Sends a notification email for this event.
   def notify
-    return if !to || notified?
-    Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{to.name} (#{to.email})"
-    role = to_donor? ? :donor : :student
-    mail = EventMailer.mail_for_event self, role
-    mail.deliver
+    return if notified?
+    roles_to_notify.each do |role|
+      mail = EventMailer.mail_for_event self, role
+      Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{role} (#{mail.to})"
+      mail.deliver
+    end
     self.notified!
   end
 

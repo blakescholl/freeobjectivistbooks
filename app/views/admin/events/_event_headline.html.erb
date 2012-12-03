@@ -13,7 +13,7 @@
         <% if event.is_thanks? %>
         thanked <%= admin_user_link event.donor %> for
         <% else %>
-        sent a message to <%= admin_user_link event.to %> about
+        sent a message to <%= admin_user_links event.recipients %> about
         <% end %>
     <% when "update_status" %>
         <%= event.detail %>

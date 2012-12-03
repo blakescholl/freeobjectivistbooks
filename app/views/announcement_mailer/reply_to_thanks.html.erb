@@ -1,8 +1,8 @@
-<p>Recently you got a thank-you message from <%= @event.from.name %> for <i><%= @event.book %>,</i> but you couldn't reply to it. (If you hit "reply" on the email, it went to me, Jason, instead.)</p>
+<p>Recently you got a thank-you message from <%= @event.user %> for <i><%= @event.book %>,</i> but you couldn't reply to it. (If you hit "reply" on the email, it went to me, Jason, instead.)</p>
 
-<p>Now you can reply to <%= @event.from.name %> if you want:</p>
+<p>Now you can reply to <%= @event.user %> if you want:</p>
 
-<p><strong><%= link_to "Reply to #{@event.from.name}", new_donation_message_url(@event.donation) %></strong></p>
+<p><strong><%= link_to "Reply to #{@event.user}", new_donation_message_url(@event.donation) %></strong></p>
 
 <p>As a reminder, the thank-you message was:</p>
 

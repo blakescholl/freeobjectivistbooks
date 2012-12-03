@@ -119,11 +119,6 @@ class EventTest < ActiveSupport::TestCase
     assert_equal @quentin, events(:quentin_adds_name).student
   end
 
-  test "from" do
-    assert_equal @hugh, events(:hugh_grants_quentin).from
-    assert_equal @quentin, events(:quentin_adds_name).from
-  end
-
   test "from student?" do
     assert !events(:hugh_grants_quentin).from_student?
     assert events(:quentin_adds_name).from_student?
@@ -134,19 +129,23 @@ class EventTest < ActiveSupport::TestCase
     assert !events(:quentin_adds_name).from_donor?
   end
 
-  test "to" do
-    assert_equal @quentin, events(:hugh_grants_quentin).to
-    assert_equal @hugh, events(:quentin_adds_name).to
+  test "from fulfiller?" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+    assert event.from_fulfiller?
+
+    assert !events(:hugh_grants_quentin).from_fulfiller?
   end
 
-  test "to student?" do
-    assert events(:hugh_grants_quentin).to_student?
-    assert !events(:quentin_adds_name).to_student?
-  end
+  test "roles to notify" do
+    assert_equal [], events(:howard_updates_info).roles_to_notify
+    assert_equal [:student], events(:hugh_messages_quentin).roles_to_notify
 
-  test "to donor?" do
-    assert !events(:hugh_grants_quentin).to_donor?
-    assert events(:quentin_adds_name).to_donor?
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+    assert_equal [:student, :donor], event.roles_to_notify
   end
 
   # Actions
@@ -155,6 +154,16 @@ class EventTest < ActiveSupport::TestCase
     event = events :hugh_messages_quentin
     assert !event.notified?
     assert_difference("ActionMailer::Base.deliveries.count") { event.notify }
+    assert event.notified?
+  end
+
+  test "notify to multiple recipients" do
+    @frisco_donation.fulfill @kira
+    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    @frisco_donation.save!
+
+    assert !event.notified?
+    assert_difference("ActionMailer::Base.deliveries.count", 2) { event.notify }
     assert event.notified?
   end
 

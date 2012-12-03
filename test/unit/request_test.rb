@@ -288,7 +288,6 @@ class RequestTest < ActiveSupport::TestCase
     assert_equal @hank, event.user
     assert_equal @hank_donation, event.donation
     assert_equal "Don't want it anymore", event.message
-    assert_equal @cameron, event.to
   end
 
   test "cancel no donor" do
@@ -300,7 +299,6 @@ class RequestTest < ActiveSupport::TestCase
     assert_equal @howard, event.user
     assert_equal "I bought the book myself", event.message
     assert_nil event.donation
-    assert_nil event.to
   end
 
   test "cancel when already canceled" do

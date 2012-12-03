@@ -1,9 +1,9 @@
-<%= @event.student.name %> has received <%= @event.book %>!
+<%= @event.student %> has received <%= @event.book %>!
 
 <% if @event.message.present? %>
 They said: "<%= @event.message %>"
 
-Reply to <%= @event.from.name %>: <%= new_donation_message_url(@event.donation) %>
+Reply to <%= @event.user %>: <%= new_donation_message_url(@event.donation) %>
 <% else %>
 Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.
 <% end %>

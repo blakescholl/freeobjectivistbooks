@@ -1,7 +1,7 @@
-<%= @event.user.name %> sent you a <% if @event.is_thanks? %>thank-you note for <%= @event.book %>:<% else %>message on Free Objectivist Books:<% end %>
+<%= @event.user %> sent you a <% if @event.is_thanks? %>thank-you note for <%= @event.book %>:<% else %>message on Free Objectivist Books:<% end %>
 
 "<%= @event.message %>"
 
-Reply to <%= @event.from.name %>: <%= new_donation_message_url @event.donation %>
+Reply to <%= @event.user %>: <%= new_donation_message_url @event.donation %>
 
 Full details for this request: <%= request_url(@event.request) %>

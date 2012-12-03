@@ -1,9 +1,9 @@
-<p><%= @event.student.name %> has received <i><%= @event.book %>!</i></p>
+<p><%= @event.student %> has received <i><%= @event.book %>!</i></p>
 
 <% if @event.message.present? %>
 <p>They said: "<%= format_block @event.message %>"</p>
 
-<p><%= link_to "Reply to #{@event.from.name}", new_donation_message_url(@event.donation) %></p>
+<p><%= link_to "Reply to #{@event.user}", new_donation_message_url(@event.donation) %></p>
 <% else %>
 <p>Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.</p>
 <% end %>

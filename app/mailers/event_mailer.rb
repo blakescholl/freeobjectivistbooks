@@ -77,10 +77,10 @@ class EventMailer < ApplicationMailer
   def cancel_donation_event(event, role)
     @event = event
     @closer = "Yours"
-    case @event.to
-    when @event.student
+    case role
+    when :student
       notification role, "We need to find you a new donor for #{@event.book}"
-    when @event.donor
+    when :donor
       notification role, "Your donation of #{@event.book} to #{@event.student.name} has been canceled",
         template_basename: "#{event.detail}_event"
     end

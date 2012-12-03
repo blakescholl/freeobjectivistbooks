@@ -537,7 +537,7 @@ class RequestsControllerTest < ActionController::TestCase
     options = {user_name: "Howard Roark", address: "123 Independence St"}
     update @howard_request, options
     verify_update @howard_request, options
-    verify_event @howard_request, "update", detail: "added a shipping address", notified?: false
+    verify_event @howard_request, "update", detail: "added a shipping address"
   end
 
   test "update requires address if granted" do
@@ -620,7 +620,7 @@ class RequestsControllerTest < ActionController::TestCase
     @hank_donation.reload
     assert @hank_donation.canceled?, "donation not canceled"
 
-    verify_event @hank_request, "cancel_request", message: "Not needed", notified?: true
+    verify_event @hank_request, "cancel_request", message: "Not needed"
   end
 
   test "destroy no donor" do
@@ -633,7 +633,7 @@ class RequestsControllerTest < ActionController::TestCase
     @howard_request.reload
     assert @howard_request.canceled?, "request not canceled"
 
-    verify_event @howard_request, "cancel_request", message: "Not needed", notified?: false
+    verify_event @howard_request, "cancel_request", message: "Not needed"
   end
 
   test "destroy already-canceled request" do

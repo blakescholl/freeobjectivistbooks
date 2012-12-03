@@ -18,7 +18,7 @@ class MessagesController < ApplicationController
     @event = @donation.message_events.build attributes
     if save @event
       message = @event.is_thanks? ? "thanks" : "message"
-      flash[:notice] = "We sent your #{message} to #{@event.to.name}."
+      flash[:notice] = "We sent your #{message} to #{@event.recipients.to_sentence}."
       redirect_to @donation.request
     else
       render_form

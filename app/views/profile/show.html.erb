@@ -116,6 +116,11 @@
     <p><%= link_to 'Find students to donate books to', donate_path %></p>
     <p><%= link_to 'See all your donations', donations_path %></p>
     <% end %>
+
+    <% if @current_user.is_volunteer? %>
+    <h2>Help out</h2>
+    <p><%= link_to 'Help out by sending books to students', volunteer_path %></p>
+    <% end %>
 </div>
 <div class="clear"></div>
 

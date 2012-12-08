@@ -5,6 +5,14 @@ class ProfileControllerTest < ActionController::TestCase
     verify_link 'request another', present
   end
 
+  def verify_all_donations_link(present = true)
+    verify_link 'see all your donations', present
+  end
+
+  def verify_volunteer_link(present = true)
+    verify_link 'help out', present
+  end
+
   def verify_one_request_text(present = true)
     assert_select 'p', text: /one open request/, count: (present ? 1 : 0)
   end
@@ -27,6 +35,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request false
+    verify_all_donations_link false
+    verify_volunteer_link false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -61,6 +71,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request false
+    verify_all_donations_link false
+    verify_volunteer_link false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -80,6 +92,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request
+    verify_all_donations_link false
+    verify_volunteer_link false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -108,6 +122,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request
+    verify_all_donations_link false
+    verify_volunteer_link false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -151,10 +167,23 @@ class ProfileControllerTest < ActionController::TestCase
       assert_select '.actions .flagged', false
     end
 
+    verify_all_donations_link
     verify_new_request_link false
     verify_one_request_text false
+    verify_volunteer_link false
 
     assert_select 'a', 'See all your donations'
+  end
+
+  test "show for volunteer" do
+    get :show, params, session_for(@kira)
+    assert_response :success
+    assert_select 'h1', "Kira Argounova"
+
+    verify_new_request_link false
+    verify_one_request_text false
+    verify_all_donations_link false
+    verify_volunteer_link
   end
 
   test "show requires login" do

@@ -1,7 +1,7 @@
 # Manages sending messages between students and their donors.
 class MessagesController < ApplicationController
   def allowed_users
-    params[:is_thanks] ? @donation.student : [@donation.student, @donation.donor]
+    params[:is_thanks] ? @donation.student : [@donation.student, @donation.donor, @donation.fulfiller]
   end
 
   def render_form

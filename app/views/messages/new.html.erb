@@ -19,7 +19,17 @@
 <h1 class="grid_16">Send a message to <%= @event.recipients.to_sentence %></h1>
 
 <div class="grid_12">
-    <p class="overview"><%= current_is_student? ? donation_summary(@donation) : request_summary(@donation.request) %></p>
+    <div class="overview">
+        <% unless current_is_student? %>
+        <p><%= @event.student %> requested <%= title @event.book %></p>
+        <% end %>
+        <% if @event.donor && !current_is_donor? %>
+        <p><%= @event.donor %> donated <%= title @event.book %></p>
+        <% end %>
+        <% if @event.fulfiller && !current_is_fulfiller? %>
+        <p><%= @event.fulfiller %> (site volunteer) sent this book</p>
+        <% end %>
+    </div>
 
     <%= form_for @event, url: donation_messages_path(@donation) do |f| %>
         <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>

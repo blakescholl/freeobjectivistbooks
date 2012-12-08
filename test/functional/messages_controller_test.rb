@@ -23,7 +23,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, params(@quentin_donation), session_for(@hugh)
     assert_response :success
     assert_select 'h1', /Send a message to Quentin Daniels/
-    assert_select '.overview', /Quentin Daniels wants to read\s+The Virtue of Selfishness/
+    assert_select '.overview', /Quentin Daniels requested The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
@@ -33,7 +33,7 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, params(@quentin_donation), session_for(@quentin)
     assert_response :success
     assert_select 'h1', /Send a message to Hugh Akston/
-    assert_select '.overview', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
+    assert_select '.overview', /Hugh Akston donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
@@ -43,10 +43,40 @@ class MessagesControllerTest < ActionController::TestCase
     get :new, params(@dagny_donation), session_for(@dagny)
     assert_response :success
     assert_select 'h1', /Send a message to Hugh Akston/
-    assert_select '.overview', /Hugh Akston in Boston, MA donated Capitalism: The Unknown Ideal/
+    assert_select '.overview', /Hugh Akston donated Capitalism: The Unknown Ideal/
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
+  end
+
+  test "new for fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :new, params(@frisco_donation), session_for(@kira)
+    assert_response :success
+    assert_select 'h1', /Send a message to Francisco d'Anconia and Henry Cameron/
+    assert_select 'p', /Francisco d'Anconia requested Objectivism/
+    assert_select 'p', /Henry Cameron donated Objectivism/
+  end
+
+  test "new for student with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :new, params(@frisco_donation), session_for(@frisco)
+    assert_response :success
+    assert_select 'h1', /Send a message to Henry Cameron and Kira Argounova/
+    assert_select 'p', /Henry Cameron donated Objectivism/
+    assert_select 'p', /Kira Argounova.*sent/
+  end
+
+  test "new for donor with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :new, params(@frisco_donation), session_for(@cameron)
+    assert_response :success
+    assert_select 'h1', /Send a message to Francisco d'Anconia and Kira Argounova/
+    assert_select 'p', /Francisco d'Anconia requested Objectivism/
+    assert_select 'p', /Kira Argounova.*sent/
   end
 
   test "new requires login" do
@@ -64,18 +94,21 @@ class MessagesControllerTest < ActionController::TestCase
   test "new thanks" do
     get :new, thank_params(@hank_donation), session_for(@hank)
     assert_response :success
-    assert_select 'h1', /Thank/
-    assert_select 'p', /Henry Cameron in New York, NY donated Atlas Shrugged/
+    assert_select 'h1', /Thank Henry Cameron/
+    assert_select 'p', /Henry Cameron donated Atlas Shrugged/
     assert_select 'textarea#event_message'
     assert_select 'input[type="radio"]'
     assert_select 'input[type="submit"]'
   end
 
-  test "new thanks for already-sent book" do
-    get :new, thank_params(@quentin_donation), session_for(@quentin)
+  test "new thanks with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :new, thank_params(@frisco_donation), session_for(@frisco)
     assert_response :success
-    assert_select 'h1', /Thank/
-    assert_select 'p', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
+    assert_select 'h1', /Thank Henry Cameron and Kira Argounova/
+    assert_select 'p', /Henry Cameron donated Objectivism/
+    assert_select 'p', /Kira Argounova.*sent/
     assert_select 'textarea#event_message'
     assert_select 'input[type="radio"]'
     assert_select 'input[type="submit"]'
@@ -115,6 +148,19 @@ class MessagesControllerTest < ActionController::TestCase
     verify_event @quentin_donation, "message", user: @hugh, message: "Hi Quentin!", notified?: true
   end
 
+  test "create from fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    assert_difference "@frisco_donation.events.count" do
+      post :create, params(@frisco_donation, "Hi everybody!"), session_for(@kira)
+    end
+
+    assert_redirected_to @frisco_request
+    assert_match /your message to Francisco d'Anconia and Henry Cameron/i, flash[:notice]
+
+    verify_event @frisco_donation, "message", user: @kira, message: "Hi everybody!", notified?: true
+  end
+
   test "create requires message" do
     assert_no_difference "@quentin_donation.events.count" do
       post :create, params(@quentin_donation, ""), session_for(@quentin)
@@ -148,6 +194,22 @@ class MessagesControllerTest < ActionController::TestCase
     assert @hank_donation.thanked?
 
     verify_event @hank_donation, "message", is_thanks?: true, message: "Thanks so much!", notified?: true
+  end
+
+  test "create thanks with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    assert_difference "@frisco_donation.events.count" do
+      post :create, thank_params(@frisco_donation, "Thanks a lot!", public: false), session_for(@frisco)
+    end
+
+    assert_redirected_to @frisco_request
+    assert_match /sent your thanks to Henry Cameron and Kira Argounova/i, flash[:notice]
+
+    @frisco_donation.reload
+    assert @frisco_donation.thanked?
+
+    verify_event @frisco_donation, "message", is_thanks?: true, message: "Thanks a lot!", notified?: true
   end
 
   test "create thanks requires message" do

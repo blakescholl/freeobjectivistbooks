@@ -15,10 +15,13 @@
  </style>
 <% end %>
 
-<h1 class="grid_16">Thank <%= @donation.donor.name %></h1>
+<h1 class="grid_16">Thank <%= @event.recipients.to_sentence %></h1>
 
 <div class="grid_12">
-    <p class="overview"><%= donation_summary @donation %></p>
+    <div class="overview">
+        <p><%= @event.donor %> donated <%= title @event.book %></p>
+        <% if @event.fulfiller %><p><%= @event.fulfiller %> (site volunteer) sent this book</p><% end %>
+    </div>
 
     <%= form_for @event, url: donation_thanks_path(@donation) do |f| %>
         <h2>Your thank-you message:</h2>

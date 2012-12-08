@@ -38,7 +38,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     assert_select '.request', /Virtue of Selfishness/ do
       assert_select '.headline', /The Virtue of Selfishness/
-      assert_select '.status', /Hugh Akston in Boston, MA has sent/
+      assert_select '.status', /Hugh Akston has sent/
       assert_select 'a', /Let Hugh Akston know when you have received/i
       assert_select 'a', text: /thank/i, count: 0
       assert_select 'a', /see full/i
@@ -110,6 +110,24 @@ class ProfileControllerTest < ActionController::TestCase
     verify_can_request
 
     assert_select 'h2', text: /donation/i, count: 0
+  end
+
+  test "show for requester with fulfiller" do
+    @frisco_donation.fulfill @kira
+    @frisco_donation.update_status! "sent", @kira
+
+    get :show, params, session_for(@frisco)
+    assert_response :success
+    assert_select 'h1', "Francisco d'Anconia"
+
+    assert_select '.request', /Objectivism:/ do
+      assert_select '.headline', /Objectivism:/
+      assert_select '.status', /Kira Argounova has sent/
+      assert_select '.flagged', false
+      assert_select 'a', /Let Henry Cameron and Kira Argounova know when you have received/
+      assert_select 'a', text: /thank/i, count: 0
+      assert_select 'a', /see full/i
+    end
   end
 
   test "show for donor" do

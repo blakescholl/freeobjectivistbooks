@@ -53,11 +53,15 @@
 
         <% if request.active? %>
             <% if request.reading? %>
-            <p><%= link_to "Let #{request.donor.name} know when you have finished reading this book",
-                edit_donation_status_path(request.donation, status: "read") %></p>
+            <p><%= link_to edit_donation_status_path(request.donation, status: "read") do %>
+                Let <%= [request.donor, request.fulfiller].compact.to_sentence %> know when you have finished reading this book
+                <% end %>
+            </p>
             <% elsif request.in_transit? %>
-            <p><%= link_to "Let #{request.donor.name} know when you have received this book",
-                edit_donation_status_path(request.donation, status: "received") %></p>
+            <p><%= link_to edit_donation_status_path(request.donation, status: "received") do %>
+                Let <%= [request.donor, request.fulfiller].compact.to_sentence %> know when you have received this book
+                <% end %>
+            </p>
             <% elsif request.needs_fix? %>
                 <% if request.address.blank? %>
                 <p class="flagged">We need your address to send you your book.</p>
@@ -69,7 +73,10 @@
             <% elsif request.address.blank? %>
             <p><%= link_to 'Add your address', edit_request_path(request) %></p>
             <% elsif request.needs_thanks? %>
-            <p><%= link_to "Thank #{request.donor.name}", new_donation_thank_url(request.donation) %></p>
+            <p><%= link_to new_donation_thank_url(request.donation) do %>
+                Thank <%= [request.donor, request.fulfiller].compact.to_sentence %>
+                <% end %>
+            </p>
             <% end %>
         <% end %>
 

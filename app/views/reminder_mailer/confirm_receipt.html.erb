@@ -1,11 +1,13 @@
 <p>Have you received <i><%= @donation.book %></i> yet?</p>
 
-<p><%= @donation.donor.name %> has sent you this book (confirmed on <%= l @donation.sent_at.to_date, format: :short %>).
+<p><%= @donation.fulfiller || @donation.donor %> has sent you this book (confirmed on <%= l @donation.sent_at.to_date, format: :short %>).
     When you receive, please confirm on Free Objectivist Books using this link:
 </p>
 
 <p><strong>
-    <%= link_to (raw "Yes, I have received <i>#{h @donation.book}</i>"), edit_donation_status_url(@donation, status: "received") %>
+    <%= link_to edit_donation_status_url(@donation, status: "received") do %>
+    Yes, I have received <i><%= @donation.book %></i>
+    <% end %>
 </strong></p>
 
 <p>That will let us know for our records, and also notify your donor.</p>

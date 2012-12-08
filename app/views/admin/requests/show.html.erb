@@ -41,6 +41,9 @@
     <% if @request.donor %>
     <p><%= admin_user_link @request.donor %> &ndash; <% if @request.thanked? %>Thank-you sent<% else %>Not thanked yet<% end %></p>
     <% end %>
+    <% if @request.fulfiller %>
+    <p>Fulfilled by <%= admin_user_link @request.fulfiller %></p>
+    <% end %>
 
     <h2>Events</h2>
     <%= render partial: "admin/events/event", collection: @request.events, spacer_template: "requests/spacer" %>

@@ -16,7 +16,7 @@
     <p class="headline">Add your address to get your book.</p>
     <% else %>
     <p class="headline">There seems to be a problem with your shipping info.</p>
-    <p class="detail">Your donor says: "<%= format_block @donation.flag_message %>"</p>
+    <p class="detail"><%= @flag_event.user %> says: "<%= format_block @flag_event.message %>"</p>
     <% end %>
 </div>
 
@@ -32,15 +32,15 @@
     <%= f.label :address, "Mailing address", class: "grid_5 alpha" %><div class="clear"></div>
     <%= f.text_area :address, class: "grid_5 alpha", rows: 5 %>
     <div class="grid_4 omega">
-        <p>Only shared with your donor.</p>
+        <p>Only shared with <%= @event.recipients.to_sentence %>.</p>
         <p class="field_with_errors"><%= @donation.errors[:address].join(", ") %></p>
     </div>
     <div class="clear"></div>
 
     <%= fields_for @event do |e| %>
-    <h2>Add a message for your donor</h2>
+    <h2>Add a message</h2>
 
-    <p>Your donor will get a notification about this update, and we'll include your message:</p>
+    <p><%= @event.recipients.to_sentence %> will get a notification about this update, and we'll include your message:</p>
     <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>
     <%= e.text_area :message, rows: 6, cols: 60 %>
     <div class="clear"></div>

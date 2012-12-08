@@ -14,7 +14,7 @@ class FlagsController < ApplicationController
   end
 
   def create
-    @event = @donation.flag params[:event].merge(user: @current_user)
+    @event = @donation.flag params[:event], @current_user
     if save @donation, @event
       flash[:notice] = "The request has been flagged, and your message has been sent to #{@donation.student}."
       redirect_to params[:redirect] || @donation.request
@@ -24,11 +24,12 @@ class FlagsController < ApplicationController
   end
 
   def fix
+    @flag_event = @donation.flag_event
     @event = @donation.fix_events.build
   end
 
   def destroy
-    @flag_event = @donation.flag_events.last
+    @flag_event = @donation.flag_event
     @event = @donation.fix params[:donation], params[:event]
     if save @donation, @event
       user = @flag_event.user

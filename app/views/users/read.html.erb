@@ -34,7 +34,7 @@
 <h1 class="grid_16">Sign up for your free Objectivist book</h1>
 <ul class="grid_12 overview">
     <li>Your profile will be listed for donors to browse.</li>
-    <li>A donor will choose you and send you the book directly.</li>
+    <li>A donor will choose you, and they or a volunteer will send you the book directly.</li>
 </ul>
 
 <div class="grid_12">
@@ -93,7 +93,7 @@
     <%= f.label :address, "Mailing address (for the book)", class: "grid_5 alpha" %><div class="clear"></div>
     <%= f.text_area :address, class: "grid_5 alpha", rows: 5 %>
     <div class="grid_4">
-        <p>Only shared with your donor.</p>
+        <p>Only shared with your donor or the volunteer who sends your book.</p>
         <p>You can enter this later.</p>
         <p class="field_with_errors"><%= @user.errors[:address].join(", ") %></p>
     </div>

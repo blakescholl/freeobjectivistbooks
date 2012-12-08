@@ -68,7 +68,7 @@ class ApplicationHelperTest < ActionView::TestCase
   test "status detail" do
     assert_equal "We are looking for a donor for this book.", status_detail(@howard_request)
     assert_equal "Hugh Akston in Boston, MA will donate this book.", status_detail(@dagny_request)
-    assert_equal "Hugh Akston in Boston, MA has sent this book.", status_detail(@quentin_request)
+    assert_equal "Hugh Akston has sent this book.", status_detail(@quentin_request)
     assert_equal "Hank Rearden has received this book.", status_detail(@hank_request_received)
     assert_equal "Quentin Daniels has read this book.", status_detail(@quentin_request_read)
   end

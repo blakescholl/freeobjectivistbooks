@@ -1,4 +1,4 @@
-<% content_for :title do %><%= @user.name %> – Admin<% end %>
+<% content_for :title do %><%= @user %> – Admin<% end %>
 
 <% content_for :stylesheet do %>
 <style>
@@ -30,7 +30,7 @@
 </style>
 <% end %>
 
-<h1 class="grid_16"><%= @user.name %></h1>
+<h1 class="grid_16"><%= @user %></h1>
 
 <div class="grid_12">
     <p class="tagline"><%= user_tagline @user %></p>
@@ -50,6 +50,9 @@
             No donor yet
             <% end %>
         </p>
+        <% if request.fulfiller %>
+        <p class="fulfiller">Fulfiller: <%= admin_user_link request.fulfiller %></p>
+        <% end %>
         <% if request.needs_fix? %>
         <p class="flagged">
             <% if request.address.blank? %>
@@ -79,7 +82,7 @@
     <% @user.donations.each do |donation| %>
     <p class="donation">
         <%= link_to admin_request_path(donation.request) do %>
-            <%= title donation.book %> to <%= donation.student.name %> in <%= donation.student.location %>
+            <%= title donation.book %> to <%= donation.student %> in <%= donation.student.location %>
         <% end %>
         &ndash;
         <% if donation.request.canceled? %>
@@ -98,6 +101,19 @@
     <% end %>
     <% end %>
 
+    <% if @user.fulfillments.any? %>
+    <h2>Fulfillments</h2>
+    <% @user.fulfillments.each do |fulfillment| %>
+    <p class="fulfillment">
+        <%= link_to admin_request_path(fulfillment.request) do %>
+            <%= title fulfillment.book %> to <%= fulfillment.student %> (donated by <%= fulfillment.donor %>)
+        <% end %>
+        &ndash;
+        <%= fulfillment.donation.status.humanize %>
+    </p>
+    <% end %>
+    <% end %>
+
     <h2>Reminders</h2>
     <% if @user.reminders.any? %>
     <%= render partial: "admin/reminders/user_reminder", collection: @user.reminders, spacer_template: "requests/spacer" %>
@@ -112,7 +128,7 @@
     <%= link_to edit_admin_user_path(@user) do %>
         <div class="edit button"></div>
     <% end %>
-    <%= link_to admin_user_path(@user), method: :delete, confirm: "Delete #{@user.name}?" do %>
+    <%= link_to admin_user_path(@user), method: :delete, confirm: "Delete #{@user}?" do %>
         <div class="delete button"></div>
     <% end %>
     <%= link_to "Spoof user", spoof_admin_user_path(@user), method: :post %>

@@ -85,13 +85,13 @@ module ApplicationHelper
     if request.canceled?
       "This request has been canceled."
     elsif request.read?
-      "#{request.user.name} has read this book."
+      "#{request.user} has read this book."
     elsif request.received?
-      "#{request.user.name} has received this book."
+      "#{request.user} has received this book."
     elsif request.sent?
-      "#{request.donor.name} in #{request.donor.location} has sent this book."
+      "#{request.fulfiller || request.donor} has sent this book."
     elsif request.granted?
-      "#{request.donor.name} in #{request.donor.location} will donate this book."
+      "#{request.donor} in #{request.donor.location} will donate this book."
     else
       "We are looking for a donor for this book."
     end

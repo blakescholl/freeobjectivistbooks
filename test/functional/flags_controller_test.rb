@@ -96,11 +96,21 @@ class FlagsControllerTest < ActionController::TestCase
     get :fix, {donation_id: @hank_donation.id}, session_for(@hank)
     assert_response :success
     assert_select '.message.error .headline', /problem/
-    assert_select '.message.error .detail', 'Your donor says: "Is your address correct?"'
+    assert_select '.message.error .detail', 'Henry Cameron says: "Is your address correct?"'
     assert_select 'input#donation_student_name[value="Hank Rearden"]'
     assert_select 'textarea#donation_address', @hank.address
     assert_select 'textarea#event_message'
     assert_select 'input[type="submit"]'
+  end
+
+  test "fix flag from fulfiller" do
+    @frisco_donation.fulfill @kira
+    @frisco_donation.flag! @kira
+
+    get :fix, {donation_id: @frisco_donation.id}, session_for(@frisco)
+    assert_response :success
+    assert_select '.message.error .headline', /problem/
+    assert_select '.message.error .detail', /Kira Argounova says: /
   end
 
   test "fix requires login" do

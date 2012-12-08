@@ -24,7 +24,7 @@
     <%= f.label :address, "Mailing address", class: "grid_5 alpha" %><div class="clear"></div>
     <%= f.text_area :address, class: "grid_5 alpha", rows: 5 %>
     <div class="grid_4 omega">
-        <p>Only shared with your donor.</p>
+        <p>Only shared with your donor or with the volunteer who sends your book.</p>
         <% if @request.address.blank? && !@request.granted? %><p>You can enter this later.</p><% end %>
         <p class="field_with_errors"><%= @request.errors[:address].join(", ") %></p>
     </div>

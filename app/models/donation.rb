@@ -196,9 +196,14 @@ class Donation < ActiveRecord::Base
     end
   end
 
+  # The most recent flag event, if any.
+  def flag_event
+    flag_events.last
+  end
+
   # The message from the donor the last time the donor flagged the request, if any.
   def flag_message
-    event = flag_events.last
+    event = flag_event
     event.message if event
   end
 
@@ -269,7 +274,7 @@ class Donation < ActiveRecord::Base
 
     event_attributes = params[:event] || {}
     event_attributes = event_attributes.merge(user: user) if user
-    event_attributes = event_attributes.merge(detail: params[:status])
+    event_attributes = event_attributes.merge(happened_at: time, detail: params[:status])
     event = update_status_events.build event_attributes
     if event.message.blank?
       event.is_thanks = nil
@@ -278,8 +283,9 @@ class Donation < ActiveRecord::Base
     event
   end
 
-  def flag(params)
+  def flag(params, user = nil)
     self.flagged = true
+    params = params.merge(user: user) if user
     flag_events.build params
   end
 

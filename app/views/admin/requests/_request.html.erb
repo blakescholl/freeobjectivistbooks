@@ -12,6 +12,9 @@
     <% if request.donor %>
     <p class="donor">Donor: <%= admin_user_link request.donor %> <% if request.thanked? %>&ndash; thanked<% end %></p>
     <% end %>
+    <% if request.fulfiller %>
+    <p class="fulfiller">Fulfiller: <%= admin_user_link request.fulfiller %></p>
+    <% end %>
     <% if request.needs_fix? %>
     <p class="flagged">
         <% if request.address.blank? %>

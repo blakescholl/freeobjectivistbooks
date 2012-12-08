@@ -171,9 +171,16 @@ class Request
 end
 
 class Donation
-  def flag!
+  def flag!(user = nil)
     params = {message: "Fix this"}
-    event = flag params
+    event = flag params, user
+    save!
+    event.save! if event
+  end
+
+  def update_status!(status, user = nil, time = Time.now)
+    params = {status: status}
+    event = update_status params, user, time
     save!
     event.save! if event
   end

@@ -127,6 +127,29 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "confirm receipt from fulfiller" do
+    @frisco_donation.fulfill @kira
+    @frisco_donation.update_status! "sent", @kira, (Time.now - 2.weeks)
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::ConfirmReceipt.new_for_entity @frisco_donation
+
+    mail = ReminderMailer.send_to_target :confirm_receipt, reminder
+    assert_equal "Have you received Objectivism: The Philosophy of Ayn Rand yet?", mail.subject
+    assert_equal [@frisco.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Francisco/
+      assert_select 'p', /Have you received Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Kira Argounova has sent you this book/
+      assert_select 'a', /I have received Objectivism/
+      assert_select 'p', /Thanks,\nFree Objectivist Books/
+    end
+  end
+
   test "read books" do
     reminder = Reminders::ReadBooks.new_for_entity @hank_donation_received
 

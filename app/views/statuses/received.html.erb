@@ -22,16 +22,18 @@
 <h1 class="grid_16">Yes, I have received my book</h1>
 
 <div class="grid_12">
-    <p class="overview"><%= donation_summary @donation %>. Use this form to let us know when you've received it.</p>
+    <p class="overview"><%= @donation.donor %> donated <%= title @donation.book %><% if @donation.fulfiller %>, and <%= @donation.fulfiller %> sent it to you<% end %>.
+        Use this form to let us know when you've received it.
+    </p>
 
     <%= form_for @donation, url: donation_status_path(@donation) do |f| %>
         <%= f.hidden_field :status, value: "received" %>
 
         <%= f.fields_for @event do |e| %>
             <% if @donation.thanked? %>
-            <h2>Add a message for <%= @donation.user.name %> (optional)</h2>
+            <h2>Add a message for <%= @event.recipients.to_sentence %> (optional)</h2>
             <% else %>
-            <h2>Add a thank-you message for <%= @donation.user.name %></h2>
+            <h2>Add a thank-you message for <%= @event.recipients.to_sentence %></h2>
             <% end %>
 
             <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>

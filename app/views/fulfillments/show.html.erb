@@ -50,7 +50,7 @@
 
     <h2>3. Confirm</h3>
     <p>Let us know when you have sent the book:</p>
-    <%= form_for @fulfillment.donation, url: donation_status_path(@fulfillment.donation) do |f| %>
+    <%= form_for @fulfillment.donation, url: donation_status_path(@fulfillment.donation, redirect: volunteer_url) do |f| %>
         <%= f.hidden_field :status, value: "sent" %>
         <%= f.submit "", class: "grid_3 alpha button sent" %>
         <div class="clear"></div>

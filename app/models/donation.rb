@@ -262,13 +262,15 @@ class Donation < ActiveRecord::Base
     end
   end
 
-  def update_status(params, time = Time.now)
+  def update_status(params, user = nil, time = Time.now)
     self.status = params[:status]
     self.status_updated_at = time
     self.flagged = false if sent?
 
     event_attributes = params[:event] || {}
-    event = update_status_events.build event_attributes.merge(detail: params[:status])
+    event_attributes = event_attributes.merge(user: user) if user
+    event_attributes = event_attributes.merge(detail: params[:status])
+    event = update_status_events.build event_attributes
     if event.message.blank?
       event.is_thanks = nil
       event.public = nil

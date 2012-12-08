@@ -3,7 +3,7 @@ require 'test_helper'
 class StatusesControllerTest < ActionController::TestCase
   # Sent "form"
 
-  test "received form redirects to request" do
+  test "sent form redirects to request" do
     get :edit, {donation_id: @dagny_donation.id, status: "sent"}, session_for(@hugh)
     assert_redirected_to @dagny_request
   end
@@ -20,7 +20,23 @@ class StatusesControllerTest < ActionController::TestCase
     @dagny_donation.reload
     assert @dagny_donation.status.sent?, @dagny_donation.status.to_s
 
-    verify_event @dagny_donation, "update_status", detail: "sent"
+    verify_event @dagny_donation, "update_status", detail: "sent", user: @hugh
+  end
+
+  test "sent by fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    assert_difference "@frisco_donation.events.count" do
+      params = {donation_id: @frisco_donation.id, donation: {status: "sent"}, redirect: volunteer_url}
+      put :update, params, session_for(@kira)
+    end
+    assert_redirected_to volunteer_url
+    assert_match /We've let Francisco d'Anconia and Henry Cameron know/, flash[:notice]
+
+    @frisco_donation.reload
+    assert @frisco_donation.status.sent?, @frisco_donation.status.to_s
+
+    verify_event @frisco_donation, "update_status", detail: "sent", user: @kira
   end
 
   test "sent requires login" do
@@ -38,7 +54,7 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form" do
     get :edit, {donation_id: @quentin_donation.id, status: "received"}, session_for(@quentin)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA donated The Virtue of Selfishness/
+    assert_select 'p', /Hugh Akston donated The Virtue of Selfishness/
     assert_select 'h2', /Add a thank-you message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks[type="hidden"][value=true]'
     assert_select 'textarea#donation_event_message'
@@ -49,7 +65,7 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form for an unsent donation" do
     get :edit, {donation_id: @quentin_donation_unsent.id, status: "received"}, session_for(@quentin)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA donated The Fountainhead/
+    assert_select 'p', /Hugh Akston donated The Fountainhead/
     assert_select 'h2', /Add a thank-you message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks[type="hidden"][value=true]'
     assert_select 'textarea#donation_event_message'
@@ -61,11 +77,23 @@ class StatusesControllerTest < ActionController::TestCase
   test "received form for an already-thanked donation" do
     get :edit, {donation_id: @dagny_donation.id, status: "received"}, session_for(@dagny)
     assert_response :success
-    assert_select 'p', /Hugh Akston in Boston, MA donated Capitalism: The Unknown Ideal/
+    assert_select 'p', /Hugh Akston donated Capitalism: The Unknown Ideal/
     assert_select 'h2', /Add a message for Hugh Akston/
     assert_select 'input#donation_event_is_thanks', false
     assert_select 'textarea#donation_event_message'
     assert_select 'input[type="radio"]', false
+    assert_select 'input[type="submit"]'
+  end
+
+  test "received form with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    get :edit, {donation_id: @frisco_donation.id, status: "received"}, session_for(@frisco)
+    assert_response :success
+    assert_select 'p', /Henry Cameron donated Objectivism/
+    assert_select 'p', /Kira Argounova sent/
+    assert_select 'h2', /Add a thank-you message for Henry Cameron and Kira Argounova/
+    assert_select 'textarea#donation_event_message'
     assert_select 'input[type="submit"]'
   end
 
@@ -87,7 +115,7 @@ class StatusesControllerTest < ActionController::TestCase
       put :update, {donation_id: @quentin_donation.id, donation: {status: "received", event: event}}, session_for(@quentin)
     end
     assert_redirected_to @quentin_request
-    assert_match /We've let your donor \(Hugh Akston\) know/, flash[:notice]
+    assert_match /We've let Hugh Akston know/, flash[:notice]
 
     @quentin_donation.reload
     assert @quentin_donation.received?, @quentin_donation.status.to_s
@@ -102,7 +130,7 @@ class StatusesControllerTest < ActionController::TestCase
       put :update, {donation_id: @quentin_donation.id, donation: {status: "received", event: event}}, session_for(@quentin)
     end
     assert_redirected_to @quentin_request
-    assert_match /We've let your donor \(Hugh Akston\) know/, flash[:notice]
+    assert_match /We've let Hugh Akston know/, flash[:notice]
 
     @quentin_donation.reload
     assert @quentin_donation.received?, @quentin_donation.status.to_s
@@ -117,12 +145,29 @@ class StatusesControllerTest < ActionController::TestCase
       put :update, {donation_id: @dagny_donation.id, donation: {status: "received", event: event}}, session_for(@dagny)
     end
     assert_redirected_to @dagny_request
-    assert_match /We've let your donor \(Hugh Akston\) know/, flash[:notice]
+    assert_match /We've let Hugh Akston know/, flash[:notice]
 
     @dagny_donation.reload
     assert @dagny_donation.received?, @dagny_donation.status.to_s
 
     verify_event @dagny_donation, "update_status", detail: "received", is_thanks?: false, message: "It came today", public: nil
+  end
+
+  test "received with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    event = {message: "", is_thanks: true, public: nil}
+    assert_difference "@frisco_donation.events.count" do
+      put :update, {donation_id: @frisco_donation.id, donation: {status: "received", event: event}}, session_for(@frisco)
+    end
+    assert_redirected_to @frisco_request
+    assert_match /We've let Henry Cameron and Kira Argounova know/, flash[:notice]
+
+    @frisco_donation.reload
+    assert @frisco_donation.received?, @frisco_donation.status.to_s
+    assert !@frisco_donation.thanked?
+
+    verify_event @frisco_donation, "update_status", detail: "received", is_thanks?: false, public: nil
   end
 
   test "received with thank-you requires explicit public bit" do
@@ -179,7 +224,7 @@ class StatusesControllerTest < ActionController::TestCase
       post :update, params, session_for(@hank)
     end
     assert_redirected_to new_request_url(from_read: true)
-    assert_match /Your donor \(Henry Cameron\) will be glad/, flash[:notice]
+    assert_match /Henry Cameron will be glad/, flash[:notice]
 
     @hank_donation_received.reload
     assert @hank_donation_received.read?
@@ -202,7 +247,7 @@ class StatusesControllerTest < ActionController::TestCase
       post :update, params, session_for(@hank)
     end
     assert_redirected_to new_request_url(from_read: true)
-    assert_match /Your donor \(Henry Cameron\) will be glad/, flash[:notice]
+    assert_match /Henry Cameron will be glad/, flash[:notice]
 
     @hank_donation_received.reload
     assert @hank_donation_received.read?
@@ -215,10 +260,24 @@ class StatusesControllerTest < ActionController::TestCase
       post :update, params, session_for(@quentin)
     end
     assert_redirected_to profile_url
-    assert_match /Your donor \(Hugh Akston\) will be glad/, flash[:notice]
+    assert_match /Hugh Akston will be glad/, flash[:notice]
 
     @quentin_donation.reload
     assert @quentin_donation.read?
+  end
+
+  test "read with fulfiller" do
+    @frisco_donation.fulfill @kira
+
+    params = {donation_id: @frisco_donation.id, donation: {status: "read"}, review: {text: ""}}
+    assert_difference "@frisco_donation.events.count" do
+      post :update, params, session_for(@frisco)
+    end
+    assert_match /Henry Cameron and Kira Argounova will be glad/, flash[:notice]
+
+    @frisco_donation.reload
+    assert @frisco_donation.read?
+    assert_nil @frisco_donation.review
   end
 
   test "read with review requires recommend bit" do

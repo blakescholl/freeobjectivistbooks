@@ -17,7 +17,7 @@ class StatusesController < ApplicationController
 
   def allowed_users
     case status
-    when "sent" then @donation.user
+    when "sent" then [@donation.user, @donation.fulfiller]
     when "received", "read" then @donation.student
     end
   end
@@ -34,7 +34,7 @@ class StatusesController < ApplicationController
     if status == "sent"
       redirect_to @donation.request
     else
-      @event = @donation.update_status_events.build detail: status
+      @event = @donation.update_status_events.build detail: status, user: @current_user
       @review = @donation.build_review
       render status
     end
@@ -42,13 +42,15 @@ class StatusesController < ApplicationController
 
   def notice
     case status
-    when "sent" then "Thanks! We've let #{@donation.student.name} know the book is on its way."
-    when "received" then "Great! We've let your donor (#{@donation.user.name}) know that you received this book."
-    when "read" then "Great! Your donor (#{@donation.user.name}) will be glad to hear that you finished this book."
+    when "sent" then "Thanks! We've let #{@event.recipients.to_sentence} know the book is on its way."
+    when "received" then "Great! We've let #{@event.recipients.to_sentence} know that you received this book."
+    when "read" then "Great! #{@event.recipients.to_sentence} will be glad to hear that you finished this book."
     end
   end
 
   def redirect_destination
+    return params[:redirect] if params[:redirect]
+
     case status
     when "sent", "received" then @donation.request
     when "read"
@@ -57,7 +59,7 @@ class StatusesController < ApplicationController
   end
 
   def update
-    @event = @donation.update_status params[:donation]
+    @event = @donation.update_status params[:donation], @current_user
     @review = @donation.build_review params[:review] if params[:review] && params[:review][:text].present?
 
     if save @donation, @review, @event

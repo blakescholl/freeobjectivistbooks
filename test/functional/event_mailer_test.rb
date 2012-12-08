@@ -168,7 +168,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "sent by fulfiller, to student" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.update_status status: "sent", event: {user: @kira}
+    event = @frisco_donation.update_status({status: "sent"}, @kira)
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, :student
@@ -187,7 +187,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "sent by fulfiller, cc to donor" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.update_status status: "sent", event: {user: @kira}
+    event = @frisco_donation.update_status({status: "sent"}, @kira)
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, :donor

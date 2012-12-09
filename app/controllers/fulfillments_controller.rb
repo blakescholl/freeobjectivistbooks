@@ -7,7 +7,7 @@ class FulfillmentsController < ApplicationController
   end
 
   def volunteer
-    @donations = Donation.needs_fulfillment
+    @donations = Donation.needs_fulfillment.reorder(:created_at)
   end
 
   def create

@@ -43,6 +43,11 @@ class DonationsController < ApplicationController
     @donations = @current_user.donations.active
   end
 
+  def pay
+    @donations = @current_user.donations.needs_payment
+    @total = @donations.inject(Money.new(0)) {|sum,donation| sum += donation.price}
+  end
+
   def create
     @event = @request.grant @current_user
     if save @request, @event

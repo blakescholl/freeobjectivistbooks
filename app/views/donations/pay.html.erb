@@ -1,0 +1,48 @@
+<% content_for :title do %>Send Money for Your Donations<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.main {
+    font-size: 1.3em;
+    margin-top: 18px;
+}
+
+h2 {
+    margin-bottom: 12px;
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Your donations</h1>
+
+<div class="main grid_12">
+    <% if @donations.any? %>
+    <p>You chose to donate:</p>
+    <ul>
+    <% @donations.each do |donation| %>
+        <li>
+            <%= link_to donation.request do %>
+                <%= title donation.book %> to <%= donation.student %> in <%= donation.student.location %> –
+                <%= humanized_money_with_symbol donation.price %>
+            <% end %>
+        </li>
+    <% end %>
+    </ul>
+
+    <p>Total for your donations: <span class="money"><%= humanized_money_with_symbol @total %></span></p>
+
+    <h2>How to pay</h2>
+    <div>
+        <ol>
+            <li><%= link_to "Buy a gift card on Amazon", "https://www.amazon.com/gp/product/B004LLIL5A", target: "_blank" %></li>
+            <li>Enter the amount: <%= @total.format %></li>
+            <li>Enter recipient email: donations@freeobjectivistbooks.org</li>
+            <li>Include your name or email address so we know whom to credit</li>
+        </ol>
+        <p>When we receive your contribution, a volunteer will send your books.</p>
+    </div>
+    <% else %>
+    <p>No donations to pay for right now. <%= link_to 'Find students to donate books to', donate_path %></p>
+    <% end %>
+</div>
+<div class="clear"></div>

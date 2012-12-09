@@ -54,8 +54,8 @@
             <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
             <% end %>
             <p class="no-donations">
-                <% if @donation_count > 0 %>
-                You previously donated <%= pluralize @donation_count, 'book' %>.
+                <% if @previous_count > 0 %>
+                You previously donated <%= pluralize @previous_count, 'book' %>.
                 <% else %>
                 You haven't donated any books yet.
                 <% end %>
@@ -65,6 +65,7 @@
                 <ul id="donations-list"></ul>
                 <% if @current_user.donor_mode.send_money? %>
                 <p>Total: <span id="donation-total" class="money"></span></p>
+                <p><%= link_to 'Send payment to complete your donation', pay_donations_path %></p>
                 <% else %>
                 <p><%= link_to 'See student addresses and send books', donations_path %></p>
                 <% end %>
@@ -77,7 +78,17 @@
 <% content_for :javascript do %>
 <script>
 $(document).ready(function () {
-    var donations = <%= raw @unsent_donations.to_json(methods: [:student, :book]) %>;
+    var donations = <%= raw @donations.to_json(methods: [:student, :book]) %>;
+
+    function formatMoney(amount) {
+        var fmt = "";
+        if (amount % 1 === 0) {
+            fmt = amount.toString();
+        } else {
+            fmt = amount.toFixed(2);
+        }
+        return "$" + fmt;
+    }
 
     function donationTotal() {
         var sum = 0;
@@ -96,7 +107,7 @@ $(document).ready(function () {
 
     function updateTotals() {
         $('#donation-count').text(donations.length + " book" + (donations.length === 1 ? "" : "s"));
-        $('#donation-total').text('$' + donationTotal().toFixed(2));
+        $('#donation-total').text(formatMoney(donationTotal()));
     }
 
     function render(animated) {

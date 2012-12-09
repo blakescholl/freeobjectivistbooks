@@ -93,7 +93,7 @@ $(document).ready(function () {
     function donationTotal() {
         var sum = 0;
         $.each(donations, function (i, donation) {
-            sum += donation.book.price_cents;
+            sum += donation.price_cents;
         });
         return sum/100;
     }

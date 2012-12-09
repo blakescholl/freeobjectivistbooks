@@ -6,7 +6,8 @@ class BalanceObserver < ActiveRecord::Observer
     when Contribution
       contribution = object
       contribution.add_to_user_balance
-      contribution.user.donations.needs_payment.each do |donation|
+      donations = contribution.user.donations.needs_payment.reorder(:created_at)
+      donations.each do |donation|
         donation.pay_if_covered
       end
     when Donation

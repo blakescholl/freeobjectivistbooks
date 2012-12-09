@@ -1,7 +1,0 @@
-<%= @event.user %> sent you a message on Free Objectivist Books:
-
-"<%= @event.message %>"
-
-Reply to <%= @event.user %>: <%= new_donation_message_url @event.donation %>
-
-Full details for this request: <%= request_url(@event.request) %>

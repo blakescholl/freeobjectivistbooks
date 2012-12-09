@@ -79,6 +79,11 @@ a:active {
     color: #d80000;
 }
 
+.warning {
+    color: #d80000;
+    font-weight: bold;
+}
+
 .more {
     margin-top: 24px;
 }

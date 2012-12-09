@@ -23,6 +23,10 @@ class Actions
     @user == fulfiller
   end
 
+  def other_users
+    [student, donor, fulfiller].compact - [@user]
+  end
+
   def prompted_status
     if for_donor? || for_fulfiller?
       if donation.can_send?

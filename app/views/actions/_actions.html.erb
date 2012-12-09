@@ -10,13 +10,13 @@
             <div class="clear"></div>
         <% end %>
     <% when :received %>
-        <p>Let <%= actions.donor %> know when you have received <%= title actions.book %>:</p>
+        <p>Let <%= actions.other_users.to_sentence %> know when you have received <%= title actions.book %>:</p>
         <%= link_to edit_donation_status_path(actions.donation, status: "received"), class: "grid_3 alpha" do %>
             <div class="button update"></div>
         <% end %>
         <div class="clear"></div>
     <% when :read %>
-        <p>Let <%= actions.donor %> know when you have finished reading <%= title actions.book %>:</p>
+        <p>Let <%= actions.other_users.to_sentence %> know when you have finished reading <%= title actions.book %>:</p>
         <%= link_to edit_donation_status_path(actions.donation, status: "read"), class: "grid_3 alpha" do %>
             <div class="button update"></div>
         <% end %>
@@ -40,7 +40,7 @@
     <% when :flag %>
         <%= link_to 'Flag problem with shipping info', new_donation_flag_path(actions.donation) %>
     <% when :message %>
-        <%= link_to "Send a message to #{other_user}", new_donation_message_path(actions.donation) %>
+        <%= link_to "Send a message to #{actions.other_users.to_sentence}", new_donation_message_path(actions.donation) %>
     <% when :thank %>
         <%= link_to "Thank #{actions.donor}", new_donation_thank_url(actions.donation) %>
     <% when :update_address %>

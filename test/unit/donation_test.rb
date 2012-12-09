@@ -66,6 +66,10 @@ class DonationTest < ActiveSupport::TestCase
     verify_scope(:unpaid) {|donation| !donation.paid?}
   end
 
+  test "has price" do
+    verify_scope(:has_price) {|donation| donation.price.present?}
+  end
+
   test "fulfilled" do
     @frisco_donation.fulfill @kira
     verify_scope(:fulfilled) {|donation| donation.fulfilled?}

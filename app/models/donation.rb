@@ -55,6 +55,7 @@ class Donation < ActiveRecord::Base
 
   scope :paid, active.where(paid: true)
   scope :unpaid, active.where(paid: false)
+  scope :has_price, where('price_cents is not null')
 
   scope :fulfilled, joins(:fulfillment)
   scope :unfulfilled, joins('left join fulfillments on fulfillments.donation_id = donations.id').where('fulfillments.id is null')
@@ -68,7 +69,7 @@ class Donation < ActiveRecord::Base
 
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
-  scope :needs_payment, active.not_sent.unpaid
+  scope :needs_payment, active.not_sent.has_price.unpaid
   scope :needs_fulfillment, active.needs_sending.paid.unfulfilled
 
   #--

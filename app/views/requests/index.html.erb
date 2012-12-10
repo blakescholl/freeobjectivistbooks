@@ -2,12 +2,18 @@
 
 <% content_for :stylesheet do %>
 <style>
-.button, .loading {
+.donate, .loading {
     height: 56px;
 }
 
-.button {
+.donate {
     background-image: url(/assets/donate-one-button.png);
+}
+
+.send-payment {
+    height: 46px;
+    margin-top: 8px;
+    background-image: url(/assets/send-payment-button.png);
 }
 
 .center {
@@ -65,7 +71,7 @@
                 <ul id="donations-list"></ul>
                 <% if @current_user.donor_mode.send_money? %>
                 <p>Total: <span id="donation-total" class="money"></span></p>
-                <p><%= link_to 'Send payment to complete your donation', pay_donations_path %></p>
+                <%= link_to pay_donations_path do %><div class="send-payment button"></div><% end %>
                 <% else %>
                 <p><%= link_to 'See student addresses and send books', donations_path %></p>
                 <% end %>

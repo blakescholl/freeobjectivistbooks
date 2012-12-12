@@ -42,8 +42,13 @@
 <h1 class="grid_16">Sign up to donate Objectivist books</h1>
 <ul class="grid_12 overview">
     <li>We'll send you a link to browse students and their requests.</li>
+    <% if params[:donor_mode] == "send_money" %>
+    <li>You'll choose the ones you want to sponsor.</li>
+    <li>A site volunteer will send the books on your behalf.</li>
+    <% else %>
     <li>You will send the books to them directly.</li>
     <li>You will <em>not</em> send money to us or to any student.</li>
+    <% end %>
 </ul>
 <div class="clear"></div>
 
@@ -89,7 +94,7 @@
     <%= fields_for @pledge do |p| %>
     <p class="field_with_errors"><%= @pledge.errors[:quantity].join(", ") %></p>
     <label>I pledge to donate <%= p.text_field :quantity, size: 1 %> books to students.</label>
-    <p class="pledge-explanation">You can usually buy books for $5 to $10 a copy.</p>
+    <p class="pledge-explanation">Most books are $10 a copy or less.</p>
 
     <h2>Why do you want to donate Objectivist books? (optional)</h2>
 

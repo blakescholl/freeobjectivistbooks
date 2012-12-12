@@ -50,8 +50,19 @@ class UsersControllerTest < ActionController::TestCase
   test "donate" do
     get :donate
     assert_response :success
+    assert_select 'ul.overview li', /you will send the books/i
+    assert_select 'ul.overview li', text: /volunteer will send the books/i, count: 0
+    assert_select 'input#user_donor_mode[value="send_money"]', count: 0
     assert_select '.error', false
     assert_select '.sidebar h2', "Already signed up?"
+  end
+
+  test "donate in send-money mode" do
+    get :donate, donor_mode: "send_money"
+    assert_response :success
+    assert_select 'ul.overview li', text: /you will send the books/i, count: 0
+    assert_select 'ul.overview li', /volunteer will send the books/i
+    assert_select 'input#user_donor_mode[value="send_money"]'
   end
 
   test "donate when logged in" do
@@ -141,6 +152,32 @@ class UsersControllerTest < ActionController::TestCase
     assert_equal "galt@gulch.com", user.email
     assert_equal "Atlantis, CO", user.location
     assert user.authenticate "dagny"
+    assert_equal "send_books", user.donor_mode
+
+    assert_equal user.id, session[:user_id]
+
+    pledge = user.pledges.first
+    assert_not_nil pledge
+    assert_equal 5, pledge.quantity
+    assert_equal pledge_reason, pledge.reason
+
+    assert_equal [], user.requests
+  end
+
+  test "create donor in send-money mode" do
+    user = user_attributes
+    user[:donor_mode] = "send_money"
+    pledge = pledge_attributes
+
+    post :create, user: user, pledge: pledge, from_action: "donate"
+    assert_redirected_to donate_url
+
+    user = User.find_by_name "John Galt"
+    assert_not_nil user
+    assert_equal "galt@gulch.com", user.email
+    assert_equal "Atlantis, CO", user.location
+    assert user.authenticate "dagny"
+    assert_equal "send_money", user.donor_mode
 
     assert_equal user.id, session[:user_id]
 

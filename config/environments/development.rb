@@ -14,18 +14,8 @@ FreeBooks::Application.configure do
   config.action_controller.perform_caching = false
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
-  config.action_mailer.smtp_settings = {
-    authentication: :plain,
-    address: "smtp.mailgun.org",
-    port: 587,
-    domain: "freeobjectivistbooks.mailgun.org",
-    user_name: "postmaster@freeobjectivistbooks.mailgun.org",
-    password: "47yry7f8jtl8"
-  }
-
-  config.mailgun_domain = "freeobjectivistbooks.mailgun.org"
-  config.mailgun_api_key = "key-5clk2a0tya0jz2p8qaidprut3-5qfey1"
+  config.action_mailer.delivery_method = :test
+  config.action_mailer.default_url_options = { host: 'localhost:5000' }
 
   config.email_recipient_override = "jason.crawford@gmail.com"
 

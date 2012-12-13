@@ -76,5 +76,5 @@ FreeBooks::Application.configure do
     sender_address: %{"FBP Exceptions" <exceptions@freeobjectivistbooks.mailgun.org>},
     exception_recipients: %w{jason@rationalegoist.com}
 
-  config.admin_password_hash = Digest::MD5.hexdigest "admin:Admin:#{ENV['ADMIN_PASSWORD']}"
+  config.admin_password_hash = ENV['ADMIN_PASSWORD_HASH']
 end

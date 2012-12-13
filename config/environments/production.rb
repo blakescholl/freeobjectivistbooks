@@ -51,15 +51,15 @@ FreeBooks::Application.configure do
   config.action_mailer.default_url_options = { host: 'freeobjectivistbooks.org' }
   config.action_mailer.smtp_settings = {
     authentication: :plain,
-    address: "smtp.mailgun.org",
-    port: 25,
-    domain: "freeobjectivistbooks.mailgun.org",
-    user_name: "postmaster@freeobjectivistbooks.mailgun.org",
-    password: "47yry7f8jtl8"
+    address: ENV['MAILGUN_SMTP_SERVER'],
+    port: ENV['MAILGUN_SMTP_PORT'],
+    domain: ENV['MAILGUN_SMTP_DOMAIN'],
+    user_name: ENV['MAILGUN_SMTP_LOGIN'],
+    password: ENV['MAILGUN_SMTP_PASSWORD']
   }
 
-  config.mailgun_domain = "freeobjectivistbooks.mailgun.org"
-  config.mailgun_api_key = "key-5clk2a0tya0jz2p8qaidprut3-5qfey1"
+  config.mailgun_domain = ENV['MAILGUN_SMTP_DOMAIN']
+  config.mailgun_api_key = ENV['MAILGUN_API_KEY']
 
   # Enable threaded mode
   # config.threadsafe!
@@ -76,5 +76,5 @@ FreeBooks::Application.configure do
     sender_address: %{"FBP Exceptions" <exceptions@freeobjectivistbooks.mailgun.org>},
     exception_recipients: %w{jason@rationalegoist.com}
 
-  config.admin_password_hash = "4cbc6da50253f97d2fb2fc2e88f80df5"
+  config.admin_password_hash = Digest::MD5.hexdigest "admin:Admin:#{ENV['ADMIN_PASSWORD']}"
 end

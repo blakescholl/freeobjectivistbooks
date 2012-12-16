@@ -15,7 +15,7 @@ class UsersControllerTest < ActionController::TestCase
       email: "galt@gulch.com",
       location: "Atlantis, CO",
       password: "dagny",
-      password_confirmation: "dagny"
+      password_confirmation: "dagny",
       donor_mode: "send_books"
     }
   end

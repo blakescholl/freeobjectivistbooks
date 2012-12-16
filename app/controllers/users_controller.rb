@@ -8,6 +8,7 @@ class UsersController < ApplicationController
 
   def load_models
     @user = User.new params[:user]
+    @user.donor_mode = params[:donor_mode] if params[:donor_mode].present?
     @request = @user.requests.build params[:request] if params[:request]
     @pledge = @user.pledges.build params[:pledge] if params[:pledge]
   end

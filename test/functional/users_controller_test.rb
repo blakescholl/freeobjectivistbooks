@@ -16,6 +16,7 @@ class UsersControllerTest < ActionController::TestCase
       location: "Atlantis, CO",
       password: "dagny",
       password_confirmation: "dagny"
+      donor_mode: "send_books"
     }
   end
 
@@ -52,7 +53,7 @@ class UsersControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'ul.overview li', /you will send the books/i
     assert_select 'ul.overview li', text: /volunteer will send the books/i, count: 0
-    assert_select 'input#user_donor_mode[value="send_money"]', count: 0
+    assert_select 'input#user_donor_mode[value="send_books"]'
     assert_select '.error', false
     assert_select '.sidebar h2', "Already signed up?"
   end

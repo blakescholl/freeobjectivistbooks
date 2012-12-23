@@ -32,9 +32,13 @@ class FlagsController < ApplicationController
     @flag_event = @donation.flag_event
     @event = @donation.fix params[:donation], params[:event]
     if save @donation, @event
-      user = @flag_event.user
-      role = role_description @flag_event.user_role
-      flash[:notice] = "Thank you. We've notified #{user} (#{role}), who will send your book."
+      flash[:notice] = if @flag_event
+        user = @flag_event.user
+        role = @flag_event.user_role
+        "Thank you. We've notified #{user} (#{role_description role}), who will send your book."
+      else
+        "Thank you."
+      end
       redirect_to @donation.request
     else
       render :fix

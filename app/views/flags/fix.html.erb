@@ -16,7 +16,9 @@
     <p class="headline">Add your address to get your book.</p>
     <% else %>
     <p class="headline">There seems to be a problem with your shipping info.</p>
+    <% if @flag_event %>
     <p class="detail"><%= @flag_event.user %> says: "<%= format_block @flag_event.message %>"</p>
+    <% end %>
     <% end %>
 </div>
 

@@ -13,6 +13,12 @@ class Book < ActiveRecord::Base
     "http://www.amazon.com/dp/#{asin}/" if asin
   end
 
+  def merge_with_duplicate(other)
+    Request.where(book_id: other).update_all(book_id: self)
+    Review.where(book_id: other).update_all(book_id: self)
+    other.destroy
+  end
+
   def to_s
     title
   end

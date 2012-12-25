@@ -47,4 +47,11 @@ FactoryGirl.define do
       association :request, factory: :request_no_address
     end
   end
+
+  factory :review do
+    association :user, factory: :student
+    book
+    text "I really enjoyed it!"
+    recommend true
+  end
 end

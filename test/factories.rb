@@ -1,22 +1,20 @@
 FactoryGirl.define do
   factory :user do
-    name "John Galt"
-    email { "#{name.downcase.gsub(' ','.')}@example.com" }
-    location "Atlantis, CO"
+    sequence(:name) {|n| "User #{n}"}
+    email { name.downcase.gsub(/\s/,'') + "@example.com" }
+    location "Anytown, USA"
     password "password"
     password_confirmation { password }
 
     factory :student do
-      name "Hank Rearden"
-      location "Philadelphia, PA"
-      studying "manufacturing"
-      school "University of Pittsburgh"
-      address "987 Steel Way\nPhiladelphia, PA 12345"
+      sequence(:name) {|n| "Student #{n}"}
+      studying "philosophy"
+      school "U. of California"
+      sequence(:address) {|n| "#{n} Main St\nAnytown, USA"}
     end
 
     factory :donor do
-      name "Hugh Akston"
-      location "Boston, MA"
+      sequence(:name) {|n| "Donor #{n}"}
     end
 
     trait :no_address do
@@ -25,7 +23,7 @@ FactoryGirl.define do
   end
 
   factory :book do
-    title "Atlas Shrugged"
+    sequence(:title) {|n| "Book #{n}"}
   end
 
   factory :request do

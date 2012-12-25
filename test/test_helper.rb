@@ -105,7 +105,7 @@ class ActiveSupport::TestCase
 
   def verify_event(entity, type, options = {})
     entity.reload
-    event = entity.events.last
+    event = entity.events.reorder(:id).last
     assert_not_nil event, "no events for #{entity.inspect}"
     assert_equal type, event.type
     options.keys.each do |key|

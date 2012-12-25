@@ -139,7 +139,8 @@ class FlagsControllerTest < ActionController::TestCase
   def verify_destroy(donation, params)
     assert_redirected_to donation.request
 
-    expected_notice = if params[:role] == :fulfiller
+    expected_notice = params[:expected_notice]
+    expected_notice ||= if params[:role] == :fulfiller
       /notified #{donation.fulfiller} \(Free Objectivist Books volunteer\)/
     else
       /notified #{donation.user} \(the donor\)/
@@ -179,13 +180,20 @@ class FlagsControllerTest < ActionController::TestCase
     @frisco_donation.fulfill @kira
     event = @frisco_donation.flag user: @kira, message: "Fix this"
     @frisco_donation.save!
-    event.happened_at = Time.now - 1.minute
     event.save!
 
     options = {student_name: "Francisco d'Anconia", address: @frisco.address, message: "It's all good", role: :fulfiller}
     destroy @frisco_donation, options
     verify_destroy @frisco_donation, options
     verify_event @frisco_donation, "fix", detail: nil, message: "It's all good", notified?: true
+  end
+
+  test "destroy autoflag" do
+    donation = create :donation_for_request_no_address
+    options = {student_name: donation.student.name, address: "123 Main St", message: "", expected_notice: /Thank you/}
+    destroy donation, options
+    verify_destroy donation, options
+    verify_event donation, "fix", detail: "added a shipping address"
   end
 
   test "destroy requires address" do

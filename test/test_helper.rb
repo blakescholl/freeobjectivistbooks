@@ -3,6 +3,8 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 
 class ActiveSupport::TestCase
+  include FactoryGirl::Syntax::Methods
+
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
   #
   # Note: You'll currently still have to declare fixtures explicitly in integration tests
@@ -161,7 +163,8 @@ class User
 end
 
 class Request
-  def grant!(donor)
+  def grant!(donor = nil)
+    donor ||= FactoryGirl.create :donor
     event = grant donor
     save!
     event.save!

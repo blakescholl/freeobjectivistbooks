@@ -76,6 +76,11 @@ GEM
       actionmailer (>= 3.0.4)
     execjs (1.2.11)
       multi_json (~> 1.0)
+    factory_girl (4.1.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.1.0)
+      factory_girl (~> 4.1.0)
+      railties (>= 3.0.0)
     fastercsv (1.5.5)
     formtastic (2.2.1)
       actionpack (>= 3.0)
@@ -205,6 +210,7 @@ DEPENDENCIES
   delayed_job_active_record
   dynamic_form
   exception_notification
+  factory_girl_rails (~> 4.0)
   jquery-rails
   meta_search (>= 1.1.0.pre)
   minitest

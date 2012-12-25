@@ -20,6 +20,7 @@ group :production do
 end
 
 group :development, :test do
+  gem 'factory_girl_rails', '~> 4.0'
   gem 'mysql2'
   gem 'ruby-debug19', require: 'ruby-debug'
 end

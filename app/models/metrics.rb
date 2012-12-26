@@ -11,6 +11,28 @@ class Metrics
     ]
   end
 
+  def send_books_pipeline
+    all_donations = Donation.unscoped.active
+    donations = all_donations.donor_mode("send_books")
+
+    calculate_metrics [
+      {name: 'Granted', value: donations.count,      denominator_name: 'Total granted', denominator_value: all_donations.count},
+      {name: 'Sent',    value: donations.sent.count, denominator_name: 'Granted'},
+    ]
+  end
+
+  def send_money_pipeline
+    all_donations = Donation.unscoped.active
+    donations = all_donations.donor_mode("send_money")
+
+    calculate_metrics [
+      {name: 'Granted',   value: donations.count,           denominator_name: 'Total granted', denominator_value: all_donations.count},
+      {name: 'Paid',      value: donations.paid.count,      denominator_name: 'Granted'},
+      {name: 'Fulfilled', value: donations.fulfilled.count, denominator_name: 'Paid'},
+      {name: 'Sent',      value: donations.sent.count,      denominator_name: 'Fulfilled'},
+    ]
+  end
+
   def time_columns
     @time_columns ||= ["Total", "3 days", "1 wk", "2 wks", "3 wks", "1 mo", "2 mos", "3 mos"]
   end
@@ -48,10 +70,12 @@ class Metrics
     {
       columns: time_columns,
       rows: [
-        {name: 'Open requests', values: breakdown_by_time(Request.not_granted)},
-        {name: 'Needs sending', values: breakdown_by_time(Donation.needs_sending)},
-        {name: 'In transit',    values: breakdown_by_time(Donation.in_transit, :status_updated_at)},
-        {name: 'Reading',       values: breakdown_by_time(Donation.reading, :status_updated_at)},
+        {name: 'Open requests',     values: breakdown_by_time(Request.not_granted)},
+        {name: 'Needs sending',     values: breakdown_by_time(Donation.donor_mode("send_books").needs_sending, 'donations.created_at')},
+        {name: 'Needs payment',     values: breakdown_by_time(Donation.needs_payment, 'donations.created_at')},
+        {name: 'Needs fulfillment', values: breakdown_by_time(Donation.needs_fulfillment, 'donations.updated_at')},
+        {name: 'In transit',        values: breakdown_by_time(Donation.in_transit, :status_updated_at)},
+        {name: 'Reading',           values: breakdown_by_time(Donation.reading, :status_updated_at)},
       ],
     }
   end

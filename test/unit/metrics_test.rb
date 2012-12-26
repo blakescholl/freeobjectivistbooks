@@ -23,12 +23,26 @@ class MetricsTest < ActiveSupport::TestCase
     assert_equal Request.count, values['Canceled'] + values['Active'], metrics.inspect
   end
 
+  test "donor mode pipelines" do
+    books_metrics = @metrics.send_books_pipeline
+    money_metrics = @metrics.send_money_pipeline
+    books_values = values_for books_metrics
+    money_values = values_for money_metrics
+
+    assert_equal Request.granted.count, books_values['Granted'] + money_values['Granted'], "granted total doesn't match"
+    assert_equal money_values['Granted'], money_values['Paid'] + Donation.donor_mode("send_money").unpaid.count, "paid + unpaid != granted"
+    assert_equal money_values['Paid'], money_values['Fulfilled'] + Donation.needs_fulfillment.count, "fulfilled + unfulfilled != paid"
+    assert_equal Donation.sent.count, books_values['Sent'] + money_values['Sent'], "send total doesn't match"
+  end
+
   test "pipeline breakdown" do
     metrics = @metrics.pipeline_breakdown
     values = values_for metrics[:rows]
 
     assert_equal Request.active.count, Request.granted.count + values['Open requests'], values.inspect
     assert_equal Donation.not_sent.count, values['Needs sending'] + Donation.not_sent.flagged.count, values.inspect
+    assert_equal Donation.payable.count, values['Needs payment'] + Donation.paid.count, values.inspect
+    assert_equal Donation.paid.count, values['Needs fulfillment'] + Donation.fulfilled.count, values.inspect
     assert_equal Donation.sent.count, values['In transit'] + Donation.received.count, values.inspect
   end
 

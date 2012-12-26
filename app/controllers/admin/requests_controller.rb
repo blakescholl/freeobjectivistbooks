@@ -6,7 +6,7 @@ class Admin::RequestsController < AdminController
     when 'not_granted'
       Request.not_granted.reorder(:created_at)
     when 'needs_sending'
-      Donation.donor_mode("send_books").needs_sending.reorder('donations.created_at').map {|d| d.request}
+      Donation.send_books.needs_sending.reorder('donations.created_at').map {|d| d.request}
     when 'needs_payment'
       Donation.needs_payment.reorder(:created_at).map {|d| d.request}
     when 'needs_fulfillment'

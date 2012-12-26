@@ -7,7 +7,7 @@ class Reminders::ConfirmReceiptUnsent < Reminder
   end
 
   def self.all_key_entities
-    Donation.donor_mode("send_books").needs_sending.includes(request: :user)
+    Donation.send_books.needs_sending.includes(request: :user)
   end
 
   def key_entity

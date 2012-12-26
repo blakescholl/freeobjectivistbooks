@@ -30,7 +30,7 @@ class MetricsTest < ActiveSupport::TestCase
     money_values = values_for money_metrics
 
     assert_equal Request.granted.count, books_values['Granted'] + money_values['Granted'], "granted total doesn't match"
-    assert_equal money_values['Granted'], money_values['Paid'] + Donation.donor_mode("send_money").unpaid.count, "paid + unpaid != granted"
+    assert_equal money_values['Granted'], money_values['Paid'] + Donation.send_money.unpaid.count, "paid + unpaid != granted"
     assert_equal money_values['Paid'], money_values['Fulfilled'] + Donation.needs_fulfillment.count, "fulfilled + unfulfilled != paid"
     assert_equal Donation.sent.count, books_values['Sent'] + money_values['Sent'], "send total doesn't match"
   end
@@ -39,11 +39,14 @@ class MetricsTest < ActiveSupport::TestCase
     metrics = @metrics.pipeline_breakdown
     values = values_for metrics[:rows]
 
-    assert_equal Request.active.count, Request.granted.count + values['Open requests'], values.inspect
-    assert_equal Donation.not_sent.count, values['Needs sending'] + Donation.not_sent.flagged.count, values.inspect
-    assert_equal Donation.payable.count, values['Needs payment'] + Donation.paid.count, values.inspect
-    assert_equal Donation.paid.count, values['Needs fulfillment'] + Donation.fulfilled.count, values.inspect
-    assert_equal Donation.sent.count, values['In transit'] + Donation.received.count, values.inspect
+    assert_equal Request.active.count, Request.granted.count + values['Open requests'], "granted + open != total: #{values.inspect}"
+
+    donations = Donation.send_books.not_sent
+    assert_equal donations.count, values['Needs sending'] + donations.flagged.count, "needs sending + flagged != not sent: #{values.inspect}"
+
+    assert_equal Donation.payable.count, values['Needs payment'] + Donation.paid.count, "needs payment + paid != payable: #{values.inspect}"
+    assert_equal Donation.paid.count, values['Needs fulfillment'] + Donation.fulfilled.count, "needs fulfillment + fulfilled != paid: #{values.inspect}"
+    assert_equal Donation.sent.count, values['In transit'] + Donation.received.count, "in transit + received != sent: #{values.inspect}"
   end
 
   test "donation metrics" do

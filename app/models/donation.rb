@@ -68,8 +68,10 @@ class Donation < ActiveRecord::Base
   scope :read, active.scoped_by_status("read")
 
   scope :donor_mode, lambda {|mode| active.joins(:user).where(users: {donor_mode: mode})}
+  scope :send_money, donor_mode('send_money')
+  scope :send_books, donor_mode('send_books')
 
-  scope :payable, active.donor_mode("send_money").not_sent.has_price
+  scope :payable, active.send_money.not_sent.has_price
 
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked

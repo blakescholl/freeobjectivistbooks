@@ -42,8 +42,13 @@ h2 {
         </ol>
         <p>When we receive your contribution, a volunteer will send your books.</p>
     </div>
-    <% else %>
+    <% elsif @current_user.donor_mode.send_money? %>
     <p>No donations to pay for right now. <%= link_to 'Find students to donate books to', donate_path %></p>
+    <% else %>
+    <p>Your account is set up to send books directly to the students, not to pay Free Objectivist Books for them.
+        You may have reached this page because of an old link or a bug. If you want to put your account in
+        “just send money” mode, <%= mail_to 'jason@rationalegoist.com', 'contact Jason' %>.
+    </p>
     <% end %>
 </div>
 <div class="clear"></div>

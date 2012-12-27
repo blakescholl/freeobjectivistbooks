@@ -68,8 +68,11 @@ class Donation < ActiveRecord::Base
   scope :reading, active.scoped_by_status("received")
   scope :read, active.scoped_by_status("read")
 
-  scope :send_money, scoped_by_donor_mode('send_money')
-  scope :send_books, scoped_by_donor_mode('send_books')
+  # Temporary change to allow migrations to run
+  # scope :send_money, scoped_by_donor_mode('send_money')
+  # scope :send_books, scoped_by_donor_mode('send_books')
+  scope :send_money, where(donor_mode: 'send_money')
+  scope :send_books, where(donor_mode: 'send_books')
 
   scope :payable, active.send_money.not_sent.has_price
 

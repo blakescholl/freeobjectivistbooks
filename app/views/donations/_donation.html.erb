@@ -6,7 +6,7 @@
         <p class="address"><%= format_address donation.address %></p>
     </div>
     <div class="grid_6 omega actions">
-        <% if donation.needs_sending? && (donation.donor.donor_mode.send_books? || !donation.price) %>
+        <% if donation.needs_sending? && (donation.donor_mode.send_books? || !donation.price) %>
         <%= form_for donation, url: donation_status_path(donation), remote: true do |f| %>
             <%= f.hidden_field :status, value: "sent" %>
             <%= f.submit "", class: "grid_3 alpha button sent" %>

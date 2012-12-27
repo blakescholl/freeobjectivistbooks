@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121123200207) do
+ActiveRecord::Schema.define(:version => 20121227073208) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -78,14 +78,15 @@ ActiveRecord::Schema.define(:version => 20121123200207) do
     t.integer  "request_id"
     t.integer  "user_id"
     t.string   "status"
-    t.boolean  "flagged",           :default => false, :null => false
-    t.boolean  "thanked",           :default => false, :null => false
-    t.boolean  "canceled",          :default => false, :null => false
+    t.boolean  "flagged",           :default => false,        :null => false
+    t.boolean  "thanked",           :default => false,        :null => false
+    t.boolean  "canceled",          :default => false,        :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "status_updated_at"
     t.integer  "price_cents"
-    t.boolean  "paid",              :default => false, :null => false
+    t.boolean  "paid",              :default => false,        :null => false
+    t.string   "donor_mode",        :default => "send_books", :null => false
   end
 
   add_index "donations", ["request_id"], :name => "index_donations_on_request_id"

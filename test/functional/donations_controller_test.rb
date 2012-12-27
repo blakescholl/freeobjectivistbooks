@@ -59,18 +59,42 @@ class DonationsControllerTest < ActionController::TestCase
   # Create
 
   test "create" do
-    request = @quentin_request_open
-    post :create, {request_id: request.id, format: "json"}, session_for(@hugh)
+    request = create :request
+    donor = create :send_books_donor
+
+    post :create, {request_id: request.id, format: "json"}, session_for(donor)
     assert_response :success
 
     hash = decode_json_response
-    assert_equal "Objectivism: The Philosophy of Ayn Rand", hash['book']['title']
-    assert_equal "Quentin Daniels", hash['student']['name']
+    assert_equal request.book.title, hash['book']['title']
+    assert_equal request.student.name, hash['student']['name']
 
     request.reload
     assert request.granted?
     donation = request.donation
-    assert_equal @hugh, donation.user
+    assert_equal donor, donation.user
+    assert donation.donor_mode.send_books?
+    assert !donation.flagged?
+
+    verify_event donation, "grant", notified?: true
+  end
+
+  test "create send-money" do
+    request = create :request
+    donor = create :send_money_donor
+
+    post :create, {request_id: request.id, format: "json"}, session_for(donor)
+    assert_response :success
+
+    hash = decode_json_response
+    assert_equal request.book.title, hash['book']['title']
+    assert_equal request.student.name, hash['student']['name']
+
+    request.reload
+    assert request.granted?
+    donation = request.donation
+    assert_equal donor, donation.user
+    assert donation.donor_mode.send_money?
     assert !donation.flagged?
 
     verify_event donation, "grant", notified?: true

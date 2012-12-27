@@ -264,6 +264,22 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal @atlas.price, @howard_request.donation.price
   end
 
+  test "donor mode is send_books if user is send_books" do
+    donation = create :donation_with_send_books_donor
+    assert donation.donor_mode.send_books?
+  end
+
+  test "donor mode is send_money if user is send_money" do
+    donation = create :donation_with_send_money_donor
+    assert donation.donor_mode.send_money?
+  end
+
+  test "donor mode is send_books if donation has no price" do
+    donor = create :send_money_donor
+    donation = create :donation_for_request_no_price, user: donor
+    assert donation.donor_mode.send_books?
+  end
+
   # Cancel
 
   test "cancel by donor" do

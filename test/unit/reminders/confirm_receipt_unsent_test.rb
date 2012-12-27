@@ -6,10 +6,12 @@ class Reminders::ConfirmReceiptUnsentTest < ActiveSupport::TestCase
     assert reminders.any?
 
     reminders.each do |reminder|
-      assert_not_nil reminder.donation
-      assert_equal reminder.donation.student, reminder.user
-      assert !reminder.donation.sent?
-      assert !reminder.donation.flagged?
+      donation = reminder.donation
+      assert_not_nil donation
+      assert_equal donation.student, reminder.user
+      assert donation.donor_mode.send_books?
+      assert !donation.sent?
+      assert !donation.flagged?
     end
   end
 

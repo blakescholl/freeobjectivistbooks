@@ -9,6 +9,7 @@ class Reminders::SendBooksTest < ActiveSupport::TestCase
       assert_not_nil reminder.user
       reminder.donations.each do |donation|
         assert_equal reminder.user, donation.user
+        assert donation.donor_mode.send_books?
         assert donation.needs_sending?
       end
     end

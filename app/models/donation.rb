@@ -31,6 +31,7 @@ class Donation < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :address, if: :needs_address?, message: "We need your address to send you your book."
   validates_inclusion_of :status, in: %w{not_sent sent received read}
+  validates_inclusion_of :donor_mode, in: User::DONOR_MODES
   validates_uniqueness_of :request_id, scope: :canceled, if: :active?, message: "has already been granted", on: :create
   validate :donor_cannot_be_requester, on: :create
 
@@ -67,9 +68,8 @@ class Donation < ActiveRecord::Base
   scope :reading, active.scoped_by_status("received")
   scope :read, active.scoped_by_status("read")
 
-  scope :donor_mode, lambda {|mode| active.joins(:user).where(users: {donor_mode: mode})}
-  scope :send_money, donor_mode('send_money')
-  scope :send_books, donor_mode('send_books')
+  scope :send_money, scoped_by_donor_mode('send_money')
+  scope :send_books, scoped_by_donor_mode('send_books')
 
   scope :payable, active.send_money.not_sent.has_price
 
@@ -91,6 +91,7 @@ class Donation < ActiveRecord::Base
 
   before_create do |donation|
     donation.price = donation.book.price
+    donation.donor_mode = user.donor_mode if donation.price
   end
 
   #--
@@ -100,6 +101,10 @@ class Donation < ActiveRecord::Base
   delegate :book, to: :request
   delegate :address, :address=, to: :student
   delegate :name, :name=, to: :student, prefix: true
+
+  def donor_mode
+    ActiveSupport::StringInquirer.new(self[:donor_mode])
+  end
 
   # Whether the donation is still active, i.e., not canceled.
   def active?
@@ -246,7 +251,7 @@ class Donation < ActiveRecord::Base
   #++
 
   def pay_if_covered
-    return unless user.donor_mode.send_money? && price.present?
+    return unless donor_mode.send_money? && price.present?
     return if paid?
     if user.balance >= price
       user.balance -= price

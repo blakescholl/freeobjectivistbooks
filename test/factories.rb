@@ -11,19 +11,26 @@ FactoryGirl.define do
       studying "philosophy"
       school "U. of California"
       sequence(:address) {|n| "#{n} Main St\nAnytown, USA"}
+
+      trait(:no_address) {address ""}
     end
 
     factory :donor do
       sequence(:name) {|n| "Donor #{n}"}
-    end
 
-    trait :no_address do
-      address ""
+      trait(:send_books) {donor_mode "send_books"}
+      trait(:send_money) {donor_mode "send_money"}
+
+      factory :send_books_donor, traits: [:send_books]
+      factory :send_money_donor, traits: [:send_money]
     end
   end
 
   factory :book do
     sequence(:title) {|n| "Book #{n}"}
+    price 9.99
+
+    trait(:no_price) {price nil}
   end
 
   factory :request do
@@ -35,6 +42,10 @@ FactoryGirl.define do
     factory :request_no_address do
       association :user, factory: [:student, :no_address]
     end
+
+    factory :request_no_price do
+      association :book, factory: [:book, :no_price]
+    end
   end
 
   factory :donation do
@@ -45,6 +56,18 @@ FactoryGirl.define do
 
     factory :donation_for_request_no_address do
       association :request, factory: :request_no_address
+    end
+
+    factory :donation_for_request_no_price do
+      association :request, factory: :request_no_price
+    end
+
+    factory :donation_with_send_books_donor do
+      association :user, factory: :send_books_donor
+    end
+
+    factory :donation_with_send_money_donor do
+      association :user, factory: :send_money_donor
     end
   end
 

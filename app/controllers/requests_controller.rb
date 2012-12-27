@@ -41,12 +41,7 @@ class RequestsController < ApplicationController
     @requests = Request.for_mode @current_user.donor_mode
 
     all_donations = @current_user.donations.active
-    if @current_user.donor_mode.send_money?
-      @donations = all_donations.needs_payment
-    else
-      @donations = all_donations.not_sent
-    end
-    @donations = @donations.reorder(:created_at)
+    @donations = all_donations.not_sent.unpaid.reorder(:created_at)
     @previous_count = all_donations.count - @donations.count
     @pledge = @current_user.pledges.first
   end

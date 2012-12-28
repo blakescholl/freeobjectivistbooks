@@ -45,7 +45,7 @@ class DonationsController < ApplicationController
 
   def pay
     @donations = @current_user.donations.needs_payment
-    @total = @donations.inject(Money.new(0)) {|sum,donation| sum += donation.price}
+    @total = @donations.map {|donation| donation.price}.sum
   end
 
   def create

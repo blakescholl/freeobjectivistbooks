@@ -44,7 +44,7 @@ class MetricsTest < ActiveSupport::TestCase
     donations = Donation.send_books.not_sent
     assert_equal donations.count, values['Needs sending'] + donations.flagged.count, "needs sending + flagged != not sent: #{values.inspect}"
 
-    assert_equal Donation.payable.count, values['Needs payment'] + Donation.paid.count, "needs payment + paid != payable: #{values.inspect}"
+    assert_equal Donation.send_money.count, values['Needs payment'] + Donation.paid.count, "needs payment + paid != payable: #{values.inspect}"
     assert_equal Donation.paid.count, values['Needs fulfillment'] + Donation.fulfilled.count, "needs fulfillment + fulfilled != paid: #{values.inspect}"
     assert_equal Donation.sent.count, values['In transit'] + Donation.received.count, "in transit + received != sent: #{values.inspect}"
   end

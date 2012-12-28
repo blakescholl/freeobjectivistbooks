@@ -71,11 +71,9 @@ class Donation < ActiveRecord::Base
   scope :send_money, scoped_by_donor_mode('send_money')
   scope :send_books, scoped_by_donor_mode('send_books')
 
-  scope :payable, active.send_money.not_sent.has_price
-
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
-  scope :needs_payment, active.payable.unpaid
+  scope :needs_payment, active.send_money.unpaid
   scope :needs_fulfillment, active.needs_sending.paid.unfulfilled
 
   #--

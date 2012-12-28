@@ -236,10 +236,9 @@ class DonationTest < ActiveSupport::TestCase
     assert !@quentin_donation_unsent.student_can_cancel?
   end
 
-  test "student can't cancel if donation paid for" do
-    @quentin_donation_unsent.paid = true
-    @quentin_donation_unsent.save!
-    assert !@quentin_donation_unsent.student_can_cancel?
+  test "student can't cancel send-money donation" do
+    donation = build :donation_with_send_money_donor
+    assert !donation.student_can_cancel?
   end
 
   test "can cancel?" do

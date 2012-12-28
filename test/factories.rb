@@ -28,7 +28,7 @@ FactoryGirl.define do
 
   factory :book do
     sequence(:title) {|n| "Book #{n}"}
-    price 9.99
+    price 10
 
     trait(:no_price) {price nil}
   end

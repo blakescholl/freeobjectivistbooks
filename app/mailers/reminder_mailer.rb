@@ -1,5 +1,7 @@
 # Mailer for sending Reminders.
 class ReminderMailer < ApplicationMailer
+  include MoneyRails::ActionViewExtension
+
   def self.send_to_target(method, reminder)
     return if !reminder.can_send?
     mail = super
@@ -34,6 +36,15 @@ class ReminderMailer < ApplicationMailer
       "Have you sent your #{@donations.size} Objectivist books to students yet?"
     end
     reminder_mail subject
+  end
+
+  def send_money(reminder)
+    @user = reminder.user
+    @donations = reminder.donations
+    @donation = @donations.first
+    @single = @donations.size == 1
+    @total = @donations.map {|d| d.price}.sum
+    reminder_mail "Please send a contribution of #{humanized_money_with_symbol @total} for your donations on Free Objectivist Books"
   end
 
   def confirm_receipt_unsent(reminder)

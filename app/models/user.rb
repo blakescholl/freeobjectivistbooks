@@ -94,7 +94,12 @@ class User < ActiveRecord::Base
   end
 
   def self.donors_with_unsent_books
-    donations = Donation.unscoped.send_books.needs_sending
+    donations = Donation.send_books.needs_sending
+    donations.map {|donation| donation.user}.uniq
+  end
+
+  def self.donors_with_unpaid_donations
+    donations = Donation.needs_payment.includes(:user)
     donations.map {|donation| donation.user}.uniq
   end
 

@@ -88,6 +88,53 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "send money for donor with one outstanding donation" do
+    donor = create :send_money_donor
+    donation = create :donation, user: donor, created_at: 1.year.ago
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::SendMoney.new_for_entity donor
+
+    mail = ReminderMailer.send_to_target :send_money, reminder
+    assert_equal "Please send a contribution of $10 for your donations on Free Objectivist Books", mail.subject
+    assert_equal [donor.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Donor \d+/
+      assert_select 'p', /contribution from you of \$10/
+      assert_select 'p', /cover sending Book \d+ to Student \d+ in Anytown, USA/
+      assert_select 'a', /pay/i
+      assert_select 'p', /Thanks,\nFree Objectivist Books/
+    end
+  end
+
+  test "send money for donor with multiple outstanding donations" do
+    donor = create :send_money_donor
+    donations = create_list :donation, 3, user: donor, created_at: 1.year.ago
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::SendMoney.new_for_entity donor
+
+    mail = ReminderMailer.send_to_target :send_money, reminder
+    assert_equal "Please send a contribution of $30 for your donations on Free Objectivist Books", mail.subject
+    assert_equal [donor.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Donor \d+/
+      assert_select 'p', /contribution from you of \$30/
+      assert_select 'p', /will cover the following books/
+      assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 3
+      assert_select 'a', /pay/i
+      assert_select 'p', /Thanks,\nFree Objectivist Books/
+    end
+  end
+
   test "confirm receipt unsent" do
     reminder = Reminders::ConfirmReceiptUnsent.new_for_entity @quentin_donation_unsent
 

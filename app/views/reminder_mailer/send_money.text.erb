@@ -1,0 +1,16 @@
+We are still waiting to receive a contribution from you of <%= humanized_money_with_symbol @total %> to sponsor your donations on Free Objectivist Books.
+
+<% if @single %>
+This contribution will cover sending <%= @donation.book %> to <%= @donation.student %> in <%= @donation.student.location %>.
+<% else %>
+This contribution will cover the following books:
+
+<% @donations.each do |donation| %>
+* <%= donation.book %> to <%= donation.student %> in <%= donation.student.location %>
+<% end %>
+<% end %>
+
+Please make your contribution using this link:
+<%= pay_donations_url %>
+
+(If you sent this contribution recently, we'll record it soon. If you sent it more than 3 days ago, please reply to this message.)

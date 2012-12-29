@@ -1,5 +1,5 @@
 <div class="reminder">
-    <p class="headline"><%= user_reminder.type.demodulize.underscore.humanize %></p>
+    <p class="headline"><%= user_reminder.class.type_name.humanize %></p>
     <p><%= user_reminder.subject %></p>
     <% user_reminder.donations.each do |donation| %>
     <p><%= link_to (title donation.book), admin_request_path(donation.request) %> to <%= admin_user_link donation.student %></p>

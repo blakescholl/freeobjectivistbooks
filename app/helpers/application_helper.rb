@@ -89,7 +89,7 @@ module ApplicationHelper
     elsif request.received?
       "#{request.user} has received this book."
     elsif request.sent?
-      "#{request.fulfiller || request.donor} has sent this book."
+      "#{request.sender} has sent this book."
     elsif request.granted?
       "#{request.donor} in #{request.donor.location} will donate this book."
     else

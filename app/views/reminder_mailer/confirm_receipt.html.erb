@@ -1,6 +1,6 @@
 <p>Have you received <i><%= @donation.book %></i> yet?</p>
 
-<p><%= @donation.fulfiller || @donation.donor %> has sent you this book (confirmed on <%= l @donation.sent_at.to_date, format: :short %>).
+<p><%= @donation.sender %> has sent you this book (confirmed on <%= l @donation.sent_at.to_date, format: :short %>).
     When you receive, please confirm on Free Objectivist Books using this link:
 </p>
 

@@ -124,6 +124,11 @@ class Donation < ActiveRecord::Base
     fulfillment.user if fulfillment
   end
 
+  # User who is responsible for sending the book.
+  def sender
+    donor_mode.send_books? ? donor : fulfiller
+  end
+
   def fulfilled?
     fulfillment.present?
   end

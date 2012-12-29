@@ -22,6 +22,11 @@ module RequestsHelper
     donation && donation.fulfiller
   end
 
+  def current_sender
+    donation = current_donation
+    donation && donation.sender
+  end
+
   def current_is_donor?
     @current_user == current_donor
   end
@@ -34,7 +39,7 @@ module RequestsHelper
     @current_user == current_fulfiller
   end
 
-  def other_user
-    current_is_student? ? current_donor : current_student
+  def current_is_sender?
+    @current_user == current_sender
   end
 end

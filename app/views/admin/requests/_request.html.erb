@@ -9,11 +9,13 @@
         <% end %>
     </p>
     <p class="student">Student: <%= admin_user_link request.user %></p>
-    <% if request.donor %>
+    <% if request.donation %>
     <p class="donor">Donor: <%= admin_user_link request.donor %> <% if request.thanked? %>&ndash; thanked<% end %></p>
-    <% end %>
-    <% if request.fulfiller %>
-    <p class="fulfiller">Fulfiller: <%= admin_user_link request.fulfiller %></p>
+        <% if request.donation.donor_mode.send_money? %>
+        <p class="fulfiller"><% if request.donation.paid? %>Paid<% else %>Not paid<% end %>
+            <% if request.fulfiller %>&ndash; fulfiller: <%= admin_user_link request.fulfiller %><% end %>
+        </p>
+        <% end %>
     <% end %>
     <% if request.needs_fix? %>
     <p class="flagged">

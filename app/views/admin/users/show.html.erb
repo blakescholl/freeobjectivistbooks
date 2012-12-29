@@ -94,6 +94,9 @@
         <% else %>
         <%= donation.status.humanize %>
         <% end %>
+        <% if donation.donor_mode.send_money? %>
+        &ndash; <% if donation.paid? %>Paid<% else %>Not paid<% end %>
+        <% end %>
         <% if donation.reminders.where(user_id: @user).any? %>
         &ndash; <%= donation.reminders.where(user_id: @user).count %> reminders
         <% end %>

@@ -38,11 +38,13 @@
 
     <h2>Status: <%= status_headline @request %></h2>
     <p class="status"><%= status_detail @request %></p>
-    <% if @request.donor %>
+    <% if @request.donation %>
     <p><%= admin_user_link @request.donor %> &ndash; <% if @request.thanked? %>Thank-you sent<% else %>Not thanked yet<% end %></p>
-    <% end %>
-    <% if @request.fulfiller %>
-    <p>Fulfilled by <%= admin_user_link @request.fulfiller %></p>
+        <% if @request.donation.donor_mode.send_money? %>
+        <p><% if @request.donation.paid? %>Paid<% else %>Not paid<% end %>
+            <% if request.fulfiller %>&ndash; fulfilled by <%= admin_user_link @request.fulfiller %><% end %>
+        </p>
+        <% end %>
     <% end %>
 
     <h2>Events</h2>

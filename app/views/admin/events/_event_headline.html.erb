@@ -16,11 +16,11 @@
         sent a message to <%= admin_user_links event.recipients %> about
         <% end %>
     <% when "update_status" %>
-        <%= event.detail %>
+        <%= event.detail %> for
     <% when "cancel_donation" %>
         canceled
         <% if event.from_donor? %>
-            <%= admin_user_link event.student %>'s request for
+            their donation to <%= admin_user_link event.student %> of
         <% else %>
             <%= admin_user_link event.donor %>'s donation of
         <% end %>
@@ -32,6 +32,7 @@
         <% case event.detail %>
         <% when "sent" %>
             to <%= admin_user_link event.student %>
+            <% if event.from_fulfiller? %>on behalf of <%= admin_user_link event.donor %><% end %>
         <% when "received", "read" %>
             from <%= admin_user_link event.donor %>
             <% if event.fulfiller %>(fulfiller: <%= admin_user_link event.fulfiller %>)<% end %>

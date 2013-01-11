@@ -121,8 +121,8 @@ class UsersControllerTest < ActionController::TestCase
     assert !User.exists?(name: "John Galt")
 
     assert_select '.message.error .headline', /problems with your signup/
-    assert_select '.field_with_errors', /can't be blank/
-    assert_select '.field_with_errors', /didn't match/
+    assert_select '.field_with_errors', /can&#x27;t be blank/
+    assert_select '.field_with_errors', /didn&#x27;t match/
     assert_select '.field_with_errors', /must pledge to read/
     assert_select 'form a', text: /log in/i, count: 0
   end
@@ -204,8 +204,8 @@ class UsersControllerTest < ActionController::TestCase
     assert !User.exists?(name: "John Galt")
 
     assert_select '.message.error .headline', /problems with your signup/
-    assert_select '.field_with_errors', /can't be blank/
-    assert_select '.field_with_errors', /didn't match/
+    assert_select '.field_with_errors', /can&#x27;t be blank/
+    assert_select '.field_with_errors', /didn&#x27;t match/
     assert_select '.field_with_errors', /Please enter a number/
     assert_select 'form a', text: /log in/i, count: 0
   end

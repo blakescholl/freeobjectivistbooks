@@ -54,8 +54,8 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@kira)
     assert_response :success
-    assert_select 'h1', /Send a message to Francisco d'Anconia and Henry Cameron/
-    assert_select 'p', /Francisco d'Anconia requested Objectivism/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia and Henry Cameron/
+    assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Henry Cameron donated Objectivism/
   end
 
@@ -74,8 +74,8 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@cameron)
     assert_response :success
-    assert_select 'h1', /Send a message to Francisco d'Anconia and Kira Argounova/
-    assert_select 'p', /Francisco d'Anconia requested Objectivism/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia and Kira Argounova/
+    assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
   end
 

@@ -77,7 +77,7 @@ class EventMailerTest < ActionMailer::TestCase
     verify_mail_body mail do
       assert_select 'p', /Hi Henry/
       assert_select 'p', /FYI/
-      assert_select 'p', /your donation of Objectivism: The Philosophy of Ayn Rand to Francisco d'Anconia/
+      assert_select 'p', /your donation of Objectivism: The Philosophy of Ayn Rand to Francisco d&#x27;Anconia/
       assert_select 'p', /Kira Argounova \(Free Objectivist Books volunteer\) has flagged/
       assert_select 'p', 'Kira Argounova says: "Fix this"'
       assert_select 'p', /We'll follow up with Francisco/
@@ -196,9 +196,9 @@ class EventMailerTest < ActionMailer::TestCase
 
     verify_mail_body mail do
       assert_select 'p', /Hi Henry/
-      assert_select 'p', /Objectivism: The Philosophy of Ayn Rand, which you donated to Francisco d'Anconia,/
+      assert_select 'p', /Objectivism: The Philosophy of Ayn Rand, which you donated to Francisco d&#x27;Anconia,/
       assert_select 'p', /Volunteer Kira Argounova has sent/
-      assert_select 'p', /confirmed that Francisco d'Anconia has received/
+      assert_select 'p', /confirmed that Francisco d&#x27;Anconia has received/
       assert_select 'p', /Thanks,/
     end
   end
@@ -248,7 +248,7 @@ class EventMailerTest < ActionMailer::TestCase
 
     verify_mail_body mail do
       assert_select 'p', /Hi Kira/
-      assert_select 'p', /Francisco d'Anconia has received Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Francisco d&#x27;Anconia has received Objectivism: The Philosophy of Ayn Rand/
       assert_select 'p', /Thank you for being a volunteer for/
       assert_select 'a', text: /Find more students/, count: 0
       assert_select 'p', /Thanks,/
@@ -308,7 +308,7 @@ class EventMailerTest < ActionMailer::TestCase
 
     verify_mail_body mail do
       assert_select 'p', /Hi Kira/
-      assert_select 'p', /Francisco d'Anconia has finished reading Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Francisco d&#x27;Anconia has finished reading Objectivism: The Philosophy of Ayn Rand/
       assert_select 'p', /Thank you for being a volunteer for/
       assert_select 'a', text: /Find more students/, count: 0
       assert_select 'p', /Thanks,/
@@ -323,7 +323,7 @@ class EventMailerTest < ActionMailer::TestCase
     verify_mail_body mail do
       assert_select 'p', /Hi Quentin/
       assert_select 'p', /Robert Stadler has canceled their donation of Objectivism: The Philosophy of Ayn Rand/
-      assert_select 'p', /Robert Stadler said: "Sorry! I can't give you this after all"/
+      assert_select 'p', /Robert Stadler said: "Sorry! I can&#x27;t give you this after all"/
       assert_select 'p', /Yours,\nFree Objectivist Books/
     end
   end
@@ -349,7 +349,7 @@ class EventMailerTest < ActionMailer::TestCase
     verify_mail_body mail do
       assert_select 'p', /Hi Hugh/
       assert_select 'p', /Dagny has canceled their request for Atlas Shrugged/
-      assert_select 'p', /They said: "I don't need this anymore"/
+      assert_select 'p', /They said: "I don&#x27;t need this anymore"/
       assert_select 'a', /Find more students/
       assert_select 'p', /Thanks,/
     end

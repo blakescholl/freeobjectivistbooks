@@ -9,7 +9,7 @@ class RequestsControllerTest < ActionController::TestCase
 
     assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
     assert_select '.request .headline', "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand"
-    assert_select '.request .headline', "Francisco d'Anconia wants We the Living"
+    assert_select '.request .headline', "Francisco d&#x27;Anconia wants We the Living"
 
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
@@ -35,7 +35,7 @@ class RequestsControllerTest < ActionController::TestCase
     end
 
     assert_select '.request .headline', text: "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand", count: 0
-    assert_select '.request .headline', text: "Francisco d'Anconia wants We the Living", count: 0
+    assert_select '.request .headline', text: "Francisco d&#x27;Anconia wants We the Living", count: 0
     assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
   end
 
@@ -308,7 +308,7 @@ class RequestsControllerTest < ActionController::TestCase
 
     get :show, {id: @frisco_request.id}, session_for(@kira)
     assert_response :success
-    assert_select 'h1', "Francisco d'Anconia wants Objectivism: The Philosophy of Ayn Rand"
+    assert_select 'h1', "Francisco d&#x27;Anconia wants Objectivism: The Philosophy of Ayn Rand"
     assert_select '.tagline', /Studying metallurgy at Patrick Henry University/
     assert_select '.address', /8234 Copper Drive/
     verify_status 'donor found'
@@ -438,7 +438,7 @@ class RequestsControllerTest < ActionController::TestCase
     get :show, {id: @frisco_request.id}, session_for(@kira)
     assert_response :success
     assert_select '.message.error', false
-    assert_select 'h1', "Francisco d'Anconia wants Objectivism: The Philosophy of Ayn Rand"
+    assert_select 'h1', "Francisco d&#x27;Anconia wants Objectivism: The Philosophy of Ayn Rand"
     assert_select '.address', /8234 Copper Drive/
     assert_select '.flagged', /Shipping info flagged/i
     verify_fulfiller_links :flagged
@@ -569,7 +569,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'p', /We'll send this to your donor \(Henry Cameron\)/
     assert_select 'textarea#request_event_message', ""
     assert_select 'input[type="submit"]'
-    assert_select 'a', /Don't cancel/
+    assert_select 'a', /Don&#x27;t cancel/
   end
 
   test "cancel no donor" do
@@ -580,7 +580,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'p', text: /We'll send this to your donor/, count: 0
     assert_select 'textarea#request_event_message', ""
     assert_select 'input[type="submit"]'
-    assert_select 'a', /Don't cancel/
+    assert_select 'a', /Don&#x27;t cancel/
   end
 
   test "cancel already-canceled request" do

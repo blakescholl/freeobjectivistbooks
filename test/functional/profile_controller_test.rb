@@ -134,7 +134,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     get :show, params, session_for(@frisco)
     assert_response :success
-    assert_select 'h1', "Francisco d'Anconia"
+    assert_select 'h1', "Francisco d&#x27;Anconia"
 
     assert_select '.request', /Objectivism:/ do
       assert_select '.headline', /Objectivism:/

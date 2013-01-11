@@ -88,11 +88,11 @@ class PasswordsControllerTest < ActionController::TestCase
   end
 
   test "update can't be blank" do
-    post_password_update "", expect_error: /can't be blank/
+    post_password_update "", expect_error: /can&#x27;t be blank/
   end
 
   test "update requires confirmation" do
-    post_password_update "password", confirmation: "wrong", expect_error: /didn't match/
+    post_password_update "password", confirmation: "wrong", expect_error: /didn&#x27;t match/
   end
 
   test "update with invalid auth" do

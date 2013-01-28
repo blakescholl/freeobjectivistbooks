@@ -63,6 +63,9 @@ FreeBooks::Application.configure do
   config.mailgun_domain = ENV['MAILGUN_SMTP_DOMAIN']
   config.mailgun_api_key = ENV['MAILGUN_API_KEY']
 
+  # Enable real payments through AWS. Turned off until we're done testing in production -Jason 27 Jan 2013
+  # config.aws_payments_live = true
+
   # Enable threaded mode
   # config.threadsafe!
 

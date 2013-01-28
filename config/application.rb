@@ -53,6 +53,10 @@ module FreeBooks
 
     config.email_recipient_override = nil
 
+    config.aws_access_key = ENV['AWS_ACCESS_KEY']
+    config.aws_secret_key = ENV['AWS_SECRET_KEY']
+    config.aws_payments_live = false
+
     config.after_initialize do |app|
       I18n.reload!
     end

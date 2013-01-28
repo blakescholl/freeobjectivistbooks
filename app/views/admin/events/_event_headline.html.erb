@@ -16,7 +16,7 @@
         sent a message to <%= admin_user_links event.recipients %> about
         <% end %>
     <% when "update_status" %>
-        <%= event.detail %> for
+        <%= event.detail %>
     <% when "cancel_donation" %>
         canceled
         <% if event.from_donor? %>

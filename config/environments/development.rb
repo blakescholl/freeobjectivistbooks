@@ -13,9 +13,11 @@ FreeBooks::Application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
+  routes.default_url_options = { host: 'localhost:5000' }
+
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :test
-  config.action_mailer.default_url_options = { host: 'localhost:5000' }
+  config.action_mailer.default_url_options = routes.default_url_options
 
   config.email_recipient_override = "jason.crawford@gmail.com"
 

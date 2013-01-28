@@ -45,10 +45,12 @@ FreeBooks::Application.configure do
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   config.assets.precompile += %w( *.js application.css homepage.css hover.css active_admin.css active_admin/print.css )
 
+  routes.default_url_options = { host: 'freeobjectivistbooks.org' }
+
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'freeobjectivistbooks.org' }
+  config.action_mailer.default_url_options = routes.default_url_options
   config.action_mailer.smtp_settings = {
     authentication: :plain,
     address: ENV['MAILGUN_SMTP_SERVER'],

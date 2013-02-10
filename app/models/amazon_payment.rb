@@ -8,6 +8,7 @@ class AmazonPayment
   attr_reader :is_donation_widget, :collect_shipping_address, :process_immediate, :immediate_return, :cobranding_style
   attr_reader :ipn_url, :return_url, :abandon_url
   attr_reader :signature_method
+  attr_reader :is_live
 
   def initialize(attributes = {})
     @is_donation_widget = 0
@@ -16,6 +17,7 @@ class AmazonPayment
     @immediate_return = 0
     @cobranding_style = "logo"
     @signature_method = "HmacSHA256"
+    @is_live = true
 
     attributes.each do |attr,value|
       instance_variable_set "@#{attr}", value
@@ -39,8 +41,8 @@ private
   end
 
   def form_submit_host
-    payments = Rails.application.config.aws_payments_live ? "payments" : "payments-sandbox"
-    "authorize.#{payments}.amazon.com"
+    env = "-sandbox" if !is_live || !Rails.application.config.aws_payments_live
+    "authorize.payments#{env}.amazon.com"
   end
 
   def form_submit_path

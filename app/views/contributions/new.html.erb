@@ -31,17 +31,13 @@ h2 {
 
     <p>Total for your donations: <span class="money"><%= humanized_money_with_symbol @total %></span></p>
 
-    <h2>How to pay</h2>
-    <div>
-        <ol>
-            <li><%= link_to "Buy a gift card on Amazon", "https://www.amazon.com/gp/product/B004LLIL5A", target: "_blank" %></li>
-            <li>Enter the amount: <%= @total.format %></li>
-            <li>Enter recipient email: donations@freeobjectivistbooks.org</li>
-            <li><span class="warning">Enter your name as the sender so we can credit your account!</span></li>
-            <li>Click “Purchase” and check out</li>
-        </ol>
-        <p>When we receive your contribution, a volunteer will send your books.</p>
-    </div>
+    <form action="<%= @amazon_payment.form_submit_url %>" method="post">
+        <% @amazon_payment.params.each do |key,value| %>
+        <%= hidden_field_tag key, value %>
+        <% end %>
+        <%= image_submit_tag "http://g-ecx.images-amazon.com/images/G/01/asp/beige_medium_paynow_withlogo_lightbg.gif" %>
+    </form>
+
     <% elsif @current_user.donor_mode.send_money? %>
     <p>No donations to pay for right now. <%= link_to 'Find students to donate books to', donate_path %></p>
     <% else %>

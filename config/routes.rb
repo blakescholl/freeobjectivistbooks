@@ -16,7 +16,6 @@ FreeBooks::Application.routes.draw do
   end
 
   resources :donations, only: [:index, :destroy] do
-    get "pay", on: :collection
     get "cancel", on: :member
     resource :status, only: [:edit, :update]
     resources :messages, only: [:new, :create]
@@ -25,6 +24,14 @@ FreeBooks::Application.routes.draw do
       get "fix", on: :member
     end
     resource :fulfillment, only: [:create]
+  end
+
+  resources :contributions, only: [:new, :create] do
+    collection do
+      get "thankyou"
+      get "cancel" => "contributions#new", defaults: {abandoned: true}
+      get "test"
+    end
   end
 
   resources :fulfillments, only: [:show]

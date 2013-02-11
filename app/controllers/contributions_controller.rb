@@ -2,7 +2,7 @@
 class ContributionsController < ApplicationController
   include ActionView::Helpers::TextHelper
 
-  before_filter :require_login
+  before_filter :require_login, except: :create
 
   def new_payment(options = {})
     AmazonPayment.new options.merge(

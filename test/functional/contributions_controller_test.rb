@@ -47,7 +47,7 @@ class ContributionsControllerTest < ActionController::TestCase
   # Create
 
   test "create" do
-    post :create, params, session_for(@donor)
+    post :create
     assert_response :success
     # this is still a stub for now
   end

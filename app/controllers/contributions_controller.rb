@@ -6,7 +6,7 @@ class ContributionsController < ApplicationController
 
   def new_payment(options = {})
     AmazonPayment.new options.merge(
-      ipn_url: new_contribution_url,
+      ipn_url: contributions_url,
       return_url: thankyou_contributions_url,
       abandon_url: cancel_contributions_url,
     )

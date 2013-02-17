@@ -36,7 +36,6 @@ private
 
     client = Net::HTTP.new uri.host, uri.port
     client.use_ssl = true
-    client.ca_file = 'ca-bundle.crt'
     client.verify_mode = OpenSSL::SSL::VERIFY_PEER
     client.verify_depth = 5
 

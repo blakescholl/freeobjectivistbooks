@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.1.10'
+gem 'rails', '3.1.11'
 
 gem 'activeadmin'
 gem 'bcrypt-ruby', '~> 3.0.0'

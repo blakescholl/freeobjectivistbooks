@@ -3,6 +3,14 @@ class ContributionsController < ApplicationController
   include ActionView::Helpers::TextHelper
 
   before_filter :require_login, except: :create
+  before_filter :verify_signature, only: :create
+
+  def verify_signature
+    return if Rails.env.test?
+    signature_params = params.subhash_without('controller', 'action')
+    signature = AmazonSignature.new signature_params, request.url
+    raise UnauthorizedException unless signature.valid?
+  end
 
   def new_payment(options = {})
     AmazonPayment.new options.merge(
@@ -36,12 +44,10 @@ class ContributionsController < ApplicationController
 
   def test
     @amount = Money.parse(params[:amount] || 10)
-    @ref = SecureRandom.hex 3
-    @amazon_payment = new_payment amount: @amount, reference_id: @ref, description: "test #{@ref}", is_live: false
+    @amazon_payment = new_payment amount: @amount, reference_id: @current_user.id, description: "test", is_live: false
   end
 
   def create
-    logger.info "params: #{params.inspect}"
     render nothing: true
   end
 end

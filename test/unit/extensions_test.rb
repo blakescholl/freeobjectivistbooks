@@ -8,10 +8,22 @@ class ExtensionsTest < ActiveSupport::TestCase
     assert_equal [], "".words
   end
 
+  test "urlencode" do
+    assert_equal "foo", "foo".urlencode
+    assert_equal "foo%3Dbar", "foo=bar".urlencode
+    assert_equal "foo%20bar", "foo bar".urlencode
+  end
+
   test "subhash" do
     hash = {a: 1, b: 2, c: 2}
     subhash = {a: 1, b: 2}
     assert_equal subhash, hash.subhash(:a, :b)
+    assert_equal subhash, hash.subhash_without(:c)
+  end
+
+  test "to query string" do
+    hash = {a: 1, b: :foo, c: "amp = &"}
+    assert_equal "a=1&b=foo&c=amp%20%3D%20%26", hash.to_query_string(sorted: true)
   end
 
   test "to bool" do

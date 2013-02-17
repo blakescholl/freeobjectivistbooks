@@ -70,22 +70,12 @@ private
     end
   end
 
-  def urlencode(string)
-    CGI.escape(string.to_s).gsub("+", "%20").gsub("%7E", "~")
-  end
-
-  def canonical_param_string
-    hash = unsigned_params
-    keys = hash.keys.sort
-    pairs = keys.map {|key| urlencode(key) + "=" + urlencode(hash[key])}
-    pairs.join "&"
-  end
-
   def canonical_request_string
     host = form_submit_host.downcase
     path = form_submit_path.present? ? form_submit_path : "/"
-    path = urlencode(path).gsub("%2F", "/")
-    parts = ["POST", host, path, canonical_param_string]
+    path = path.urlencode.gsub("%2F", "/")
+    query = unsigned_params.to_query_string(sorted: true)
+    parts = ["POST", host, path, query]
     parts.join "\n"
   end
 

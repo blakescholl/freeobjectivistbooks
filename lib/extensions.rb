@@ -2,12 +2,28 @@ class String
   def words
     strip.split /\s+/
   end
+
+  def urlencode
+    CGI.escape(self).gsub("+", "%20").gsub("%7E", "~")
+  end
 end
 
 class Hash
   def subhash(*keys)
     keys = keys.flatten
     select {|k,v| keys.include? k}
+  end
+
+  def subhash_without(*keys)
+    keys = keys.flatten
+    subhash (self.keys - keys)
+  end
+
+  def to_query_string(options = {})
+    keylist = keys
+    keylist = keylist.sort if options[:sorted]
+    pairs = keylist.map {|key| key.to_s.urlencode + "=" + self[key].to_s.urlencode}
+    pairs.join "&"
   end
 end
 

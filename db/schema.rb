@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121227073208) do
+ActiveRecord::Schema.define(:version => 20130218001639) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(:version => 20121227073208) do
     t.integer  "amount_cents", :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "transaction_id"
   end
 
   add_index "contributions", ["user_id"], :name => "index_contributions_on_user_id"

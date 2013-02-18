@@ -1,0 +1,5 @@
+class AddTransactionIdToContributions < ActiveRecord::Migration
+  def change
+    add_column :contributions, :transaction_id, :string
+  end
+end

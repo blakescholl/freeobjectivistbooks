@@ -10,6 +10,11 @@ class AmazonPayment
   attr_reader :signature_method
   attr_reader :is_live
 
+  def self.success_status?(status)
+    # http://docs.aws.amazon.com/AmazonSimplePay/latest/ASPAdvancedUserGuide/ipn-statuscodes.html
+    status.in? %w{PS PI}
+  end
+
   def initialize(attributes = {})
     @is_donation_widget = 0
     @collect_shipping_address = 0

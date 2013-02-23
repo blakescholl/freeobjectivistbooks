@@ -48,6 +48,7 @@ class ContributionsController < ApplicationController
   end
 
   def create
+    Contribution.create_from_amazon_ipn params
     render nothing: true
   end
 end

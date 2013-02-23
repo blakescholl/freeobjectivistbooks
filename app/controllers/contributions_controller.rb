@@ -51,4 +51,14 @@ class ContributionsController < ApplicationController
     Contribution.create_from_amazon_ipn params
     render nothing: true
   end
+
+  def thankyou
+    if !AmazonPayment.success_status?(params['status'])
+      flash[:error] = {
+        headline: "Something went wrong with your payment. Try again?",
+        detail: "We won't be able to send these books until you make a contribution to cover them."
+      }
+      redirect_to action: :new
+    end
+  end
 end

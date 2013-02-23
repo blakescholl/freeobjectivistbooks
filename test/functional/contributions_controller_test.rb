@@ -106,11 +106,16 @@ class ContributionsControllerTest < ActionController::TestCase
   # Thank-you
 
   test "thankyou" do
-    get :thankyou, params, session_for(@donor)
+    get :thankyou, amazon_ipn_params, session_for(@donor)
     assert_response :success
     assert_select 'h1', "Thank you"
     assert_select 'p', /Thank you/
     assert_select 'a', /Find more/
+  end
+
+  test "thankyou for failed payment" do
+    get :thankyou, amazon_ipn_params.merge('status' => "PF"), session_for(@donor)
+    assert_redirected_to action: :new
   end
 
   # Cancel

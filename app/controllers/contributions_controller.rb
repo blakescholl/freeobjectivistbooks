@@ -6,10 +6,9 @@ class ContributionsController < ApplicationController
   before_filter :verify_signature, only: :create
 
   def verify_signature
-    return if Rails.env.test?
     signature_params = params.subhash_without('controller', 'action')
-    signature = AmazonSignature.new signature_params, request.url
-    raise UnauthorizedException unless signature.valid?
+    @signature = AmazonSignature.new signature_params, request.url
+    raise UnauthorizedException if !Rails.env.test? && !@signature.valid?
   end
 
   def new_payment(options = {})
@@ -48,7 +47,7 @@ class ContributionsController < ApplicationController
   end
 
   def create
-    Contribution.create_from_amazon_ipn params
+    Contribution.create_from_amazon_ipn params unless @signature.sandbox?
     render nothing: true
   end
 

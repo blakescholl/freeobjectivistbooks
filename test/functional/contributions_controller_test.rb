@@ -61,7 +61,7 @@ class ContributionsControllerTest < ActionController::TestCase
       "operation" => "pay",
       "recipientName" => "Free Objectivist Books",
       "signatureVersion" => "2",
-      "certificateUrl" => "https://fps.sandbox.amazonaws.com/certs/090911/PKICert.pem?requestId=15n8r3d",
+      "certificateUrl" => "https://fps.amazonaws.com/certs/090911/PKICert.pem?requestId=15n8r3d",
       "paymentMethod" => "CC",
       "signature" => "Oe9T3lr4BQTeMbyCior55XoySQKdB7q0dnnI6ZypUJQKzisMFAwSSgjEHg7Kr/QvlN2se99xXea8",
     }
@@ -97,6 +97,16 @@ class ContributionsControllerTest < ActionController::TestCase
   test "create doesn't create if status is failure" do
     assert_difference "@donor.balance", Money.parse(0) do
       post :create, amazon_ipn_params.merge('status' => "PF")
+      assert_response :success
+    end
+
+    assert_nil Contribution.find_by_transaction_id "17J3JCDIN2HZCSKGTCIVOJ1MB81RGOIEV5P"
+  end
+
+  test "create doesn't create from sandbox transactions" do
+    certificate_url = "https://fps.sandbox.amazonaws.com/certs/090911/PKICert.pem?requestId=15n8r3d"
+    assert_difference "@donor.balance", Money.parse(0) do
+      post :create, amazon_ipn_params.merge('certificateUrl' => certificate_url)
       assert_response :success
     end
 

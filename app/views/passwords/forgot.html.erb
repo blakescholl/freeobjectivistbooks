@@ -5,7 +5,7 @@
 <p class="grid_16">No problem. Enter the email you signed up with:</p>
 <%= form_tag request_reset_password_path do %>
     <%= label_tag :email, "Email", class: "grid_1" %>
-    <%= text_field_tag :email, params[:email], class: "grid_4" %>
+    <%= email_field_tag :email, params[:email], class: "grid_4" %>
     <% if @error %><p class="grid_4 field_with_errors"><%= @error %></p><% end %>
     <div class="clear"></div>
 

@@ -4,7 +4,7 @@
 
 <%= form_tag login_path do %>
     <%= label_tag :email, "Email", class: "grid_1" %>
-    <%= text_field_tag :email, params[:email], class: "grid_4" %>
+    <%= email_field_tag :email, params[:email], class: "grid_4" %>
     <% if @error %><div class="grid_8 field_with_errors"><%= @error %></div><% end %>
     <div class="clear"></div>
 

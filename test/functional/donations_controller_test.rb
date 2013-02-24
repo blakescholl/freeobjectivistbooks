@@ -68,6 +68,7 @@ class DonationsControllerTest < ActionController::TestCase
     hash = decode_json_response
     assert_equal request.book.title, hash['book']['title']
     assert_equal request.student.name, hash['student']['name']
+    assert_equal request.student.location.name, hash['student']['location']['name']
 
     request.reload
     assert request.granted?
@@ -89,6 +90,7 @@ class DonationsControllerTest < ActionController::TestCase
     hash = decode_json_response
     assert_equal request.book.title, hash['book']['title']
     assert_equal request.student.name, hash['student']['name']
+    assert_equal request.student.location.name, hash['student']['location']['name']
 
     request.reload
     assert request.granted?
@@ -108,6 +110,7 @@ class DonationsControllerTest < ActionController::TestCase
     hash = decode_json_response
     assert_equal "Atlas Shrugged", hash['book']['title']
     assert_equal "Howard Roark", hash['student']['name']
+    assert_equal "New York, NY", hash['student']['location']['name']
 
     request.reload
     assert request.granted?

@@ -110,9 +110,8 @@ class RequestTest < ActiveSupport::TestCase
       assert request.book.price, "request #{request.id} has no price for #{request.book}"
       assert request.book.price > 0, "request #{request.id} has price of zero for #{request.book}"
 
-      location = Location.find_by_name request.user.location
-      assert_not_nil location
-      assert_equal "United States", location.country
+      assert_not_nil request.user.location
+      assert_equal "United States", request.user.location.country
     end
   end
 

@@ -1,3 +1,13 @@
+class Object
+  def hash_from_methods(*methods)
+    methods = methods.flatten
+    methods.inject({}) do |hash,method|
+      value = send method
+      hash.merge(method => value)
+    end
+  end
+end
+
 class String
   def words
     strip.split /\s+/

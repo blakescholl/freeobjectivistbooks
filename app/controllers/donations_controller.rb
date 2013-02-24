@@ -53,7 +53,7 @@ class DonationsController < ApplicationController
     if save @request, @event
       respond_to do |format|
         format.html { redirect_to @request }
-        format.json { render json: @request.donation, methods: [:student, :book] }
+        format.json { render json: @request.donation }
       end
     else
       message = @request.donation.errors.full_messages.join ", "

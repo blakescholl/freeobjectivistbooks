@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   # Associations
   #++
 
+  belongs_to :location
   has_many :requests
   has_many :pledges
   has_many :donations
@@ -112,14 +113,12 @@ class User < ActiveRecord::Base
   end
 
   before_validation do |user|
-    [:name, :email, :location, :school, :studying].each do |attribute|
+    [:name, :email, :school, :studying].each do |attribute|
       value = user.send attribute
       value.strip! if value
       value.squeeze! " " if value
     end
   end
-
-  after_save :create_location_if_needed
 
   after_create do |user|
     Rails.logger.info "New user: #{@user.inspect}"
@@ -128,6 +127,19 @@ class User < ActiveRecord::Base
   #--
   # Derived attributes
   #++
+
+  def location_name
+    location && location.name
+  end
+
+  def location_name=(name)
+    self.location = if name.present?
+      name = name.strip.squeeze " "
+      Location.find_or_create_by_name name
+    else
+      nil
+    end
+  end
 
   def donor_mode
     ActiveSupport::StringInquirer.new(self[:donor_mode])
@@ -190,15 +202,19 @@ class User < ActiveRecord::Base
     User.verifier.generate [id, timestamp.to_i]
   end
 
-  def create_location_if_needed
-    Location.find_or_create_by_name location
-  end
-
   def self.verifier
     @@verifier ||= ActiveSupport::MessageVerifier.new Rails.application.config.secret_token
   end
 
+  #--
+  # Conversions
+  #++
+
   def to_s
     name
+  end
+
+  def as_json(options = {})
+    hash_from_methods :id, :name, :location, :school, :studying
   end
 end

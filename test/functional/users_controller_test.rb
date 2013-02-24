@@ -13,7 +13,7 @@ class UsersControllerTest < ActionController::TestCase
     {
       name: "John Galt",
       email: "galt@gulch.com",
-      location: "Atlantis, CO",
+      location_name: "Atlantis, CO",
       password: "dagny",
       password_confirmation: "dagny",
       donor_mode: "send_books"
@@ -92,7 +92,7 @@ class UsersControllerTest < ActionController::TestCase
     user = User.find_by_name "John Galt"
     assert_not_nil user
     assert_equal "galt@gulch.com", user.email
-    assert_equal "Atlantis, CO", user.location
+    assert_equal "Atlantis, CO", user.location.name
     assert user.authenticate "dagny"
 
     assert_equal user.id, session[:user_id]
@@ -151,7 +151,7 @@ class UsersControllerTest < ActionController::TestCase
     user = User.find_by_name "John Galt"
     assert_not_nil user
     assert_equal "galt@gulch.com", user.email
-    assert_equal "Atlantis, CO", user.location
+    assert_equal "Atlantis, CO", user.location.name
     assert user.authenticate "dagny"
     assert_equal "send_books", user.donor_mode
 
@@ -176,7 +176,7 @@ class UsersControllerTest < ActionController::TestCase
     user = User.find_by_name "John Galt"
     assert_not_nil user
     assert_equal "galt@gulch.com", user.email
-    assert_equal "Atlantis, CO", user.location
+    assert_equal "Atlantis, CO", user.location.name
     assert user.authenticate "dagny"
     assert_equal "send_money", user.donor_mode
 
@@ -232,7 +232,7 @@ class UsersControllerTest < ActionController::TestCase
     user = User.find_by_name "John Galt"
     assert_not_nil user
     assert_equal "galt@gulch.com", user.email
-    assert_equal "Atlantis, CO", user.location
+    assert_equal "Atlantis, CO", user.location.name
     assert user.authenticate "dagny"
 
     assert_equal user.id, session[:user_id]

@@ -3,7 +3,7 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
   def setup
     super
-    @john = User.new name: "John Galt", email: "galt@gulch.com", location: "Atlantis, CO", password: "dagny",
+    @john = User.new name: "John Galt", email: "galt@gulch.com", location_name: "Atlantis, CO", password: "dagny",
       password_confirmation: "dagny"
   end
 
@@ -202,6 +202,32 @@ class UserTest < ActiveSupport::TestCase
   end
 
   # Derived attributes
+
+  test "location name" do
+    user = create :user
+    assert_equal "Anytown, USA", user.location_name
+  end
+
+  test "location name setter" do
+    user = create :user
+    user.location_name = "New City"
+    assert_equal "New City", user.location_name
+    assert_equal "New City", user.location.name
+  end
+
+  test "location name setter can clear location" do
+    user = create :user
+    user.location_name = nil
+    assert_nil user.location_name
+    assert_nil user.location
+  end
+
+  test "location name setter doesn't create duplicates" do
+    user = create :user
+    location = create :location, name: "New City"
+    user.location_name = "New City"
+    assert_equal location, user.location
+  end
 
   test "update detail: added name" do
     @dagny.name = "Dagny Taggart"

@@ -47,8 +47,7 @@ class Request < ActiveRecord::Base
     if donor_mode.send_money?
       requests = requests.with_prices
       requests = requests.select do |request|
-        location = Location.find_by_name request.user.location
-        location && location.country == "United States"
+        request.user.location.country == "United States"
       end
     end
     requests

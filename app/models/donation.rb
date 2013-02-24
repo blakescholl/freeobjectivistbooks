@@ -320,4 +320,12 @@ class Donation < ActiveRecord::Base
       cancel_donation_events.build params[:event].merge(user: user)
     end
   end
+
+  #--
+  # Conversions
+  #++
+
+  def as_json(options = {})
+    hash_from_methods :id, :donor, :student, :book, :price_cents
+  end
 end

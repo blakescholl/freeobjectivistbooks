@@ -84,7 +84,7 @@
 <% content_for :javascript do %>
 <script>
 $(document).ready(function () {
-    var donations = <%= raw @donations.to_json(methods: [:student, :book]) %>;
+    var donations = <%= raw @donations.to_json %>;
 
     function formatMoney(amount) {
         var fmt = "";
@@ -106,7 +106,7 @@ $(document).ready(function () {
 
     function addDonationToList(donation, animated) {
         var item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
-            ' in ' + donation.student.location + '</li>');
+            ' in ' + donation.student.location.name + '</li>');
         $('#donations-list').append(item);
         if (animated) item.hide().fadeAndSlideIn();
     }

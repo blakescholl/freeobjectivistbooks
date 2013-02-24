@@ -1,8 +1,12 @@
 FactoryGirl.define do
+  factory :location do
+    name "Anytown, USA"
+  end
+
   factory :user do
     sequence(:name) {|n| "User #{n}"}
     email { name.downcase.gsub(/\s/,'') + "@example.com" }
-    location "Anytown, USA"
+    location
     password "password"
     password_confirmation { password }
 

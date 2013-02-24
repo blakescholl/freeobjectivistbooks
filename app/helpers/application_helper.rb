@@ -59,7 +59,7 @@ module ApplicationHelper
     parts = []
     parts << "studying #{user.studying}" unless user.studying.blank?
     parts << "at #{user.school}" unless user.school.blank?
-    parts << "in #{user.location}" unless user.location.blank?
+    parts << "in #{user.location}" unless user.location.nil?
     tagline = parts.join " "
     tagline[0] = tagline[0].upcase
     tagline

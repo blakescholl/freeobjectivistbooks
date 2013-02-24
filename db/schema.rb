@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130218001639) do
+ActiveRecord::Schema.define(:version => 20130224004953) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(:version => 20130218001639) do
 
   create_table "contributions", :force => true do |t|
     t.integer  "user_id"
-    t.integer  "amount_cents", :null => false
+    t.integer  "amount_cents",   :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "transaction_id"
@@ -227,17 +227,18 @@ ActiveRecord::Schema.define(:version => 20130218001639) do
     t.string   "name"
     t.string   "email"
     t.string   "password_digest"
-    t.string   "location"
+    t.string   "location_deprecated"
     t.string   "school"
     t.string   "studying"
     t.text     "address"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "referral_id"
-    t.boolean  "blocked",         :default => false,        :null => false
-    t.string   "donor_mode",      :default => "send_books", :null => false
-    t.integer  "balance_cents",   :default => 0,            :null => false
+    t.boolean  "blocked",             :default => false,        :null => false
+    t.string   "donor_mode",          :default => "send_books", :null => false
+    t.integer  "balance_cents",       :default => 0,            :null => false
     t.string   "roles"
+    t.integer  "location_id"
   end
 
   add_index "users", ["referral_id"], :name => "index_users_on_referral_id"

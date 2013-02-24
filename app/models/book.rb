@@ -19,7 +19,15 @@ class Book < ActiveRecord::Base
     other.destroy
   end
 
+  #--
+  # Conversions
+  #++
+
   def to_s
     title
+  end
+
+  def as_json(options = {})
+    hash_from_methods :id, :title, :author, :asin, :price_cents
   end
 end

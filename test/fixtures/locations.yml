@@ -140,6 +140,15 @@ boston:
     - locality
     - political
 
+chicago:
+  name: "Chicago, IL"
+
+philadelphia:
+  name: "Philadelphia, PA"
+
+ithaca:
+  name: "Ithaca, NY"
+
 madrid:
   name: "Madrid, Spain"
   geocoder_results:
@@ -187,3 +196,6 @@ madrid:
     types:
     - locality
     - political
+
+leningrad:
+  name: "Leningrad, Russia"

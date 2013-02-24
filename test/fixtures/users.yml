@@ -4,7 +4,7 @@ howard:
   name: Howard Roark
   email: roark@stanton.edu
   password_digest: <%= BCrypt::Password.create "roark" %>
-  location: "New York, NY"
+  location: new_york
   school: Stanton Institute of Technology
   studying: architecture
 
@@ -12,7 +12,7 @@ quentin:
   name: Quentin Daniels
   email: quentin@mit.edu
   password_digest: <%= BCrypt::Password.create "daniels" %>
-  location: "Boston, MA"
+  location: boston
   school: MIT
   studying: physics
   address: "123 Main St Apt 456\nBoston, MA 12345"
@@ -21,7 +21,7 @@ dagny:
   name: Dagny
   email: dagny@taggart.com
   password_digest: <%= BCrypt::Password.create "taggart" %>
-  location: "Chicago, IL"
+  location: chicago
   school: Northwestern University
   studying: business
 
@@ -29,7 +29,7 @@ hank:
   name: Hank Rearden
   email: hank@rearden.com
   password_digest: <%= BCrypt::Password.create "rearden" %>
-  location: "Philadelphia, PA"
+  location: philadelphia
   school: University of Pittsburgh
   studying: manufacturing
   address: "987 Steel Way\nPhiladelphia, PA 12345"
@@ -39,7 +39,7 @@ frisco:
   name: Francisco d'Anconia
   email: francisco@danconiacopper.com
   password_digest: <%= BCrypt::Password.create "frisco" %>
-  location: "Madrid, Spain"
+  location: madrid
   school: Patrick Henry University
   studying: metallurgy
   address: "8234 Copper Drive"
@@ -50,14 +50,14 @@ hugh:
   name: Hugh Akston
   email: akston@patrickhenry.edu
   password_digest: <%= BCrypt::Password.create "akston" %>
-  location: "Boston, MA"
+  location: boston
   donor_mode: send_books
 
 cameron:
   name: Henry Cameron
   email: henry@cameron.com
   password_digest: <%= BCrypt::Password.create "cameron" %>
-  location: "New York, NY"
+  location: new_york
   donor_mode: send_money
   balance_cents: 5000
 
@@ -65,7 +65,7 @@ stadler:
   name: Robert Stadler
   email: stadler@scienceinstitute.gov
   password_digest: <%= BCrypt::Password.create "stadler" %>
-  location: "Ithaca, NY"
+  location: ithaca
   referral: sfl_fb
   donor_mode: send_books
 
@@ -75,12 +75,12 @@ kira:
   name: Kira Argounova
   email: kira@argounova.ru
   password_digest: <%= BCrypt::Password.create "kira" %>
-  location: "Leningrad, Russia"
+  location: leningrad
   roles: '["volunteer"]'
 
 irina:
   name: Irina Dunaev
   email: irina@dunaev.ru
   password_digest: <%= BCrypt::Password.create "irina" %>
-  location: "Leningrad, Russia"
+  location: leningrad
   roles: '["volunteer"]'

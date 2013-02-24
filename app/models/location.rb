@@ -63,4 +63,16 @@ class Location < ActiveRecord::Base
     save!
   end
   handle_asynchronously :geocode!
+
+  #--
+  # Conversions
+  #++
+
+  def to_s
+    name
+  end
+
+  def as_json(options = {})
+    {id: id, name: name}
+  end
 end

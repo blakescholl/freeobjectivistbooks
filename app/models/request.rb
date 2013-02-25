@@ -46,9 +46,7 @@ class Request < ActiveRecord::Base
     requests = not_granted.includes(user: :location).includes(:book).reorder('open_at desc')
     if donor_mode.send_money?
       requests = requests.with_prices
-      requests = requests.select do |request|
-        request.user.location.country == "United States"
-      end
+      requests = requests.select {|request| request.can_send_money?}
     end
     requests
   end
@@ -84,6 +82,11 @@ class Request < ActiveRecord::Base
   # Current donor who is going to grant this request, if any.
   def donor
     donation && donation.user
+  end
+
+  # Whether this request can be granted with a "send-money" donation.
+  def can_send_money?
+    book.price && book.price > 0 && user.location.country == "United States"
   end
 
   # Whether the request is active (not canceled).

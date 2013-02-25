@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :location do
     name "Anytown, USA"
+    geocoder_results [{'address_components' => [{'long_name' => 'United States', 'types' => ['country']}]}]
   end
 
   factory :user do

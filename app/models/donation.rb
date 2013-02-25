@@ -89,7 +89,7 @@ class Donation < ActiveRecord::Base
 
   before_create do |donation|
     donation.price = donation.book.price
-    donation.donor_mode = user.donor_mode if donation.price
+    donation.donor_mode = request.can_send_money? ? user.donor_mode : 'send_books'
   end
 
   #--

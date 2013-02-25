@@ -13,7 +13,7 @@
     background-position-x: left;
 }
 
-.sent {
+.send {
     background-image: url(/assets/send-button.png);
 }
 </style>
@@ -21,7 +21,7 @@
 
 <h1 class="grid_16">Send books</h1>
 <div class="grid_16 overview">
-    <% if @donations.any? %>
+    <% if @unsent.any? || @unclaimed.any? %>
     <p>These books have been chosen by donors who have sent in contributions.</p>
     <p>Please send as many as you can using the Amazon login Jason gave you.</p>
     <p><%= mail_to 'jason@rationalegoist.com', 'Contact Jason' %> if you need help.</p>
@@ -31,6 +31,15 @@
 </div>
 
 <div class="grid_12">
-    <%= render partial: 'fulfillments/donation', collection: @donations %>
+    <% if @unsent.any? %>
+    <h2>Claimed by you</h2>
+    <p>Please send these now!</p>
+    <%= render @unsent %>
+    <% end %>
+
+    <% if @unclaimed.any? %>
+    <% if @unsent.any? %><h2>Unclaimed</h2><% end %>
+    <%= render @unclaimed %>
+    <% end %>
 </div>
 <div class="clear"></div>

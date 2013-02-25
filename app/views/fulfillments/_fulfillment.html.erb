@@ -1,0 +1,17 @@
+<div class="fulfillment">
+    <%= render "requests/spacer" %>
+    <div class="grid_6 alpha donation">
+        <p class="headline"><%= title fulfillment.book %> to <%= fulfillment.student %></p>
+        <p>On behalf of <%= fulfillment.donor %></p>
+    </div>
+    <div class="grid_6 omega actions">
+        <% if fulfillment.new_record? %>
+        <%= form_for fulfillment, url: donation_fulfillment_path(fulfillment.donation) do |f| %>
+            <%= f.submit "", class: "grid_3 alpha omega button send" %>
+        <% end %>
+        <% else %>
+        <%= link_to fulfillment do %><div class="grid_3 alpha omega button send"></div><% end %>
+        <% end %>
+    </div>
+    <div class="clear"></div>
+</div>

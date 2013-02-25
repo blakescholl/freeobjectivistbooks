@@ -201,14 +201,41 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   test "show for volunteer" do
-    get :show, params, session_for(@kira)
+    user = create :volunteer
+
+    get :show, params, session_for(user)
     assert_response :success
-    assert_select 'h1', "Kira Argounova"
+    assert_select 'h1', /Volunteer \d+/
+
+    assert_select 'h2', /volunteered/
+    assert_select '.fulfillment', false
 
     verify_new_request_link false
     verify_one_request_text false
     verify_all_donations_link false
     verify_volunteer_link
+  end
+
+  test "show for volunteer with unsent fulfillments" do
+    user = create :volunteer
+    fulfillments = create_list :fulfillment, 3, user: user
+    fulfillments.first.donation.update_status! 'sent', user
+
+    get :show, params, session_for(user)
+    assert_response :success
+    assert_select 'h1', /Volunteer \d+/
+
+    assert_select 'h2', /volunteered/
+    assert_select '.fulfillment', 2 do
+      assert_select '.donation', /Book \d+ to Student \d+/
+      assert_select '.donation', /On behalf of Donor \d+/
+      assert_select '.actions a'
+    end
+
+    verify_new_request_link false
+    verify_one_request_text false
+    verify_all_donations_link false
+    verify_volunteer_link false
   end
 
   test "show requires login" do

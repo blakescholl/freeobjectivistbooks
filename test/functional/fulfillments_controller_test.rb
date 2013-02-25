@@ -4,8 +4,42 @@ class FulfillmentsControllerTest < ActionController::TestCase
   # Volunteers index
 
   test "volunteer" do
-    get :volunteer, params, session_for(@kira)
+    user = create :volunteer
+    donation = create :donation_with_send_money_donor, paid: true
+
+    get :volunteer, params, session_for(user)
     assert_response :success
+
+    assert_select 'h2', text: /Claimed/, count: 0
+
+    assert_select '.fulfillment', /#{donation.book}/ do
+      assert_select '.donation', /#{donation.book} to #{donation.student}/
+      assert_select '.donation', /On behalf of #{donation.donor}/
+      assert_select '.actions form'
+    end
+  end
+
+  test "volunteers index with unsent fulfillments" do
+    user = create :volunteer
+    fulfillment = create :fulfillment, user: user
+    donation = create :donation_with_send_money_donor, paid: true
+
+    get :volunteer, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h2', /Claimed/
+
+    assert_select '.fulfillment', /#{fulfillment.book}/ do
+      assert_select '.donation', /#{fulfillment.book} to #{fulfillment.student}/
+      assert_select '.donation', /On behalf of #{fulfillment.donor}/
+      assert_select '.actions a'
+    end
+
+    assert_select '.fulfillment', /#{donation.book}/ do
+      assert_select '.donation', /#{donation.book} to #{donation.student}/
+      assert_select '.donation', /On behalf of #{donation.donor}/
+      assert_select '.actions form'
+    end
   end
 
   test "volunteers index requires login" do

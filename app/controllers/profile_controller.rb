@@ -13,5 +13,8 @@ class ProfileController < ApplicationController
     @flag_count = send_books_donations.not_sent.flagged.count
 
     @needs_payment_donations = donations.needs_payment
+
+    @fulfillments = @current_user.fulfillments.needs_sending
+    @show_fulfillments = @fulfillments.any? || @current_user.is_volunteer?
   end
 end

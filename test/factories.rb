@@ -29,6 +29,11 @@ FactoryGirl.define do
       factory :send_books_donor, traits: [:send_books]
       factory :send_money_donor, traits: [:send_money]
     end
+
+    factory :volunteer do
+      sequence(:name) {|n| "Volunteer #{n}"}
+      roles ['volunteer']
+    end
   end
 
   factory :book do
@@ -54,8 +59,8 @@ FactoryGirl.define do
   end
 
   factory :donation do
-    request
     association :user, factory: :donor
+    request
 
     initialize_with { request.grant! user }
 
@@ -74,6 +79,11 @@ FactoryGirl.define do
     factory :donation_with_send_money_donor do
       association :user, factory: :send_money_donor
     end
+  end
+
+  factory :fulfillment do
+    association :user, factory: :volunteer
+    association :donation, factory: :donation_with_send_money_donor
   end
 
   factory :review do

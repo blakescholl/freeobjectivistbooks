@@ -7,7 +7,9 @@ class FulfillmentsController < ApplicationController
   end
 
   def volunteer
-    @donations = Donation.needs_fulfillment.reorder(:created_at)
+    donations = Donation.needs_fulfillment.reorder(:created_at)
+    @unclaimed = donations.map {|donation| donation.build_fulfillment}
+    @unsent = @current_user.fulfillments.needs_sending
   end
 
   def create

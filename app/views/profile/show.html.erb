@@ -27,6 +27,10 @@
     padding-left: 3px;
 }
 
+.send {
+    background-image: url(/assets/send-button.png);
+}
+
 .sent {
     background-image: url(/assets/sent-button.png);
 }
@@ -110,6 +114,7 @@
     <h2>Outstanding donations</h2>
         <% if @needs_payment_donations.any? %>
         <% if @needs_sending_donations.any? %><h3>Books to pay for</h3><% end %>
+        <p>Please send a contribution to cover the following books:</p>
         <%= render @needs_payment_donations %>
         <p><%= link_to 'Send a contribution to cover these books', new_contribution_path %></p>
         <% end %>
@@ -136,9 +141,15 @@
     </div>
     <% end %>
 
-    <% if @current_user.is_volunteer? %>
-    <h2>Help out</h2>
-    <p><%= link_to 'Help out by sending books to students', volunteer_path %></p>
+    <% if @show_fulfillments %>
+    <h2>Books you volunteered to send</h2>
+        <% if @fulfillments.any? %>
+        <p>Please send the following books:</p>
+        <%= render @fulfillments %>
+        <% else %>
+        <p>None outstanding.</p>
+        <p><%= link_to 'Help out by sending books', volunteer_path %></p>
+        <% end %>
     <% end %>
 </div>
 <div class="clear"></div>

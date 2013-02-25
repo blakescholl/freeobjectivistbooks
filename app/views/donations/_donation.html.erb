@@ -3,40 +3,26 @@
     <div class="grid_6 alpha request">
         <p class="headline"><%= title donation.book %> to:</p>
         <p class="name"><%= donation.student.name %></p>
+        <% if @current_user == donation.sender %>
         <p class="address"><%= format_address donation.address %></p>
+            <% if donation.needs_fix? %>
+            <p class="flagged">
+                <% if donation.address.present? %>
+                Shipping info flagged
+                <% else %>
+                Student has been contacted to add address
+                <% end %>
+            </p>
+            <% end %>
+        <% elsif donation.donor_mode.send_money? && !donation.paid? %>
+        <p class="money book_price"><%= humanized_money_with_symbol donation.price %></p>
+        <% end %>
     </div>
     <div class="grid_6 omega actions">
-        <% if donation.needs_sending? && (donation.donor_mode.send_books? || !donation.price) %>
-        <%= form_for donation, url: donation_status_path(donation), remote: true do |f| %>
-            <%= f.hidden_field :status, value: "sent" %>
-            <%= f.submit "", class: "grid_3 alpha button sent" %>
-            <div class="grid_1 omega loading"></div>
-            <div class="clear"></div>
-        <% end %>
-        <% if donation.book.asin %>
-        <p><%= link_to donation.book.amazon_url do %><%= title donation.book %> on Amazon<% end %></p>
-        <% end %>
-        <% else %>
+        <% if donation.sent? %>
         <p class="status"><%= status_headline donation.request %></p>
         <% end %>
-
-        <% if donation.needs_fix? %>
-        <p class="flagged">
-            <% if donation.address.present? %>
-            Shipping info flagged
-            <% else %>
-            Student has been contacted to add address
-            <% end %>
-        </p>
-        <% elsif donation.request.can_flag? %>
-        <p class="not-sent"><%= link_to 'Flag problem with shipping info', new_donation_flag_path(donation) %></p>
-        <% end %>
-
-        <% if donation.donor_can_cancel? %>
-        <p class="not-sent"><%= link_to 'Cancel this donation', cancel_donation_path(donation) %></p>
-        <% end %>
-
-        <p><%= link_to 'See full request details', request_path(donation.request) %></p>
+        <%= render donation.request.actions_for @current_user, context: :list %>
     </div>
     <div class="clear"></div>
 </div>

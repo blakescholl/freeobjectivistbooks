@@ -161,18 +161,43 @@ class ProfileControllerTest < ActionController::TestCase
     assert_select '.donation', /The Fountainhead to/ do
       assert_select '.request .name', /Quentin Daniels/
       assert_select '.request .address', /123 Main St/
+      assert_select '.request .flagged', false
       assert_select '.actions a', /see full/i
       assert_select '.actions a', /flag/i
       assert_select '.actions a', /cancel/i
-      assert_select '.actions .flagged', false
     end
 
     verify_all_donations_link
     verify_new_request_link false
     verify_one_request_text false
     verify_volunteer_link false
+  end
 
-    assert_select 'a', 'See all your donations'
+  test "show for send-money donor" do
+    donor = create :send_money_donor
+    paid_donation = create :donation, user: donor, paid: true
+    unpaid_donation = create :donation, user: donor, paid: false
+
+    assert_equal 'send_money', paid_donation.donor_mode
+    assert_equal 'send_money', unpaid_donation.donor_mode
+
+    get :show, params, session_for(donor)
+    assert_response :success
+
+    assert_select '.donation', text: /#{paid_donation.book}/, count: 0
+
+    assert_select '.donation', /#{unpaid_donation.book}/ do
+      assert_select '.request .name', /Student \d+/
+      assert_select '.request .address', false
+      assert_select '.money', /\$10/
+      assert_select '.actions a', /see full/i
+      assert_select '.actions a', text: /flag/i, count: 0
+    end
+
+    verify_all_donations_link
+    verify_new_request_link false
+    verify_one_request_text false
+    verify_volunteer_link false
   end
 
   test "show for volunteer" do

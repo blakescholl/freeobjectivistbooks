@@ -128,8 +128,8 @@ class Request < ActiveRecord::Base
     !sent? && !canceled?
   end
 
-  def actions_for(user)
-    Actions.new self, user
+  def actions_for(user, options)
+    Actions.new self, user, options
   end
 
   #--

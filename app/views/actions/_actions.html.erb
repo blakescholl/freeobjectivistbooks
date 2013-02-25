@@ -1,22 +1,23 @@
 <% if actions.prompted_status.present? %>
-    <h2>Update status</h2>
+    <% if actions.show_headers? %><h2>Update status</h2><% end %>
     <% case actions.prompted_status %>
     <% when :sent %>
-        <p>Let <%= actions.student %> know when you have sent <%= title actions.book %>:</p>
-        <%= form_for actions.donation, url: donation_status_path(actions.donation) do |f| %>
+        <% if actions.show_headers? %><p>Let <%= actions.student %> know when you have sent <%= title actions.book %>:</p><% end %>
+        <%= form_for actions.donation, url: donation_status_path(actions.donation), remote: actions.update_status_async? do |f| %>
             <%= f.hidden_field :status, value: "sent" %>
             <%= f.submit "", class: "grid_3 alpha button sent", confirm: (actions.request.flagged? ?
-                "You flagged this request. Are you sending the book anyway? If you mark this book sent, it will be unflagged." : nil) %>
+                "This request is flagged. Are you sending the book anyway? If you mark this book sent, it will be unflagged." : nil) %>
+            <div class="grid_1 omega loading"></div>
             <div class="clear"></div>
         <% end %>
     <% when :received %>
-        <p>Let <%= actions.other_users.to_sentence %> know when you have received <%= title actions.book %>:</p>
+        <% if actions.show_headers? %><p>Let <%= actions.other_users.to_sentence %> know when you have received <%= title actions.book %>:</p><% end %>
         <%= link_to edit_donation_status_path(actions.donation, status: "received"), class: "grid_3 alpha" do %>
             <div class="button update"></div>
         <% end %>
         <div class="clear"></div>
     <% when :read %>
-        <p>Let <%= actions.other_users.to_sentence %> know when you have finished reading <%= title actions.book %>:</p>
+        <% if actions.show_headers? %><p>Let <%= actions.other_users.to_sentence %> know when you have finished reading <%= title actions.book %>:</p><% end %>
         <%= link_to edit_donation_status_path(actions.donation, status: "read"), class: "grid_3 alpha" do %>
             <div class="button update"></div>
         <% end %>
@@ -47,6 +48,8 @@
         <%= link_to edit_request_path(actions.request) do %>
             <% if actions.request.address.blank? %>Add your address<% else %>Update shipping info<% end %>
         <% end %>
+    <% when :details %>
+        <%= link_to 'See full request details', request_path(actions.request) %>
     <% end %>
     </p>
 <% end %>

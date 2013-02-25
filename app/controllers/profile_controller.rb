@@ -7,8 +7,11 @@ class ProfileController < ApplicationController
 
     donations = @current_user.donations.active
     @show_donations = donations.any? || @current_user.pledges.any?
-    unsent_donations = donations.not_sent
-    @donations = unsent_donations.not_flagged
-    @flag_count = unsent_donations.flagged.count
+
+    send_books_donations = donations.send_books
+    @needs_sending_donations = send_books_donations.needs_sending
+    @flag_count = send_books_donations.not_sent.flagged.count
+
+    @needs_payment_donations = donations.needs_payment
   end
 end

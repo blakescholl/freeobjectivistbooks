@@ -80,7 +80,7 @@
 <div class="grid_5 sidebar">
     <div class="top_5">&nbsp;</div>
     <div class="content_5">
-        <%= render @request.actions_for @current_user %>
+        <%= render @request.actions_for @current_user, context: :detail %>
     </div>
     <div class="bottom_5">&nbsp;</div>
 </div>

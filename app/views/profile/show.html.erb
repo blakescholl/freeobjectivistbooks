@@ -32,11 +32,15 @@
 }
 
 .any-donations {
-    display: <%= @donations.any? ? "block" : "none" %>;
+    display: <%= @needs_sending_donations.any? ? "block" : "none" %>;
 }
 
 .no-donations {
-    display: <%= @donations.any? ? "none" : "block" %>;
+    display: <%= @needs_sending_donations.any? ? "none" : "block" %>;
+}
+
+#donation-nav-links {
+    margin-top: 20px;
 }
 </style>
 <% end %>
@@ -104,17 +108,32 @@
 
     <% if @show_donations %>
     <h2>Outstanding donations</h2>
+        <% if @needs_payment_donations.any? %>
+        <% if @needs_sending_donations.any? %><h3>Books to pay for</h3><% end %>
+        <%= render @needs_payment_donations %>
+        <p><%= link_to 'Send a contribution to cover these books', new_contribution_path %></p>
+        <% end %>
+
+        <% if @needs_sending_donations.any? || @flag_count > 0 %>
+        <% if @needs_payment_donations.any? %><h3>Books to send</h3><% end %>
         <div class="any-donations">
             <p>Please send the following books:</p>
-            <%= render @donations %>
+            <%= render @needs_sending_donations %>
             <%= render "donations/donation_notes" %>
         </div>
         <p class="no-donations">None right now.</p>
         <% if @flag_count > 0 %>
         <p class="flagged"><%= pluralize @flag_count, 'donation' %> flagged and waiting on student response.</p>
         <% end %>
-    <p><%= link_to 'Find students to donate books to', donate_path %></p>
-    <p><%= link_to 'See all your donations', donations_path %></p>
+        <% end %>
+
+        <% if @needs_payment_donations.empty? && @needs_sending_donations.empty? && @flag_count == 0 %>
+        <p>None right now.</p>
+        <% end %>
+    <div id="donation-nav-links">
+        <p><%= link_to 'Find students to donate books to', donate_path %></p>
+        <p><%= link_to 'See all your donations', donations_path %></p>
+    </div>
     <% end %>
 
     <% if @current_user.is_volunteer? %>

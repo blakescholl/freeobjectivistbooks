@@ -40,7 +40,7 @@ class Request < ActiveRecord::Base
   scope :granted, active.where('donation_id is not null')
   scope :not_granted, active.where(donation_id: nil)
 
-  scope :with_prices, joins(:book).where('books.price_cents is not null').where('books.price_cents > 0')
+  scope :with_prices, joins(:book).merge(Book.with_prices)
 
   def self.for_mode(donor_mode)
     requests = not_granted.includes(user: :location).includes(:book).reorder('open_at desc')

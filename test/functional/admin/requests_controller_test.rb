@@ -44,6 +44,16 @@ class Admin::RequestsControllerTest < ActionController::TestCase
     assert_select 'h2', /book sent/i
   end
 
+  test "show with fulfiller" do
+    donation = create :donation_with_send_money_donor
+
+    admin_auth
+    get :show, id: donation.request.id
+    assert_response :success
+    assert_select 'h1', /Student \d+ wants\s+Book \d+/
+    assert_select 'h2', /donor found/i
+  end
+
   test "show requires login" do
     get :show, id: @howard_request.id
     assert_response :unauthorized

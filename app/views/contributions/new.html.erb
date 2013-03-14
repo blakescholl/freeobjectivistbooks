@@ -3,8 +3,15 @@
 <% content_for :stylesheet do %>
 <style>
 .main {
-    font-size: 1.3em;
     margin-top: 18px;
+}
+
+.main > p, .main > ul {
+    font-size: 1.3em;
+}
+
+.message {
+    margin-top: 12px;
 }
 
 h2 {
@@ -37,6 +44,13 @@ h2 {
         <% end %>
         <%= image_submit_tag "http://g-ecx.images-amazon.com/images/G/01/asp/beige_medium_paynow_withlogo_lightbg.gif" %>
     </form>
+
+    <% if chrome? %>
+    <div class="message error">
+        <p class="headline">You appear to be using Chrome. Amazon Payments has been having problems in this browser.</p>
+        <p class="detail">You may want to try another browser, such as Safari or Firefox.</p>
+    </div>
+    <% end %>
 
     <% elsif @current_user.donor_mode.send_money? %>
     <p>No donations to pay for right now. <%= link_to 'Find students to donate books to', donate_path %></p>

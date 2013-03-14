@@ -21,6 +21,14 @@ class ActiveSupport::TestCase
     user ? {user_id: user.id} : {}
   end
 
+  def user_agent_for(browser)
+    case browser
+    when :chrome then "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11"
+    when :safari then "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.17 (KHTML, like Gecko) Version/6.0.2 Safari/536.26.17"
+    when :firefox then "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:8.0.1) Gecko/20100101 Firefox/8.0.1"
+    end
+  end
+
   def setup
     @atlas = books :atlas
     @fountainhead = books :fountainhead

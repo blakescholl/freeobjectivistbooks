@@ -5,6 +5,10 @@ module ApplicationHelper
     request.user_agent =~ /iPad|iPod|iPhone|Android/
   end
 
+  def chrome?
+    request.user_agent =~ /Chrome\/\d+/
+  end
+
   # Generic formatting
 
   def format_block(text)

@@ -44,6 +44,24 @@ class ContributionsControllerTest < ActionController::TestCase
     assert_select 'p', /Your account is set up to send books directly/
   end
 
+  test "new shows warning to Chrome users" do
+    donation = create :donation, user: @donor
+
+    @request.user_agent = user_agent_for :chrome
+    get :new, params, session_for(@donor)
+    assert_response :success
+    assert_select '.error .headline', /Chrome/
+  end
+
+  test "new doesn't show warning to Safari users" do
+    donation = create :donation, user: @donor
+
+    @request.user_agent = user_agent_for :safari
+    get :new, params, session_for(@donor)
+    assert_response :success
+    assert_select '.error .headline', false
+  end
+
   # Create
 
   def amazon_ipn_params

@@ -47,8 +47,14 @@ h2 {
 
     <% if chrome? %>
     <div class="message error">
-        <p class="headline">You appear to be using Chrome. Amazon Payments has been having problems in this browser.</p>
-        <p class="detail">You may want to try another browser, such as Safari or Firefox.</p>
+        <p class="headline">You appear to be using Chrome. Some users have had problems paying with this browser.</p>
+        <p class="detail">If you reach a blank page after logging in to Amazon:</p>
+        <ol class="detail">
+            <li>Try clearing your cache and/or cookies and starting over.
+            <li>Alternately, you can use another browser, such as Safari or Firefox.
+        </ol>
+        <p class="detail">(We've notified Amazon of the problem but don't know if or when they will resolve it—sorry for the inconvenience.)
+        </p>
     </div>
     <% end %>
 

@@ -155,7 +155,7 @@ a:active {
     background-image: url(/assets/notice-icon.png);
 }
 
-.message p {
+.message p, .message ul, .message ol {
     padding: 4px 12px 4px 30px;
     margin-bottom: 0;
 }

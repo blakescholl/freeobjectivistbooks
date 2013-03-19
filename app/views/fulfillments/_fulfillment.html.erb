@@ -9,9 +9,12 @@
         <%= form_for fulfillment, url: donation_fulfillment_path(fulfillment.donation) do |f| %>
             <%= f.submit "", class: "grid_3 alpha omega button send" %>
         <% end %>
-        <% else %>
+        <div class="clear"></div>
+        <% elsif fulfillment.needs_sending? %>
         <%= link_to fulfillment do %><div class="grid_3 alpha omega button send"></div><% end %>
+        <div class="clear"></div>
         <% end %>
+        <p><%= link_to "See all details for this request", fulfillment.request %></p>
     </div>
     <div class="clear"></div>
 </div>

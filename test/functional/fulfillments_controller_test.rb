@@ -52,6 +52,62 @@ class FulfillmentsControllerTest < ActionController::TestCase
     verify_wrong_login_page
   end
 
+  # Index
+
+  test "index" do
+    user = create :volunteer
+    fulfillments = create_list :fulfillment, 2, user: user
+    fulfillments.each {|f| f.donation.send! user}
+
+    get :index, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h2', false
+    assert_select '.fulfillment', 2
+    fulfillments.each do |fulfillment|
+      assert_select '.headline', /#{fulfillment.book}/
+    end
+  end
+
+  test "index with unsent fulfillments" do
+    user = create :volunteer
+    fulfillments = create_list :fulfillment, 2, user: user
+
+    get :index, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h2', /Unsent/
+    assert_select '.fulfillment', 2
+    fulfillments.each do |fulfillment|
+      assert_select '.headline', /#{fulfillment.book}/
+    end
+
+    assert_select 'h2', text: /Flagged/, count: 0
+
+    assert_select 'h2', /Sent/
+    assert_select 'p', /None yet/
+  end
+
+  test "index with flagged fulfillments" do
+    user = create :volunteer
+    fulfillments = create_list :fulfillment, 2, user: user
+    fulfillments.each {|f| f.donation.flag! user}
+
+    get :index, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h2', text: /Unsent/, count: 0
+
+    assert_select 'h2', /Flagged/
+    assert_select '.fulfillment', 2
+    fulfillments.each do |fulfillment|
+      assert_select '.headline', /#{fulfillment.book}/
+    end
+
+    assert_select 'h2', /Sent/
+    assert_select 'p', /None yet/
+  end
+
   # Create
 
   test "create" do

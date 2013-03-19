@@ -1,0 +1,46 @@
+<% content_for :title do %>Fulfillments<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.request, .actions {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.button {
+    height: 46px;
+    margin-bottom: 6px;
+    background-position-x: left;
+}
+
+.send {
+    background-image: url(/assets/send-button.png);
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Books you volunteered to send</h1>
+
+<div class="grid_12">
+    <% if @needs_sending.any? %>
+    <h2>Unsent</h2>
+    <p>Please send these now!</p>
+    <%= render @needs_sending %>
+    <% end %>
+
+    <% if @flagged.any? %>
+    <h2>Flagged</h2>
+    <p>These books have been flagged and are waiting on student response.</p>
+    <%= render @flagged %>
+    <% end %>
+
+    <% if @needs_sending.any? || @flagged.any? %>
+    <h2>Sent</h2>
+    <% end %>
+    <% if @sent.any? %>
+    <%= render @sent %>
+    <% else %>
+    <p>None yet.</p>
+    <% end %>
+</div>
+<div class="clear"></div>

@@ -12,6 +12,13 @@ class FulfillmentsController < ApplicationController
     @unsent = @current_user.fulfillments.needs_sending
   end
 
+  def index
+    fulfillments = @current_user.fulfillments
+    @needs_sending = fulfillments.needs_sending
+    @flagged = fulfillments.flagged
+    @sent = fulfillments.sent
+  end
+
   def create
     begin
       fulfillment = @donation.fulfill @current_user

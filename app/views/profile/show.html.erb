@@ -148,8 +148,9 @@
         <%= render @fulfillments %>
         <% else %>
         <p>None outstanding.</p>
-        <p><%= link_to 'Help out by sending books', volunteer_path %></p>
         <% end %>
+        <p><%= link_to 'Help out by sending books', volunteer_path %></p>
+        <p><%= link_to 'See all books you volunteered to send', volunteer_path %></p>
     <% end %>
 </div>
 <div class="clear"></div>

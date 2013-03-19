@@ -9,8 +9,9 @@ class ProfileControllerTest < ActionController::TestCase
     verify_link 'see all your donations', present
   end
 
-  def verify_volunteer_link(present = true)
+  def verify_volunteer_links(present = true)
     verify_link 'help out', present
+    verify_link 'see all books you volunteered to send', present
   end
 
   def verify_one_request_text(present = true)
@@ -36,7 +37,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_can_request false
     verify_all_donations_link false
-    verify_volunteer_link false
+    verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -72,7 +73,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_can_request false
     verify_all_donations_link false
-    verify_volunteer_link false
+    verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -93,7 +94,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_can_request
     verify_all_donations_link false
-    verify_volunteer_link false
+    verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -123,7 +124,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_can_request
     verify_all_donations_link false
-    verify_volunteer_link false
+    verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
   end
@@ -170,7 +171,7 @@ class ProfileControllerTest < ActionController::TestCase
     verify_all_donations_link
     verify_new_request_link false
     verify_one_request_text false
-    verify_volunteer_link false
+    verify_volunteer_links false
   end
 
   test "show for send-money donor" do
@@ -197,7 +198,7 @@ class ProfileControllerTest < ActionController::TestCase
     verify_all_donations_link
     verify_new_request_link false
     verify_one_request_text false
-    verify_volunteer_link false
+    verify_volunteer_links false
   end
 
   test "show for volunteer" do
@@ -213,7 +214,7 @@ class ProfileControllerTest < ActionController::TestCase
     verify_new_request_link false
     verify_one_request_text false
     verify_all_donations_link false
-    verify_volunteer_link
+    verify_volunteer_links
   end
 
   test "show for volunteer with unsent fulfillments" do
@@ -235,7 +236,7 @@ class ProfileControllerTest < ActionController::TestCase
     verify_new_request_link false
     verify_one_request_text false
     verify_all_donations_link false
-    verify_volunteer_link false
+    verify_volunteer_links
   end
 
   test "show requires login" do

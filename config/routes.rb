@@ -34,7 +34,7 @@ FreeBooks::Application.routes.draw do
     end
   end
 
-  resources :fulfillments, only: [:show]
+  resources :fulfillments, only: [:index, :show]
   get "volunteer" => "fulfillments#volunteer"
 
   resources :testimonials, only: [:index, :show] do

@@ -1,4 +1,4 @@
-<% content_for :title do %><%= @fulfillment.book %> to <%= @fulfillment.student.name %><% end %>
+<% content_for :title do %><%= @fulfillment.book %> to <%= @fulfillment.student %><% end %>
 
 <% content_for :stylesheet do %>
 <style>
@@ -31,8 +31,8 @@
 <% end %>
 
 <div class="grid_16">
-    <h1><%= title @fulfillment.book %> to <%= @fulfillment.student.name %></h1>
-    <p class="overview">On behalf of <%= @fulfillment.donor.name %> in <%= @fulfillment.donor.location%></p>
+    <h1><%= title @fulfillment.book %> to <%= @fulfillment.student %></h1>
+    <p class="overview">On behalf of <%= @fulfillment.donor %> in <%= @fulfillment.donor.location %></p>
 </div>
 
 <div class="grid_11 overview">
@@ -44,11 +44,17 @@
     <p>Log in with email: donations@freeobjectivistbooks.org</p>
     <p>Ship to:</p>
     <div class="request">
-        <p class="name"><%= @fulfillment.student.name %></p>
+        <p class="name"><%= @fulfillment.student %></p>
         <p class="address"><%= format_address @fulfillment.address %></p>
     </div>
 
-    <h2>3. Confirm</h3>
+    <h2>3. Enter gift note</h2>
+    <p>Mark that the book is a gift and use the following gift note:<p>
+    <p class="request">Via Free Objectivist Books and donor <%= @fulfillment.donor %>. Please go to
+        http://freeobjectivistbooks.org to let us know you have received your book. Happy reading!
+    </p>
+
+    <h2>4. Confirm</h3>
     <p>Let us know when you have sent the book:</p>
     <%= form_for @fulfillment.donation, url: donation_status_path(@fulfillment.donation, redirect: volunteer_url) do |f| %>
         <%= f.hidden_field :status, value: "sent" %>

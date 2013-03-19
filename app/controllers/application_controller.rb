@@ -7,6 +7,9 @@ class ForbiddenException < StandardError; end
 # Thrown when a blocked user tries to access any page or action.
 class BlockedUserException < StandardError; end
 
+# Thrown when an SSL-only action is accessed over http (instead of https).
+class SslRequiredException < StandardError; end
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
@@ -78,16 +81,13 @@ class ApplicationController < ActionController::Base
   # Redirects to the secure (https) version of this link if needed (and if the environment supports it).
   # Optional before_filter that subclasses can use (e.g., on the login page).
   def require_ssl(options = {})
-    if !request.ssl? && Rails.application.config.ssl_supported
-      redirect_options = {protocol: 'https', status: :moved_permanently}
-      redirect_options.merge! Rails.application.config.ssl_options
-      redirect_to request.query_parameters.merge(redirect_options)
-    end
+    raise SslRequiredException if !request.ssl? && Rails.application.config.ssl_supported
   end
 
   # Invokes render_unauthorized if there is no current logged-in user.
   # Optional before_filter that subclasses can use.
   def require_login
+    require_ssl
     raise UnauthorizedException if !@current_user
   end
 
@@ -169,9 +169,16 @@ class ApplicationController < ActionController::Base
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   end
 
+  rescue_from SslRequiredException, with: :redirect_to_ssl
   rescue_from UnauthorizedException, with: :render_unauthorized
   rescue_from ForbiddenException, with: :render_forbidden
   rescue_from BlockedUserException, with: :render_blocked_user
+
+  def redirect_to_ssl
+    redirect_options = {protocol: 'https', status: :moved_permanently}
+    redirect_options.merge! Rails.application.config.ssl_options
+    redirect_to request.query_parameters.merge(redirect_options)
+  end
 
   # Renders an HTTP 401 Unauthorized response for HTML or JSON.
   def render_unauthorized

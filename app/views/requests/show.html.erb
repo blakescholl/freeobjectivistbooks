@@ -51,11 +51,12 @@
 </div>
 
 <div class="request grid_10">
+    <% if current_is_sender? || current_is_student? %>
     <h2>Ship to</h2>
     <p class="name"><%= @request.user.name %></p>
     <p class="address"><%= format_address @request.address %></p>
 
-    <% if (current_is_donor? || current_is_fulfiller?) && @request.needs_fix? %>
+    <% if current_is_sender? && @request.needs_fix? %>
     <p class="flagged">
         <% if @request.address.present? %>
         Shipping info flagged
@@ -63,6 +64,7 @@
         Student has been contacted to add address
         <% end %>
     </p>
+    <% end %>
     <% end %>
 
     <h2>Status: <%= status_headline @request %></h2>

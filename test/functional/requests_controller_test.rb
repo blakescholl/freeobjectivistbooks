@@ -243,10 +243,16 @@ class RequestsControllerTest < ActionController::TestCase
     verify_cancel_donation_link false
   end
 
+  def verify_sender_links(present, status, options = {})
+    verify_flag_link (present && status == :not_sent)
+    verify_sent_button (present && status.in?([:not_sent, :flagged])), options
+  end
+
   def verify_donor_links(status, options = {})
+    sender = options[:donor_mode] != :send_money
+
     verify_back_link
-    verify_flag_link (status == :not_sent)
-    verify_sent_button (status.in? [:not_sent, :flagged]), options
+    verify_sender_links sender, status, options
     verify_cancel_donation_link (status.in? [:not_sent, :sent, :flagged])
 
     verify_no_student_links
@@ -254,8 +260,7 @@ class RequestsControllerTest < ActionController::TestCase
 
   def verify_fulfiller_links(status, options = {})
     verify_back_link false
-    verify_flag_link (status == :not_sent)
-    verify_sent_button (status.in? [:not_sent, :flagged]), options
+    verify_sender_links true, status, options
     verify_cancel_donation_link false
 
     verify_no_student_links
@@ -301,6 +306,18 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'h1', "Hank Rearden wants The Fountainhead"
     verify_status 'book received'
     verify_donor_links :received
+  end
+
+  test "show to send-money donor" do
+    donation = create :donation_with_send_money_donor
+
+    get :show, {id: donation.request.id}, session_for(donation.user)
+    assert_response :success
+    assert_select 'h1', /Student \d+ wants Book \d+/
+    assert_select '.tagline', /Studying .* at .*/
+    assert_select '.address', false
+    verify_status 'donor found'
+    verify_donor_links :not_sent, donor_mode: :send_money
   end
 
   test "show to fulfiller" do

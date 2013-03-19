@@ -131,7 +131,7 @@ class ProfileControllerTest < ActionController::TestCase
 
   test "show for requester with fulfiller" do
     @frisco_donation.fulfill @kira
-    @frisco_donation.update_status! "sent", @kira
+    @frisco_donation.send! @kira
 
     get :show, params, session_for(@frisco)
     assert_response :success
@@ -220,7 +220,7 @@ class ProfileControllerTest < ActionController::TestCase
   test "show for volunteer with unsent fulfillments" do
     user = create :volunteer
     fulfillments = create_list :fulfillment, 3, user: user
-    fulfillments.first.donation.update_status! 'sent', user
+    fulfillments.first.donation.send! user
 
     get :show, params, session_for(user)
     assert_response :success

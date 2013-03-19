@@ -28,6 +28,9 @@ FreeBooks::Application.configure do
 
   routes.default_url_options = { host: 'test.com' }
 
+  # Don't use https
+  config.ssl_supported = false
+
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.

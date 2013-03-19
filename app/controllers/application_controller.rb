@@ -75,6 +75,16 @@ class ApplicationController < ActionController::Base
     @donation = Donation.find params[:donation_id] if params[:donation_id]
   end
 
+  # Redirects to the secure (https) version of this link if needed (and if the environment supports it).
+  # Optional before_filter that subclasses can use (e.g., on the login page).
+  def require_ssl(options = {})
+    if !request.ssl? && Rails.application.config.ssl_supported
+      redirect_options = {protocol: 'https', status: :moved_permanently}
+      redirect_options.merge! Rails.application.config.ssl_options
+      redirect_to request.query_parameters.merge(redirect_options)
+    end
+  end
+
   # Invokes render_unauthorized if there is no current logged-in user.
   # Optional before_filter that subclasses can use.
   def require_login

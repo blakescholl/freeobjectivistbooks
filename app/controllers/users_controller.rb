@@ -1,5 +1,6 @@
 # Manages user signup of both students and donors.
 class UsersController < ApplicationController
+  before_filter :require_ssl
   before_filter :seen_signup, only: [:read, :donate, :volunteer]
 
   def seen_signup

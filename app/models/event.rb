@@ -118,11 +118,25 @@ class Event < ActiveRecord::Base
     return :fulfiller if from_fulfiller?
   end
 
+  def notify_student?
+    true
+  end
+
+  def notify_donor?
+    return false if !donation
+    return false if donation.donor_mode.send_money? && type.in?(%w{fix update})
+    return true
+  end
+
+  def notify_fulfiller?
+    true
+  end
+
   def roles_to_notify
     roles = []
-    roles << :student unless from_student?
-    roles << :donor if donor && !from_donor?
-    roles << :fulfiller if fulfiller && !from_fulfiller?
+    roles << :student if student && notify_student? && !from_student?
+    roles << :donor if donor && notify_donor? && !from_donor?
+    roles << :fulfiller if fulfiller && notify_fulfiller? && !from_fulfiller?
     roles
   end
 

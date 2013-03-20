@@ -143,9 +143,11 @@ class EventTest < ActiveSupport::TestCase
     assert_equal [:student], events(:hugh_messages_quentin).roles_to_notify
 
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
-    @frisco_donation.save!
+    event = @frisco_donation.flag! @kira
     assert_equal [:student, :donor], event.roles_to_notify
+
+    event = @frisco_donation.fix!
+    assert_equal [:fulfiller], event.roles_to_notify
   end
 
   # Actions
@@ -165,6 +167,16 @@ class EventTest < ActiveSupport::TestCase
     assert !event.notified?
     assert_difference("ActionMailer::Base.deliveries.count", 2) { event.notify }
     assert event.notified?
+  end
+
+  test "notify on fix only goes to fulfiller" do
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+
+    assert_difference("ActionMailer::Base.deliveries.count", 1) do
+      event = fulfillment.donation.fix!
+      assert event.notified?
+    end
   end
 
   test "notify is idempotent" do

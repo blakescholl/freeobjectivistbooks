@@ -187,17 +187,21 @@ class Donation
     event = update_status params, user, time
     save!
     event.save! if event
+    event
   end
 
   def send!(user = nil)
+    user ||= sender
     update_status! 'sent', user
   end
 
   def flag!(user = nil)
+    user ||= sender
     params = {message: "Fix this"}
     event = flag params, user
     save!
     event.save! if event
+    event
   end
 
   def cancel!(user)
@@ -205,5 +209,15 @@ class Donation
     event = cancel params, user
     save!
     event.save! if event
+    event
+  end
+
+  def fix!
+    attributes = {address: "12345 Main St"}
+    event_attributes = {message: "Fixed!"}
+    event = fix attributes, event_attributes
+    save!
+    event.save! if event
+    event
   end
 end

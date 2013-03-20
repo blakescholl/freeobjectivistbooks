@@ -35,6 +35,10 @@
     background-image: url(/assets/sent-button.png);
 }
 
+.send-payment {
+    background-image: url(/assets/send-payment-button.png);
+}
+
 .any-donations {
     display: <%= @needs_sending_donations.any? ? "block" : "none" %>;
 }
@@ -116,7 +120,7 @@
         <% if @needs_sending_donations.any? %><h3>Books to pay for</h3><% end %>
         <p>Please send a contribution to cover the following books:</p>
         <%= render @needs_payment_donations %>
-        <p><%= link_to 'Send a contribution to cover these books', new_contribution_path %></p>
+        <%= link_to new_contribution_path do %><div class="send-payment button"></div><% end %>
         <% end %>
 
         <% if @needs_sending_donations.any? || @flag_count > 0 %>

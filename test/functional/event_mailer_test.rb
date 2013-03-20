@@ -79,7 +79,6 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /FYI/
       assert_select 'p', /your donation of Objectivism: The Philosophy of Ayn Rand to Francisco d&#x27;Anconia/
       assert_select 'p', /Kira Argounova \(Free Objectivist Books volunteer\) has flagged/
-      assert_select 'p', 'Kira Argounova says: "Fix this"'
       assert_select 'p', /We'll follow up with Francisco/
       assert_select 'a', text: /Respond/, count: 0
     end

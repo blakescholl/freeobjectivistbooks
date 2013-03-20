@@ -176,7 +176,7 @@ class ReminderMailerTest < ActionMailer::TestCase
 
   test "confirm receipt from fulfiller" do
     @frisco_donation.fulfill @kira
-    @frisco_donation.update_status! "sent", @kira, (Time.now - 2.weeks)
+    @frisco_donation.send! @kira, (Time.now - 2.weeks)
     ActionMailer::Base.deliveries = []
 
     reminder = Reminders::ConfirmReceipt.new_for_entity @frisco_donation

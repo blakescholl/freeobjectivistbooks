@@ -182,7 +182,8 @@ class Request
 end
 
 class Donation
-  def update_status!(status, user = nil, time = Time.now)
+  def update_status!(status, user = nil, time = nil)
+    time ||= Time.now
     params = {status: status}
     event = update_status params, user, time
     save!
@@ -190,9 +191,9 @@ class Donation
     event
   end
 
-  def send!(user = nil)
+  def send!(user = nil, time = nil)
     user ||= sender
-    update_status! 'sent', user
+    update_status! 'sent', user, time
   end
 
   def flag!(user = nil)

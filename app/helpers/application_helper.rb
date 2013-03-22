@@ -30,6 +30,7 @@ module ApplicationHelper
   end
 
   def format_number(number, precision = 2)
+    return "" if number.nil?
     digits = count_digits number
     precision = digits if precision < digits
     number_with_precision number, precision: precision, significant: true, strip_insignificant_zeros: true, delimiter: ","

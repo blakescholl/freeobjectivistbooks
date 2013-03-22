@@ -5,7 +5,7 @@ ActiveAdmin.register User do
   filter :email
   filter :studying
   filter :school
-  filter :location
+  filter :location_name, as: :string
   filter :donor_mode
   filter :blocked, as: :check_boxes
 

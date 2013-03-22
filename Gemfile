@@ -10,18 +10,14 @@ gem 'exception_notification'
 gem 'jquery-rails'
 gem 'meta_search', '>= 1.1.0.pre' # required by activeadmin
 gem 'money-rails'
+gem 'pg'
 gem 'redcarpet'
 gem 'rest-client'
 gem 'thin'
 gem 'valid_email'
 
-group :production do
-  gem 'pg'
-end
-
 group :development, :test do
   gem 'factory_girl_rails', '~> 4.0'
-  gem 'mysql2'
   gem 'ruby-debug19', require: 'ruby-debug'
 end
 

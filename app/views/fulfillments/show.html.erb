@@ -70,6 +70,7 @@
         <p><%= link_to 'Flag problem with shipping info',
             new_donation_flag_path(@fulfillment.donation, redirect: volunteer_url) %>
         </p>
+        <p><%= link_to 'See full request details', @fulfillment.request %></p>
     </div>
     <div class="bottom_5">&nbsp;</div>
 </div>

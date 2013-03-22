@@ -1,6 +1,16 @@
 ActiveAdmin.register User do
   actions :all, except: [:new, :destroy]
 
+  member_action :spoof, method: :post do
+    @user = User.find params[:id]
+    set_current_user @user
+    redirect_to profile_url
+  end
+
+  action_item only: :show do
+    link_to "Spoof user", spoof_admin_user_path(user), method: :post
+  end
+
   filter :name
   filter :email
   filter :studying

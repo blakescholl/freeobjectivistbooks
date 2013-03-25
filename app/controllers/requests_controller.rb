@@ -60,6 +60,10 @@ class RequestsController < ApplicationController
     end
   end
 
+  def show
+    @actions = @request.actions_for @current_user, context: :detail
+  end
+
   def edit
     if @request.flagged?
       redirect_to fix_donation_flag_url(@request.donation)

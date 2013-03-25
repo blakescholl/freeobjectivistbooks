@@ -95,17 +95,25 @@ class Actions
       when :cancel_request                then request.can_cancel?
       when :thank                         then request.needs_thanks?
       when :update_address                then !request.sent?
+      else false
       end
     elsif for_donor? || for_fulfiller?
       case action
       when :amazon_link                   then for_sender? && donation.can_send? && book.amazon_url
       when :cancel_donation               then for_donor? && donation.donor_can_cancel?
       when :flag                          then for_sender? && donation.can_flag?
+      else false
       end
+    else
+      false
     end
   end
 
   def other_actions
     relevant_actions.select {|action| available? action}
+  end
+
+  def any?
+    prompted_status.present? || other_actions.any?
   end
 end

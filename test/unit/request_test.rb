@@ -311,4 +311,13 @@ class RequestTest < ActiveSupport::TestCase
       @quentin_request.cancel
     end
   end
+
+  # Reopen
+
+  test "reopen" do
+    request = create :request, canceled: true, open_at: (Time.now - 3.months)
+    request.reopen
+    assert request.active?
+    assert_open_at_is_recent request
+  end
 end

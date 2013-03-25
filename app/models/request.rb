@@ -62,7 +62,7 @@ class Request < ActiveRecord::Base
   end
 
   before_create do |request|
-    request.open_at = Time.now
+    request.open_at ||= Time.now
   end
 
   #--
@@ -128,6 +128,11 @@ class Request < ActiveRecord::Base
     !sent? && !canceled?
   end
 
+  # Whether we will show the student the option to reopen the request.
+  def can_reopen?
+    canceled? && user.can_request?
+  end
+
   def actions_for(user, options)
     Actions.new self, user, options
   end
@@ -154,5 +159,14 @@ class Request < ActiveRecord::Base
     self.canceled = true
     donation.canceled = true if donation
     cancel_request_events.build params[:event]
+  end
+
+  def reopen
+    return if active?
+    raise "Can't reopen" if !can_reopen?
+
+    self.canceled = false
+    self.open_at = Time.now
+    reopen_events.build
   end
 end

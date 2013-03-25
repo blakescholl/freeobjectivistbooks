@@ -62,6 +62,7 @@ class Actions
         :update_address,
         :message,
         :cancel_request,
+        :reopen,
         :details,
       ]
     elsif for_donor?
@@ -94,7 +95,8 @@ class Actions
       when :cancel_donation_not_received  then donation && donation.student_can_cancel?
       when :cancel_request                then request.can_cancel?
       when :thank                         then request.needs_thanks?
-      when :update_address                then !request.sent?
+      when :update_address                then request.active? && !request.sent?
+      when :reopen                        then request.can_reopen?
       else false
       end
     elsif for_donor? || for_fulfiller?

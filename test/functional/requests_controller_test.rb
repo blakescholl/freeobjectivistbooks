@@ -224,6 +224,10 @@ class RequestsControllerTest < ActionController::TestCase
     verify_link 'report book not received', present
   end
 
+  def verify_reopen_link(present = true)
+    verify_link 'reopen', present
+  end
+
   def verify_cancel_donation_link(present = true)
     verify_link 'cancel this donation', present
   end
@@ -234,6 +238,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_update_shipping_link false
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link false
   end
 
   def verify_no_donor_links
@@ -277,6 +282,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :add
     verify_cancel_request_link
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -347,6 +353,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_thank_link
     verify_address_link :update
     verify_cancel_request_link
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -365,6 +372,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :none
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -383,6 +391,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :none
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -398,6 +407,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :none
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -412,6 +422,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :add
     verify_cancel_request_link
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -425,6 +436,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :update
     verify_cancel_request_link
     verify_not_received_link false
+    verify_reopen_link false
     verify_no_donor_links
   end
 
@@ -462,13 +474,16 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "show canceled" do
-    get :show, {id: @howard_request_canceled.id}, session_for(@howard)
+    request = create :request, canceled: true
+
+    get :show, {id: request.id}, session_for(request.user)
     assert_response :success
-    assert_select 'h1', "Howard Roark wants The Fountainhead"
+    assert_select 'h1', /Student \d+ wants Book \d+/
     verify_thank_link false
     verify_address_link :none
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link
     verify_no_donor_links
   end
 
@@ -480,6 +495,7 @@ class RequestsControllerTest < ActionController::TestCase
     verify_address_link :none
     verify_cancel_request_link false
     verify_not_received_link false
+    verify_reopen_link
     verify_no_donor_links
   end
 
@@ -677,6 +693,58 @@ class RequestsControllerTest < ActionController::TestCase
 
   test "destroy requires request owner" do
     delete :destroy, {id: @howard_request.id}, session_for(@quentin)
+    verify_wrong_login_page
+  end
+
+  # Reopan
+
+  test "reopen" do
+    request = create :request, canceled: true
+
+    post :reopen, {id: request.id}, session_for(request.user)
+    assert_redirected_to request
+
+    request.reload
+    assert request.active?
+    assert_open_at_is_recent request
+  end
+
+  test "reopen is idempotent" do
+    open_at = 3.weeks.ago
+    request = create :request, open_at: open_at
+
+    post :reopen, {id: request.id}, session_for(request.user)
+    assert_redirected_to request
+
+    request.reload
+    assert request.active?
+    assert_equal open_at, request.open_at
+  end
+
+  test "reopen requires can_reopen?" do
+    request = create :request, canceled: true
+    request2 = create :request, user: request.user
+
+    post :reopen, {id: request.id}, session_for(request.user)
+    assert_redirected_to request
+    assert_match /can't reopen/i, flash[:error]
+
+    request.reload
+    assert request.canceled?
+  end
+
+  test "reopen requires login" do
+    request = create :request, canceled: true
+
+    post :reopen, {id: request.id}
+    verify_login_page
+  end
+
+  test "reopen requires request owner" do
+    request = create :request, canceled: true
+    user = create :user
+
+    post :reopen, {id: request.id}, session_for(user)
     verify_wrong_login_page
   end
 end

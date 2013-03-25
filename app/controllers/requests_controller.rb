@@ -3,6 +3,7 @@ class RequestsController < ApplicationController
   before_filter :require_login
   before_filter :require_can_request, only: [:new, :create]
   before_filter :require_unsent_for_cancel, only: [:cancel, :destroy]
+  before_filter :require_can_request_for_reopen, only: [:reopen]
 
   #--
   # Filters
@@ -15,7 +16,7 @@ class RequestsController < ApplicationController
   def allowed_users
     case params[:action]
     when "show" then [@request.user, @request.donor, @request.fulfiller]
-    when "edit", "update", "cancel", "destroy" then @request.user
+    when "edit", "update", "cancel", "destroy", "reopen" then @request.user
     end
   end
 
@@ -29,6 +30,13 @@ class RequestsController < ApplicationController
   def require_unsent_for_cancel
     if !@request.canceled? && @request.sent?
       flash[:error] = "Can't cancel this request because the book has already been sent."
+      redirect_to @request
+    end
+  end
+
+  def require_can_request_for_reopen
+    if !@current_user.can_request?
+      flash[:error] = "Can't reopen this request because you already have an open request."
       redirect_to @request
     end
   end
@@ -100,5 +108,16 @@ class RequestsController < ApplicationController
     else
       render :cancel
     end
+  end
+
+  def reopen
+    @event = @request.reopen
+    if save @request, @event
+      flash[:notice] = "Your request has been reopened and put back on the list to find a donor."
+    else
+      # Shouldn't happen
+      flash[:error] = "Sorry, something went wrong reopening this request. Please try again or contact us if you need help."
+    end
+    redirect_to @request
   end
 end

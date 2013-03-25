@@ -2,6 +2,7 @@ require 'test_helper'
 
 class EventMailerTest < ActionMailer::TestCase
   def verify_mail_body(mail, &block)
+    ActionMailer::Base.deliveries = []
     assert_equal ["jason@rationalegoist.com"], mail.from
     assert mail.body.encoded.present?, "mail is blank"
     mail.deliver
@@ -148,6 +149,23 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hugh Akston sent you a\s+message/
       assert_select 'p', /"Thanks! I will send you the book"/
       assert_select 'a', /Reply to Hugh/
+      assert_select 'a', /Full details for this request/
+    end
+  end
+
+  test "message to multiple recipients" do
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.message_events.build user: fulfillment.student, message: "Hello!"
+
+    mail = EventMailer.mail_for_event event, :donor
+    assert_match /Student \d+ sent you and Volunteer \d+ a message about Book \d+/, mail.subject
+    assert_equal [fulfillment.donor.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Donor \d+/
+      assert_select 'p', /Student \d+ sent you and Volunteer \d+ a\s+message/
+      assert_select 'p', /"Hello!"/
+      assert_select 'a', /Reply to Student \d+/
       assert_select 'a', /Full details for this request/
     end
   end

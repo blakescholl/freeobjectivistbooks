@@ -10,6 +10,13 @@ class EventMailer < ApplicationMailer
     Dir.glob(path).any? ? "#{role}/#{template_basename}" : template_basename
   end
 
+  def format_recipients(event, role)
+    all_recipients = event.recipients
+    current_recipient = event.send role
+    names = all_recipients.map {|user| user == current_recipient ? "you" : user.name}
+    names.to_sentence
+  end
+
   def notification(role, subject, options = {})
     @recipient = @event.send role
     template_basename = options[:template_basename] || "#{@event.type}_event"
@@ -45,8 +52,9 @@ class EventMailer < ApplicationMailer
 
   def message_event(event, role)
     @event = event
+    @recipient_list = format_recipients event, role
     message_type = event.is_thanks? ? "thank-you note for #{@event.book}" : "message about #{@event.book}"
-    notification role, "#{@event.user.name} sent you a #{message_type}"
+    notification role, "#{@event.user.name} sent #{@recipient_list} a #{message_type}"
   end
 
   def update_status_event(event, role)

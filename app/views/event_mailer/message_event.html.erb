@@ -1,4 +1,4 @@
-<p><%= @event.user %> sent you a
+<p><%= @event.user %> sent <%= @recipient_list %> a
     <% if @event.is_thanks? %>
     thank-you note for <i><%= @event.book %>:</i>
     <% else %>

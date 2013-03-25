@@ -244,11 +244,24 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "updated shipping info", @quentin.update_detail
   end
 
-  test "can request?" do
-    assert @dagny.can_request?
-    assert @hank.can_request?
-    assert !@quentin.can_request?
-    assert !@howard.can_request?
+  test "can request? true if no requests" do
+    user = create :student
+    assert user.can_request?
+  end
+
+  test "can request? false if open request" do
+    request = create :request
+    assert !request.user.can_request?
+  end
+
+  test "can request? true if request granted" do
+    donation = create :donation
+    assert donation.student.can_request?
+  end
+
+  test "can request? true if request canceled" do
+    request = create :request, canceled: true
+    assert request.user.can_request?
   end
 
   test "donor mode" do

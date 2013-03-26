@@ -182,9 +182,10 @@ class Request
 end
 
 class Donation
-  def update_status!(status, user = nil, time = nil)
+  def update_status!(status, user = nil, message = nil, time = nil)
     time ||= Time.now
     params = {status: status}
+    params[:event] = {message: message} if message
     event = update_status params, user, time
     save!
     event.save! if event
@@ -193,7 +194,12 @@ class Donation
 
   def send!(user = nil, time = nil)
     user ||= sender
-    update_status! 'sent', user, time
+    update_status! 'sent', user, nil, time
+  end
+
+  def receive!(user = nil, time = nil)
+    user ||= student
+    update_status! 'received', user, "Thanks!", time
   end
 
   def flag!(user = nil)

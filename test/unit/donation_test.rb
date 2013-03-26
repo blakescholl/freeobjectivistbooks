@@ -231,11 +231,6 @@ class DonationTest < ActiveSupport::TestCase
     assert !@quentin_donation_unsent.student_can_cancel?
   end
 
-  test "student can't cancel if no reminders" do
-    @quentin_donation_unsent.reminders.destroy_all
-    assert !@quentin_donation_unsent.student_can_cancel?
-  end
-
   test "student can't cancel send-money donation" do
     donation = build :donation_with_send_money_donor
     assert !donation.student_can_cancel?
@@ -275,7 +270,7 @@ class DonationTest < ActiveSupport::TestCase
 
   test "donor mode is send_books if donation has no price" do
     donor = create :send_money_donor
-    donation = create :donation_for_request_no_price, user: donor
+    donation = create :donation_for_request_not_amazon, user: donor
     assert donation.donor_mode.send_books?
   end
 

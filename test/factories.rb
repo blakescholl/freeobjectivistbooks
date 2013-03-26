@@ -38,9 +38,11 @@ FactoryGirl.define do
 
   factory :book do
     sequence(:title) {|n| "Book #{n}"}
+    sequence(:asin) {|n| "B%09d" % n}
     price 10
 
     trait(:no_price) {price nil}
+    trait(:no_asin) {asin nil}
   end
 
   factory :request do
@@ -53,8 +55,8 @@ FactoryGirl.define do
       association :user, factory: [:student, :no_address]
     end
 
-    factory :request_no_price do
-      association :book, factory: [:book, :no_price]
+    factory :request_not_amazon do
+      association :book, factory: [:book, :no_asin, :no_price]
     end
   end
 
@@ -68,8 +70,8 @@ FactoryGirl.define do
       association :request, factory: :request_no_address
     end
 
-    factory :donation_for_request_no_price do
-      association :request, factory: :request_no_price
+    factory :donation_for_request_not_amazon do
+      association :request, factory: :request_not_amazon
     end
 
     factory :donation_with_send_books_donor do
@@ -89,6 +91,7 @@ FactoryGirl.define do
   factory :review do
     association :user, factory: :student
     book
+    donation nil
     text "I really enjoyed it!"
     recommend true
   end

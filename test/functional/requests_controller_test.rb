@@ -182,330 +182,133 @@ class RequestsControllerTest < ActionController::TestCase
 
   # Show
 
-  def verify_thank_link(present = true)
-    verify_link 'thank', present
-  end
-
-  def verify_add_address_link(present = true)
-    verify_link 'add your address', present
-  end
-
-  def verify_update_shipping_link(present = true)
-    verify_link 'update shipping', present
-  end
-
-  def verify_flag_link(present = true)
-    verify_link 'flag', present
-  end
-
-  def verify_back_link(present = true)
-    verify_link 'back', present
-  end
-
-  def verify_sent_button(present = true, options = {})
-    assert_select '.sidebar form', present
-    verify_link 'Amazon', (present && options[:amazon_link].to_bool)
-  end
-
   def verify_status(status)
     assert_select 'h2', /status: #{status}/i
   end
 
-  def verify_address_link(which)
-    verify_add_address_link (which == :add)
-    verify_update_shipping_link (which == :update)
-  end
-
-  def verify_cancel_request_link(present = true)
-    verify_link 'cancel this request', present
-  end
-
-  def verify_not_received_link(present = true)
-    verify_link 'report book not received', present
-  end
-
-  def verify_reopen_link(present = true)
-    verify_link 'reopen', present
-  end
-
-  def verify_cancel_donation_link(present = true)
-    verify_link 'cancel this donation', present
-  end
-
-  def verify_no_student_links
-    verify_thank_link false
-    verify_add_address_link false
-    verify_update_shipping_link false
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link false
-  end
-
-  def verify_no_donor_links
-    verify_back_link false
-    verify_flag_link false
-    verify_sent_button false
-    verify_cancel_donation_link false
-  end
-
-  def verify_sender_links(present, status, options = {})
-    verify_flag_link (present && status == :not_sent)
-    verify_sent_button (present && status.in?([:not_sent, :flagged])), options
-  end
-
-  def verify_donor_links(status, options = {})
-    sender = options[:donor_mode] != :send_money
-
-    verify_back_link
-    verify_sender_links sender, status, options
-    verify_cancel_donation_link (status.in? [:not_sent, :sent, :flagged])
-
-    verify_no_student_links
-  end
-
-  def verify_fulfiller_links(status, options = {})
-    verify_back_link false
-    verify_sender_links true, status, options
-    verify_cancel_donation_link false
-
-    verify_no_student_links
-  end
-
-  test "show no donor" do
-    get :show, {id: @howard_request.id}, session_for(@howard)
-    assert_response :success
-    assert_select 'h1', "Howard Roark wants Atlas Shrugged"
-    assert_select '.tagline', "Studying architecture at Stanton Institute of Technology in New York, NY"
-    assert_select '.address', /no address/i
-    verify_status 'looking'
-    verify_thank_link false
-    verify_address_link :add
-    verify_cancel_request_link
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show to donor" do
-    get :show, {id: @quentin_request.id}, session_for(@hugh)
-    assert_response :success
-    assert_select 'h1', "Quentin Daniels wants The Virtue of Selfishness"
-    assert_select '.tagline', "Studying physics at MIT in Boston, MA"
-    assert_select '.address', /123 Main St/
-    verify_status 'book sent'
-    verify_donor_links :sent
-  end
-
-  test "show to donor unsent" do
-    get :show, {id: @quentin_request_unsent.id}, session_for(@hugh)
-    assert_response :success
-    assert_select 'h1', "Quentin Daniels wants The Fountainhead"
-    assert_select '.tagline', "Studying physics at MIT in Boston, MA"
-    assert_select '.address', /123 Main St/
-    verify_status 'donor found'
-    verify_donor_links :not_sent
-  end
-
-  test "show to donor received" do
-    get :show, {id: @hank_request_received.id}, session_for(@cameron)
-    assert_response :success
-    assert_select 'h1', "Hank Rearden wants The Fountainhead"
-    verify_status 'book received'
-    verify_donor_links :received
-  end
-
-  test "show to send-money donor" do
-    donation = create :donation_with_send_money_donor
-
-    get :show, {id: donation.request.id}, session_for(donation.user)
-    assert_response :success
-    assert_select 'h1', /Student \d+ wants Book \d+/
-    assert_select '.tagline', /Studying .* at .*/
-    assert_select '.address', false
-    verify_status 'donor found'
-    verify_donor_links :not_sent, donor_mode: :send_money
-  end
-
-  test "show to fulfiller" do
-    @frisco_donation.fulfill @kira
-
-    get :show, {id: @frisco_request.id}, session_for(@kira)
-    assert_response :success
-    assert_select 'h1', "Francisco d&#x27;Anconia wants Objectivism: The Philosophy of Ayn Rand"
-    assert_select '.tagline', /Studying metallurgy at Patrick Henry University/
-    assert_select '.address', /8234 Copper Drive/
-    verify_status 'donor found'
-    verify_fulfiller_links :not_sent
-  end
-
-  test "show unsent" do
-    get :show, {id: @quentin_request_unsent.id}, session_for(@quentin)
-    assert_response :success
-    assert_select 'h1', "Quentin Daniels wants The Fountainhead"
-    assert_select '.tagline', "Studying physics at MIT in Boston, MA"
-    assert_select '.address', /123 Main St/
-    verify_status 'donor found'
-    assert_select '.sidebar' do
-      assert_select 'h2', /Update/
-      assert_select 'p', /Let Hugh Akston know when you have received\s+The Fountainhead/
-    end
-    verify_not_received_link
-    verify_thank_link
-    verify_address_link :update
-    verify_cancel_request_link
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show sent" do
-    get :show, {id: @quentin_request.id}, session_for(@quentin)
-    assert_response :success
-    assert_select 'h1', "Quentin Daniels wants The Virtue of Selfishness"
-    assert_select '.tagline', "Studying physics at MIT in Boston, MA"
-    assert_select '.address', /123 Main St/
-    verify_status 'book sent'
-    assert_select '.sidebar' do
-      assert_select 'h2', /Update/
-      assert_select 'p', /Let Hugh Akston know when you have received\s+The Virtue of Selfishness/
-    end
-    verify_thank_link
-    verify_address_link :none
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show received" do
-    get :show, {id: @hank_request_received.id}, session_for(@hank)
-    assert_response :success
-    assert_select 'h1', "Hank Rearden wants The Fountainhead"
-    assert_select '.tagline', "Studying manufacturing at University of Pittsburgh in Philadelphia, PA"
-    assert_select '.address', /987 Steel Way/
-    verify_status 'book received'
-    assert_select '.sidebar' do
-      assert_select 'h2', /Update/
-      assert_select 'p', /Let Henry Cameron know when you have finished reading\s+The Fountainhead/
-    end
-    verify_thank_link
-    verify_address_link :none
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show read" do
-    get :show, {id: @quentin_request_read.id}, session_for(@quentin)
-    assert_response :success
-    assert_select 'h1', "Quentin Daniels wants Atlas Shrugged"
-    assert_select '.tagline', "Studying physics at MIT in Boston, MA"
-    verify_status 'finished reading'
-    assert_select '.review', /It was great/
-    assert_select 'p', text: /Let .* know/, count: 0
-    verify_thank_link false
-    verify_address_link :none
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show to student with missing address" do
-    get :show, {id: @dagny_request.id}, session_for(@dagny)
-    assert_response :success
-    assert_select '.message.error .headline', /We need your address/
-    assert_select '.message.error .headline a', /Add/
-    assert_select 'h1', "Dagny wants Capitalism: The Unknown Ideal"
-    verify_status 'donor found'
-    verify_thank_link false
-    verify_address_link :add
-    verify_cancel_request_link
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show to student with flagged address" do
-    get :show, {id: @hank_request.id}, session_for(@hank)
-    assert_response :success
-    assert_select '.message.error .headline', /problem with your shipping info/
-    assert_select '.message.error .headline a', /Update/
-    assert_select 'h1', "Hank Rearden wants Atlas Shrugged"
-    verify_thank_link true
-    verify_address_link :update
-    verify_cancel_request_link
-    verify_not_received_link false
-    verify_reopen_link false
-    verify_no_donor_links
-  end
-
-  test "show to donor with missing address" do
-    get :show, {id: @dagny_request.id}, session_for(@hugh)
-    assert_response :success
-    assert_select '.message.error', false
-    assert_select 'h1', "Dagny wants Capitalism: The Unknown Ideal"
-    assert_select '.address', /no address/i
-    assert_select '.flagged', /Student has been contacted/i
-    verify_donor_links :flagged
-  end
-
-  test "show to donor with flagged address" do
-    get :show, {id: @hank_request.id}, session_for(@cameron)
-    assert_response :success
-    assert_select '.message.error', false
-    assert_select 'h1', "Hank Rearden wants Atlas Shrugged"
-    assert_select '.address', /987 Steel Way/i
-    assert_select '.flagged', /Shipping info flagged/i
-    verify_donor_links :flagged, amazon_link: true
-  end
-
-  test "show to fulfiller with flagged address" do
-    @frisco_donation.fulfill @kira
-    @frisco_donation.flag!
-
-    get :show, {id: @frisco_request.id}, session_for(@kira)
-    assert_response :success
-    assert_select '.message.error', false
-    assert_select 'h1', "Francisco d&#x27;Anconia wants Objectivism: The Philosophy of Ayn Rand"
-    assert_select '.address', /8234 Copper Drive/
-    assert_select '.flagged', /Shipping info flagged/i
-    verify_fulfiller_links :flagged
-  end
-
-  test "show canceled" do
-    request = create :request, canceled: true
-
+  test "show open request" do
+    request = create :request
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success
     assert_select 'h1', /Student \d+ wants Book \d+/
-    verify_thank_link false
-    verify_address_link :none
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link
-    verify_no_donor_links
+    assert_select '.tagline', "Studying philosophy at U. of California in Anytown, USA"
+    verify_status 'looking'
   end
 
-  test "show flagged and canceled" do
-    get :show, {id: @dagny_request_canceled.id}, session_for(@dagny)
+  test "show granted" do
+    donation = create :donation
+    get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
-    assert_select 'h1', "Dagny wants Atlas Shrugged"
-    verify_thank_link false
-    verify_address_link :none
-    verify_cancel_request_link false
-    verify_not_received_link false
-    verify_reopen_link
-    verify_no_donor_links
+    verify_status 'donor found'
+  end
+
+  test "show sent" do
+    donation = create :donation, status: 'sent'
+    get :show, {id: donation.request.id}, session_for(donation.student)
+    assert_response :success
+    verify_status 'book sent'
+  end
+
+  test "show received" do
+    donation = create :donation, status: 'received'
+    get :show, {id: donation.request.id}, session_for(donation.student)
+    assert_response :success
+    verify_status 'book received'
+  end
+
+  test "show read" do
+    donation = create :donation, status: 'read'
+    review = create :review, user: donation.student, book: donation.book, donation: donation
+    get :show, {id: donation.request.id}, session_for(donation.student)
+    assert_response :success
+    verify_status 'finished reading'
+    assert_select '.review', /enjoyed it/
+  end
+
+  test "show to donor displays address" do
+    donation = create :donation
+    get :show, {id: donation.request.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.address', /\d+ Main St/
+  end
+
+  test "show to send-money donor doesn't display address" do
+    donation = create :donation_with_send_money_donor
+    get :show, {id: donation.request.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.address', false
+  end
+
+  test "show to fulfiller displays address" do
+    fulfillment = create :fulfillment
+    get :show, {id: fulfillment.request.id}, session_for(fulfillment.user)
+    assert_response :success
+    assert_select '.address', /\d+ Main St/
+  end
+
+  test "show open request with missing address has no error" do
+    request = create :request_no_address
+    get :show, {id: request.id}, session_for(request.user)
+    assert_response :success
+    assert_select '.message.error', false
+  end
+
+  test "show granted request with missing address has error" do
+    donation = create :donation_for_request_no_address
+    get :show, {id: donation.request.id}, session_for(donation.student)
+    assert_response :success
+    assert_select '.message.error .headline', /We need your address/
+    assert_select '.message.error .headline a', /Add/
+  end
+
+  test "show request flagged address has error" do
+    donation = create :donation
+    donation.flag!
+    get :show, {id: donation.request.id}, session_for(donation.student)
+    assert_response :success
+    assert_select '.message.error .headline', /problem with your shipping info/
+    assert_select '.message.error .headline a', /Update/
+  end
+
+  test "show to donor with missing address" do
+    donation = create :donation_for_request_no_address
+    get :show, {id: donation.request.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.message.error', false
+    assert_select '.address', /no address/i
+    assert_select '.flagged', /Student has been contacted/i
+  end
+
+  test "show to donor with flagged address" do
+    donation = create :donation
+    donation.flag!
+    get :show, {id: donation.request.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.message.error', false
+    assert_select '.address', /\d+ Main St/i
+    assert_select '.flagged', /Shipping info flagged/i
+  end
+
+  test "show to fulfiller with flagged address" do
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+    get :show, {id: fulfillment.request.id}, session_for(fulfillment.user)
+    assert_response :success
+    assert_select '.message.error', false
+    assert_select '.address', /\d+ Main St/i
+    assert_select '.flagged', /Shipping info flagged/i
   end
 
   test "show requires login" do
-    get :show, id: @howard_request.id
+    request = create :request
+    get :show, id: request.id
     verify_login_page
   end
 
-  test "show requires request owner or donor" do
-    get :show, {id: @howard_request.id}, session_for(@quentin)
+  test "show requires request owner, donor or fulfiller" do
+    request = create :request
+    user = create :user
+    get :show, {id: request.id}, session_for(user)
     verify_wrong_login_page
   end
 

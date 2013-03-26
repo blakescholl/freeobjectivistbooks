@@ -15,6 +15,7 @@ development:
 test:
   <<: *common
   database: free_books_test
+  min_messages: warning
 
 production:
   <<: *common

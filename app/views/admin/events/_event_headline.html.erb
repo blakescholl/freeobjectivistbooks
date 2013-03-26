@@ -26,6 +26,10 @@
         <% end %>
     <% when "cancel_request" %>
         canceled their request for
+    <% when "renew" %>
+        <%= event.detail %> their request for
+    <% else %>
+        <%= event.type %>ed
     <% end %>
     <%= link_to (title event.book), admin_request_path(event.request) %>
     <% if event.type == "update_status" %>

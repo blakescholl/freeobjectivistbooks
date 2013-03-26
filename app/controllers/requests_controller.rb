@@ -2,8 +2,10 @@
 class RequestsController < ApplicationController
   before_filter :require_login
   before_filter :require_can_request, only: [:new, :create]
+  before_filter :fix_if_needed, only: [:edit]
   before_filter :require_unsent_for_cancel, only: [:cancel, :destroy]
-  before_filter :require_can_request_for_reopen, only: [:reopen]
+  before_filter :require_open_request, if: :is_renew?
+  before_filter :require_can_request_for_reopen, if: :is_reopen?
 
   #--
   # Filters
@@ -11,12 +13,21 @@ class RequestsController < ApplicationController
 
   def parse_params
     @from_read = params[:from_read].to_bool
+    @renew = params[:renew].to_bool || params[:action] == "renew"
+  end
+
+  def is_renew?
+    @renew
+  end
+
+  def is_reopen?
+    @renew && @request.canceled?
   end
 
   def allowed_users
     case params[:action]
     when "show" then [@request.user, @request.donor, @request.fulfiller]
-    when "edit", "update", "cancel", "destroy", "reopen" then @request.user
+    when "edit", "update", "cancel", "destroy", "renew" then @request.user
     end
   end
 
@@ -27,9 +38,22 @@ class RequestsController < ApplicationController
     end
   end
 
+  def fix_if_needed
+    if @request.flagged?
+      redirect_to fix_donation_flag_url(@request.donation)
+    end
+  end
+
   def require_unsent_for_cancel
     if !@request.canceled? && @request.sent?
       flash[:error] = "Can't cancel this request because the book has already been sent."
+      redirect_to @request
+    end
+  end
+
+  def require_open_request
+    if !@request.open?
+      flash[:error] = "This request has already been granted."
       redirect_to @request
     end
   end
@@ -72,14 +96,6 @@ class RequestsController < ApplicationController
     @actions = @request.actions_for @current_user, context: :detail
   end
 
-  def edit
-    if @request.flagged?
-      redirect_to fix_donation_flag_url(@request.donation)
-    else
-      @event = @request.events.build type: "update"
-    end
-  end
-
   def update
     @request.attributes = params[:request]
     @event = @request.build_update_event
@@ -110,14 +126,19 @@ class RequestsController < ApplicationController
     end
   end
 
-  def reopen
-    @event = @request.reopen
+  def renew
+    @event = @request.renew params[:request]
     if save @request, @event
-      flash[:notice] = "Your request has been reopened and put back on the list to find a donor."
+      if @event
+        flash[:notice] = case @event.detail
+        when "renewed" then "Your request has been put back at the top of the list to find a donor."
+        when "reopened" then "Your request has been reopened and back at the top of the list to find a donor."
+        when "uncanceled" then "Your request has been reopened."
+        end
+      end
+      redirect_to @request
     else
-      # Shouldn't happen
-      flash[:error] = "Sorry, something went wrong reopening this request. Please try again or contact us if you need help."
+      render :edit
     end
-    redirect_to @request
   end
 end

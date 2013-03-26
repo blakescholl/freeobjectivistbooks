@@ -54,15 +54,25 @@ class Actions
     @context == :list
   end
 
+  def renew_action
+    if request.can_uncancel? && request.can_renew?
+      :reopen
+    elsif request.can_renew?
+      :renew
+    elsif request.can_uncancel?
+      :uncancel
+    end
+  end
+
   def relevant_actions
-    if for_student?
+    actions = if for_student?
       [
         :cancel_donation_not_received,
         :thank,
         :update_address,
         :message,
+        renew_action,
         :cancel_request,
-        :reopen,
         :details,
       ]
     elsif for_donor?
@@ -83,6 +93,8 @@ class Actions
     else
       []
     end
+
+    actions.compact
   end
 
   def available?(action)
@@ -96,7 +108,7 @@ class Actions
       when :cancel_request                then request.can_cancel?
       when :thank                         then request.needs_thanks?
       when :update_address                then request.active? && !request.sent?
-      when :reopen                        then request.can_reopen?
+      when :renew, :reopen, :uncancel     then true # special case; these actions only appear if available
       else false
       end
     elsif for_donor? || for_fulfiller?

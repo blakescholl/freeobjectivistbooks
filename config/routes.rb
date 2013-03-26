@@ -11,8 +11,11 @@ FreeBooks::Application.routes.draw do
 
   get "donate" => "requests#index"
   resources :requests do
-    get "cancel", on: :member
-    post "reopen", on: :member
+    member do
+      get "cancel"
+      get "renew" => "requests#edit", defaults: {renew: true}
+      put "renew"
+    end
     resource :donation, only: [:create]
   end
 

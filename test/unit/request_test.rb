@@ -204,6 +204,47 @@ class RequestTest < ActiveSupport::TestCase
     assert !@howard_request_canceled.can_cancel?  # already canceled
   end
 
+  # Can renew?
+
+  test "can renew? true if old" do
+    request = build :request, open_at: 5.weeks.ago
+    assert request.can_renew?
+  end
+
+  test "can renew? true even if canceled" do
+    request = build :request, open_at: 5.weeks.ago, canceled: true
+    assert request.can_renew?
+  end
+
+  test "can renew? false if recent" do
+    request = build :request
+    assert !request.can_renew?
+  end
+
+  test "can renew? false if granted" do
+    request = create :request, open_at: 5.weeks.ago
+    donation = create :donation, request: request
+    assert !request.can_renew?
+  end
+
+  # Can uncancel?
+
+  test "can uncancel? true if canceled" do
+    request = build :request, canceled: true
+    assert request.can_uncancel?
+  end
+
+  test "can uncancel? false if active" do
+    request = build :request
+    assert !request.can_uncancel?
+  end
+
+  test "can uncancel? false unless user.can_request?" do
+    request = create :request, canceled: true
+    request2 = create :request, user: request.user
+    assert !request.can_uncancel?
+  end
+
   # Grant
 
   test "grant" do
@@ -312,12 +353,51 @@ class RequestTest < ActiveSupport::TestCase
     end
   end
 
-  # Reopen
+  # Renew
 
-  test "reopen" do
-    request = create :request, canceled: true, open_at: (Time.now - 3.months)
-    request.reopen
+  test "renew" do
+    request = create :request, open_at: 5.weeks.ago
+    attributes = {user_name: "John Galt", address: "123 Rationality Way"}
+    event = request.renew attributes
+
+    assert_open_at_is_recent request
+    assert_equal "John Galt", request.user.name
+    assert_equal "123 Rationality Way", request.user.address
+    assert_equal "renew", event.type
+    assert_equal "renewed", event.detail
+  end
+
+  test "renew for canceled request" do
+    request = create :request, open_at: 2.months.ago, canceled: true
+    attributes = {user_name: "John Galt", address: "123 Rationality Way"}
+    event = request.renew attributes
+
     assert request.active?
     assert_open_at_is_recent request
+    assert_equal "John Galt", request.user.name
+    assert_equal "123 Rationality Way", request.user.address
+    assert_equal "renew", event.type
+    assert_equal "reopened", event.detail
+  end
+
+  test "renew for a recently-canceled request" do
+    open_at = 1.day.ago
+    request = create :request, open_at: open_at, canceled: true
+    event = request.renew
+
+    assert request.active?
+    assert_equal open_at, request.open_at
+    assert_equal "renew", event.type
+    assert_equal "uncanceled", event.detail
+  end
+
+  test "renew for a recently opened request is a no-op" do
+    open_at = 1.day.ago
+    request = create :request, open_at: open_at
+    event = request.renew
+
+    assert request.active?
+    assert_equal open_at, request.open_at
+    assert_nil event
   end
 end

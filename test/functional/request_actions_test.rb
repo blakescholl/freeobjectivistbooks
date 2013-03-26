@@ -497,7 +497,6 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "renew link on old request" do
-    skip "coming soon"
     request = create :request, open_at: 5.weeks.ago
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success

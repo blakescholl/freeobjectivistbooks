@@ -317,20 +317,26 @@ class RequestsControllerTest < ActionController::TestCase
   test "edit no donor" do
     get :edit, {id: @howard_request.id}, session_for(@howard)
     assert_response :success
+    assert_select 'h1', "Your shipping info"
+    assert_select 'p', text: /back at the top/, count: 0
+    assert_select "form[action=\"#{request_path(@howard_request)}\"]"
     assert_select 'input[type="text"][value="Howard Roark"]#request_user_name'
     assert_select 'textarea#request_address', ""
     assert_select 'p', /you can enter this later/i
     assert_select 'textarea#event_message', false
-    assert_select 'input[type="submit"]'
+    assert_select 'input.update[type="submit"]'
   end
 
   test "edit with donor" do
     get :edit, {id: @quentin_request.id}, session_for(@quentin)
     assert_response :success
+    assert_select 'h1', "Your shipping info"
+    assert_select 'p', text: /back at the top/, count: 0
+    assert_select "form[action=\"#{request_path(@quentin_request)}\"]"
     assert_select 'input[type="text"][value="Quentin Daniels"]#request_user_name'
     assert_select 'textarea#request_address', @quentin.address
     assert_select 'p', text: /you can enter this later/i, count: 0
-    assert_select 'input[type="submit"]'
+    assert_select 'input.update[type="submit"]'
     assert_select '.message.error', false
   end
 
@@ -499,55 +505,169 @@ class RequestsControllerTest < ActionController::TestCase
     verify_wrong_login_page
   end
 
-  # Reopan
+  # Renew form
 
-  test "reopen" do
-    request = create :request, canceled: true
+  test "renew form" do
+    request = create :request, open_at: 5.weeks.ago
 
-    post :reopen, {id: request.id}, session_for(request.user)
+    get :edit, {id: request.id, renew: true}, session_for(request.user)
+    assert_response :success
+
+    assert_select 'h1', /Please confirm/
+    assert_select 'p', /back at the top/
+    assert_select "form[action=\"#{renew_request_path(request)}\"]"
+    assert_select 'input[type="text"]#request_user_name'
+    assert_select 'textarea#request_address'
+    assert_select 'input.confirm[type="submit"]'
+  end
+
+  test "renew form for canceled request requires can_request?" do
+    request = create :request, open_at: 5.weeks.ago, canceled: true
+    request2 = create :request, user: request.user
+
+    get :edit, {id: request.id, renew: true}, session_for(request.user)
+    assert_redirected_to request
+    assert_not_nil flash[:error]
+  end
+
+  test "renew form requires open request" do
+    request = create :request, open_at: 5.weeks.ago
+    request.grant!
+
+    get :edit, {id: request.id, renew: true}, session_for(request.user)
+    assert_redirected_to request
+    assert_not_nil flash[:error]
+  end
+
+  test "renew form requires login" do
+    request = create :request, open_at: 5.weeks.ago
+
+    get :edit, {id: request.id, renew: true}
+    verify_login_page
+  end
+
+  test "renew form requires request owner" do
+    request = create :request, open_at: 5.weeks.ago
+    user = create :user
+
+    get :edit, {id: request.id, renew: true}, session_for(user)
+    verify_wrong_login_page
+  end
+
+  # Renew
+
+  def renew_params
+    {user_name: "John Galt", address: "123 Rationality Way"}
+  end
+
+  test "renew" do
+    request = create :request, open_at: 5.weeks.ago
+
+    put :renew, {id: request.id, request: renew_params}, session_for(request.user)
+    assert_redirected_to request
+
+    request.reload
+    assert_open_at_is_recent request
+    assert_equal "John Galt", request.user.name
+    assert_equal "123 Rationality Way", request.user.address
+
+    verify_event request, "renew", detail: "renewed"
+  end
+
+  test "renew of canceled request is a reopen" do
+    request = create :request, open_at: 5.weeks.ago, canceled: true
+
+    put :renew, {id: request.id, request: renew_params}, session_for(request.user)
     assert_redirected_to request
 
     request.reload
     assert request.active?
     assert_open_at_is_recent request
+    assert_equal "John Galt", request.user.name
+    assert_equal "123 Rationality Way", request.user.address
+
+    verify_event request, "renew", detail: "reopened"
   end
 
-  test "reopen is idempotent" do
-    open_at = 3.weeks.ago
-    request = create :request, open_at: open_at
+  test "renew of recent canceled request is an uncancel" do
+    open_at = 1.day.ago
+    request = create :request, open_at: open_at, canceled: true
 
-    post :reopen, {id: request.id}, session_for(request.user)
+    put :renew, {id: request.id}, session_for(request.user)
     assert_redirected_to request
 
     request.reload
     assert request.active?
     assert_equal open_at, request.open_at
+
+    verify_event request, "renew", detail: "uncanceled"
   end
 
-  test "reopen requires can_reopen?" do
-    request = create :request, canceled: true
+  test "renew is idempotent" do
+    open_at = 1.minute.ago
+    request = create :request, open_at: open_at
+
+    put :renew, {id: request.id, request: renew_params}, session_for(request.user)
+    assert_redirected_to request
+
+    request.reload
+    assert_equal open_at, request.open_at
+  end
+
+  test "renew for canceled request requires can_request?" do
+    request = create :request, open_at: 5.weeks.ago, canceled: true
     request2 = create :request, user: request.user
 
-    post :reopen, {id: request.id}, session_for(request.user)
+    put :renew, {id: request.id}, session_for(request.user)
     assert_redirected_to request
-    assert_match /can't reopen/i, flash[:error]
+    assert_not_nil flash[:error]
 
     request.reload
     assert request.canceled?
   end
 
-  test "reopen requires login" do
-    request = create :request, canceled: true
+  test "renew requires open request" do
+    open_at = 5.weeks.ago
+    request = create :request, open_at: open_at
+    request.grant!
 
-    post :reopen, {id: request.id}
+    put :renew, {id: request.id, request: renew_params}, session_for(request.user)
+    assert_redirected_to request
+    assert_not_nil flash[:error]
+
+    request.reload
+    assert_equal open_at, request.open_at
+  end
+
+  test "renew requires valid shipping info" do
+    open_at = 5.weeks.ago
+    request = create :request, open_at: open_at
+    name = request.user.name
+
+    put :renew, {id: request.id, request: renew_params.merge(user_name: "")}, session_for(request.user)
+    assert_response :success
+    assert_select 'h1', /Please confirm/
+    assert_select "form[action=\"#{renew_request_path(request)}\"]"
+    assert_select '.field_with_errors', /blank/
+    assert_select 'input.confirm[type="submit"]'
+
+    request.reload
+    assert_equal open_at, request.open_at
+    assert_equal name, request.user.name
+  end
+
+  test "renew requires login" do
+    request = create :request, open_at: 5.weeks.ago
+
+    put :renew, {id: request.id, request: renew_params}
     verify_login_page
   end
 
-  test "reopen requires request owner" do
-    request = create :request, canceled: true
+  test "renew requires request owner" do
+    request = create :request, open_at: 5.weeks.ago
     user = create :user
 
-    post :reopen, {id: request.id}, session_for(user)
+    put :renew, {id: request.id, request: renew_params}, session_for(user)
     verify_wrong_login_page
   end
 end

@@ -2,6 +2,8 @@
 class Request < ActiveRecord::Base
   attr_accessor :other_book
 
+  RENEW_THRESHOLD = 1.month
+
   #--
   # Associations
   #++
@@ -55,14 +57,14 @@ class Request < ActiveRecord::Base
   # Callbacks
   #++
 
+  after_initialize do |request|
+    request.open_at ||= Time.now
+  end
+
   before_validation do |request|
     if request.book.nil? && request.other_book.present?
       request.book = Book.find_or_create_by_title request.other_book
     end
-  end
-
-  before_create do |request|
-    request.open_at ||= Time.now
   end
 
   #--
@@ -128,9 +130,14 @@ class Request < ActiveRecord::Base
     !sent? && !canceled?
   end
 
-  # Whether we will show the student the option to reopen the request.
-  def can_reopen?
+  # Whether a canceled request can be uncanceled.
+  def can_uncancel?
     canceled? && user.can_request?
+  end
+
+  # Whether an request can be put back at the top of the list.
+  def can_renew?
+    open? && Time.since(open_at) > RENEW_THRESHOLD
   end
 
   def actions_for(user, options)
@@ -161,12 +168,38 @@ class Request < ActiveRecord::Base
     cancel_request_events.build params[:event]
   end
 
-  def reopen
-    return if active?
-    raise "Can't reopen" if !can_reopen?
+  # Put this request back at the top of the list and/or uncancel it.
+  #
+  # The request will be uncanceled if it canceled. The open_at date will be reset to now only if
+  # open_at is currently older than the RENEW_THRESHOLD.
+  #
+  # The request attributes are also updated if supplied, which gives the student a chance to
+  # confirm their shipping info for old requests.
+  def renew(attributes = {})
+    raise "Can't renew granted request" if !open?
 
-    self.canceled = false
-    self.open_at = Time.now
-    reopen_events.build
+    self.attributes = attributes
+    self.canceled = false if can_uncancel?
+    self.open_at = Time.now if can_renew? && attributes[:address].present?
+
+    detail = renew_detail
+    renew_events.build detail: detail if detail
   end
+
+  #--
+  # Helpers
+  #++
+
+private
+
+  def renew_detail
+    if canceled_changed? && open_at_changed?
+      "reopened"
+    elsif open_at_changed?
+      "renewed"
+    elsif canceled_changed?
+      "uncanceled"
+    end
+  end
+
 end

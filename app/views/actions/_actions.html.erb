@@ -38,8 +38,12 @@
         <% end %>
     <% when :cancel_request %>
         <%= link_to 'Cancel this request', cancel_request_path(actions.request) %>
+    <% when :renew %>
+        <%= link_to 'Renew this request', renew_request_path(actions.request) %>
     <% when :reopen %>
-        <%= link_to 'Reopen this request', reopen_request_path(actions.request), method: :post %>
+        <%= link_to 'Reopen this request', renew_request_path(actions.request) %>
+    <% when :uncancel %>
+        <%= link_to 'Reopen this request', renew_request_path(actions.request), method: :put %>
     <% when :flag %>
         <%= link_to 'Flag problem with shipping info', new_donation_flag_path(actions.donation) %>
     <% when :message %>

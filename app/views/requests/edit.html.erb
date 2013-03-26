@@ -6,19 +6,30 @@
     height: 46px;
     margin-top: 24px;
     margin-bottom: 24px;
-    background-image: url(/assets/update-button.png);
     background-position-x: left;
+}
+
+.update {
+    background-image: url(/assets/update-button.png);
+}
+
+.confirm {
+    background-image: url(/assets/confirm-button.png);
 }
  </style>
 <% end %>
 
-<h1 class="grid_16">Your shipping info</h1>
+<h1 class="grid_16"><% if @renew %>Please confirm your shipping info<% else %>Your shipping info<% end %></h1>
+
+<% if @renew %>
+<p class="grid_16 overview">We'll put your request back at the top of the list for donors to browse.</p>
+<% end %>
 
 <div class="grid_12">
-<%= form_for @request do |f| %>
+<%= form_for @request, url: (@renew ? renew_request_path(@request) : request_path(@request)) do |f| %>
     <%= f.label :user_name, "Your name", class: "grid_5 alpha" %><div class="clear"></div>
     <%= f.text_field :user_name, class: "grid_5 alpha" %>
-    <span class="grid_4 omega field_with_errors"><%= @request.errors[:user_name].join(", ") %></span>
+    <span class="grid_4 omega field_with_errors"><%= @request.user.errors[:name].join(", ") %></span>
     <div class="clear"></div>
 
     <%= f.label :address, "Mailing address", class: "grid_5 alpha" %><div class="clear"></div>
@@ -30,7 +41,11 @@
     </div>
     <div class="clear"></div>
 
-    <%= f.submit "", class: "grid_3 alpha submit button" %><div class="clear"></div>
+    <% if @renew %>
+    <%= f.submit "", class: "grid_3 alpha submit confirm button" %><div class="clear"></div>
+    <% else %>
+    <%= f.submit "", class: "grid_3 alpha submit update button" %><div class="clear"></div>
+    <% end %>
 
     <% if @request.donor %>
     <p>Your donor will get a notification about this update.</p>

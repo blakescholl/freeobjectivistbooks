@@ -41,6 +41,62 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "renew request" do
+    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    reminder = Reminders::RenewRequest.new_for_entity request
+
+    mail = ReminderMailer.send_to_target :renew_request, reminder
+    assert_match /Do you still want Book \d+\?/, mail.subject
+    assert_equal [request.user.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /requested a copy of Book \d+/
+      assert_select 'p', /on [A-Z][a-z]+ \d+ \(2 months ago\)/
+      assert_select 'a', /Renew your request for Book \d+/
+      assert_select 'a', /cancel/
+      assert_select 'p', /hear back from you by [A-Z][a-z]+ \d+,/
+    end
+  end
+
+  test "renew request for very old request doesn't give cancel date" do
+    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    reminder = Reminders::RenewRequest.new_for_entity request
+
+    mail = ReminderMailer.send_to_target :renew_request, reminder
+
+    assert_select_email do
+      assert_select 'p', /hear back from you soon,/
+    end
+  end
+
+  test "renew request before Apr 10 mentions new donor drive" do
+    Timecop.freeze "2013-04-09"
+    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    reminder = Reminders::RenewRequest.new_for_entity request
+
+    mail = ReminderMailer.send_to_target :renew_request, reminder
+
+    assert_select_email do
+      assert_select 'p', /new donor drive/
+    end
+  end
+
+  test "renew request after Apr 10 doesn't mention new donor drive" do
+    Timecop.freeze "2013-04-11"
+    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    reminder = Reminders::RenewRequest.new_for_entity request
+
+    mail = ReminderMailer.send_to_target :renew_request, reminder
+
+    assert_select_email do
+      assert_select 'p', text: /new donor drive/, count: 0
+    end
+  end
+
   test "send books for donor with one outstanding donation" do
     reminder = Reminders::SendBooks.new_for_entity @hugh
 

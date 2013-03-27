@@ -25,6 +25,14 @@ class ReminderMailer < ApplicationMailer
     reminder_mail "Fulfill your pledge of #{@pledge.quantity} Objectivist books"
   end
 
+  def renew_request(reminder)
+    @user = reminder.user
+    @request = reminder.request
+    @use_autocancel_at = Time.until(@request.autocancel_at) > 3.days
+    @mention_donor_drive = Time.now < Time.parse("2013-04-10")  # limited-time postscript
+    reminder_mail "Do you still want #{@request.book}?"
+  end
+
   def send_books(reminder)
     @user = reminder.user
     @donations = reminder.donations

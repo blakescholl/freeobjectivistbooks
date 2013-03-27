@@ -85,6 +85,10 @@ class ActiveSupport::TestCase
     ActionMailer::Base.deliveries = []
   end
 
+  def teardown
+    Timecop.return
+  end
+
   def admin_auth
     authenticate_with_http_digest "admin", "password", "Admin"
   end

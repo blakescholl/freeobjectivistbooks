@@ -14,6 +14,7 @@ class Reminder < ActiveRecord::Base
   belongs_to :user
   has_many :reminder_entities, dependent: :destroy
   has_many :pledges, through: :reminder_entities, source: :entity, source_type: 'Pledge'
+  has_many :requests, through: :reminder_entities, source: :entity, source_type: 'Request'
   has_many :donations, through: :reminder_entities, source: :entity, source_type: 'Donation'
 
   #--
@@ -70,12 +71,23 @@ class Reminder < ActiveRecord::Base
     3
   end
 
+  # The datetime at which the reminder count reset, for the purpose of applying the max_reminders restriction. If
+  # non-nil, then only reminders created after this time are counted against max_reminders. Otherwise, there is no
+  # reset, and all past reminders are counted. May be overridden by subclasses.
+  def reminder_count_reset_at
+    nil
+  end
+
   #--
   # Derived attributes
   #++
 
   def pledge
     pledges.first
+  end
+
+  def request
+    requests.first
   end
 
   def donation
@@ -91,8 +103,17 @@ class Reminder < ActiveRecord::Base
   # or Pledges.
   def past_reminder_count
     # We want the minimum past reminder count among all entities this reminder is for.
-    entities = donations + pledges
-    entities.map {|entity| entity.reminders.where(type: type, user_id: user).count}.min
+    entities = donations + requests + pledges
+    return 0 if entities.empty?
+
+    reset_at = reminder_count_reset_at
+
+    counts = entities.map do |entity|
+      reminders = entity.reminders.where(type: type, user_id: user)
+      reminders = reminders.where('reminders.created_at >= ?', reset_at) if reset_at
+      reminders.count
+    end
+    counts.min
   end
 
   # True if this reminder should actually be sent.

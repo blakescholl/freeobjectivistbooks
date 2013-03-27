@@ -2,7 +2,11 @@
 class Request < ActiveRecord::Base
   attr_accessor :other_book
 
-  RENEW_THRESHOLD = 1.month
+  # Note that we use 30 and 60 days here instead of 1 and 2 months, because not all months are the same. In Rails,
+  # (now - (now - 1.month)) is not necessarily equal to 1.month. Days are constant, as long as you do everything in UTC.
+  # -Jason 27 Mar 2013
+  RENEW_THRESHOLD = 30.days
+  AUTOCANCEL_THRESHOLD = 60.days
 
   #--
   # Associations
@@ -13,6 +17,8 @@ class Request < ActiveRecord::Base
   belongs_to :donation
   has_many :donations, dependent: :destroy
   has_many :events, dependent: :destroy
+  has_many :reminder_entities, as: :entity
+  has_many :reminders, through: :reminder_entities
   belongs_to :referral
 
   Event::TYPES.each do |type|
@@ -43,6 +49,8 @@ class Request < ActiveRecord::Base
   scope :not_granted, active.where(donation_id: nil)
 
   scope :with_prices, joins(:book).merge(Book.with_prices)
+
+  scope :renewable, lambda { not_granted.where('open_at < ?', Time.now - RENEW_THRESHOLD) }
 
   def self.for_mode(donor_mode)
     requests = not_granted.includes(user: :location).includes(:book).reorder('open_at desc')
@@ -138,6 +146,11 @@ class Request < ActiveRecord::Base
   # Whether an request can be put back at the top of the list.
   def can_renew?
     open? && Time.since(open_at) > RENEW_THRESHOLD
+  end
+
+  # When this request will be autocanceled (if not renewed).
+  def autocancel_at
+    open_at + AUTOCANCEL_THRESHOLD if active? && open?
   end
 
   def actions_for(user, options)

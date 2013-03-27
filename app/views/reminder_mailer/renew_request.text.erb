@@ -1,0 +1,14 @@
+You requested a copy of <%= @request.book %> from Free Objectivist Books on <%= l @request.created_at.to_date, format: :short %> (<%= distance_of_time_in_words_to_now @request.created_at %> ago). We're sorry we haven't found a donor for you yet—we get a lot of requests for books, and sometimes we can't get enough donations to grant them all. (We try to find a donor for every request, but no guarantees.)
+
+If you still want this book, please let us know using this link, and we'll put your request back at the top to find a donor:
+
+<%= renew_request_url(@request) %>
+
+If you don't want this book anymore, you can cancel your request instead:
+<%= cancel_request_url(@request) %>
+
+(If we don't hear back from you <% if @use_autocancel_at %>by <%= l @request.autocancel_at.to_date, format: :short %><% else %>soon<% end %>, we'll assume you're no longer interested and cancel your request automatically.)
+
+<% if @mention_donor_drive %>
+By the way, we'll be launching a new program soon and a new donor drive that I expect to bring a lot more donations. So if may be worth renewing your request, even if it's been open for a long time.
+<% end %>

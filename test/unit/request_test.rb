@@ -368,7 +368,7 @@ class RequestTest < ActiveSupport::TestCase
   end
 
   test "renew for canceled request" do
-    request = create :request, open_at: 2.months.ago, canceled: true
+    request = create :request, open_at: 60.days.ago, canceled: true
     attributes = {user_name: "John Galt", address: "123 Rationality Way"}
     event = request.renew attributes
 

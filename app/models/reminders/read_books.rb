@@ -17,11 +17,11 @@ class Reminders::ReadBooks < Reminder
   #++
 
   def too_soon?
-    Time.since(donation.received_at) < 1.month
+    Time.since(donation.received_at) < 30.days
   end
 
   def min_interval
-    1.month
+    30.days
   end
 
   def max_reminders

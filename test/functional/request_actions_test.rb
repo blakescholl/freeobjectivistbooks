@@ -434,7 +434,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "not-received link on granted request" do
-    donation = create :donation, created_at: 1.month.ago
+    donation = create :donation, created_at: 30.days.ago
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link
@@ -448,21 +448,21 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no not-received link on sent request" do
-    donation = create :donation, created_at: 1.month.ago, status: 'sent'
+    donation = create :donation, created_at: 30.days.ago, status: 'sent'
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link false
   end
 
   test "no not-received link on flagged request" do
-    donation = create :donation, created_at: 1.month.ago, flagged: true
+    donation = create :donation, created_at: 30.days.ago, flagged: true
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link false
   end
 
   test "no not-received link on send-money request" do
-    donation = create :donation_with_send_money_donor, created_at: 1.month.ago
+    donation = create :donation_with_send_money_donor, created_at: 30.days.ago
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link false

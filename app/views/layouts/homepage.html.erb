@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>Free Ayn Rand and Objectivist Books for Students: Atlas Shrugged, The Fountainhead, The Virtue of Selfishness,
-      Capitalism: The Unknown Ideal, and more
+    Capitalism: The Unknown Ideal, and more
   </title>
   <%= stylesheet_link_tag "homepage" %>
   <% unless touch_device? %>
-  <%= stylesheet_link_tag "hover" %>
+      <%= stylesheet_link_tag "hover" %>
   <% end %>
   <%= yield :stylesheet %>
   <%= csrf_meta_tags %>
@@ -15,9 +15,9 @@
 <body>
 
 <div class="container_24">
-<%= yield %>
-<div class="clear"></div>
-<p>&nbsp;</p>
+  <%= yield %>
+  <div class="clear"></div>
+  <p>&nbsp;</p>
 </div>
 
 <%= javascript_include_tag "application" %>

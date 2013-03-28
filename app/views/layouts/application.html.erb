@@ -4,7 +4,7 @@
   <title><%= content_for?(:title) ? "#{yield :title} – " : "" %>Free Ayn Rand and Objectivist Books for Students</title>
   <%= stylesheet_link_tag "application" %>
   <% unless touch_device? %>
-  <%= stylesheet_link_tag "hover" %>
+      <%= stylesheet_link_tag "hover" %>
   <% end %>
   <%= yield :stylesheet %>
   <%= csrf_meta_tags %>
@@ -13,42 +13,42 @@
 <body>
 
 <div class="header">
-    <%= link_to 'Free Objectivist Books', home_path, class: "home" %>
-    <span class="topnav">
-        <% if @current_user %>
+  <%= link_to 'Free Objectivist Books', home_path, class: "home" %>
+  <span class="topnav">
+    <% if @current_user %>
         Logged in as <%= link_to @current_user.name, profile_path %> &ndash;
         <%= link_to 'Log out', logout_path %> |
         <%= link_to 'Donate', donate_path %> |
-        <% else %>
+    <% else %>
         <%= link_to 'Log in', login_path %> |
         <%= link_to 'Read', signup_read_path %> |
         <%= link_to 'Donate', signup_donate_path %> |
-        <% end %>
-        <%= link_to 'About', about_path %> |
-        <%= link_to 'Testimonials', testimonials_path %>
-    </span>
+    <% end %>
+    <%= link_to 'About', about_path %> |
+    <%= link_to 'Testimonials', testimonials_path %>
+</span>
 </div>
 
 <div class="container_16">
-<div class="grid_12 flash">
+  <div class="grid_12 flash">
     <% [:error, :notice].each do |type| %>
-    <% if flash[type] %>
-    <div class="message <%= type %>">
-        <% case flash[type] %>
-        <% when String %>
-        <p class="headline"><%= flash[type] %></p>
-        <% when Hash %>
-        <% if flash[type][:headline].present? %><p class="headline"><%= flash[type][:headline] %></p><% end %>
-        <% if flash[type][:detail].present? %><p class="detail"><%= flash[type][:detail] %></p><% end %>
+        <% if flash[type] %>
+            <div class="message <%= type %>">
+              <% case flash[type] %>
+              <% when String %>
+                  <p class="headline"><%= flash[type] %></p>
+              <% when Hash %>
+                  <% if flash[type][:headline].present? %><p class="headline"><%= flash[type][:headline] %></p><% end %>
+                  <% if flash[type][:detail].present? %><p class="detail"><%= flash[type][:detail] %></p><% end %>
+              <% end %>
+            </div>
         <% end %>
-    </div>
     <% end %>
-    <% end %>
-</div>
-<div class="clear"></div>
-<%= yield %>
-<div class="clear"></div>
-<p>&nbsp;</p>
+  </div>
+  <div class="clear"></div>
+  <%= yield %>
+  <div class="clear"></div>
+  <p>&nbsp;</p>
 </div>
 
 <%= javascript_include_tag "application" %>

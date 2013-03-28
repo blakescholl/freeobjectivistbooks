@@ -1,0 +1,24 @@
+<p>You requested a copy of <i><%= @event.book %></i> from Free Objectivist Books
+  on <%= short_date_with_time_ago @event.request.created_at %>. I'm sorry we haven't found a donor for you yet—we get a
+  lot of requests for books, and sometimes we can't get enough donations to grant them all. (We try to find a donor for
+  every request, but no guarantees.)
+</p>
+
+<p>We've canceled your request for now, since we're not sure if you still want the book or if we still have the right
+  address for you. However, if you still want the book, you are welcome to reopen your request using this link:
+</p>
+
+<p><b><%= link_to renew_request_url(@event.request) do %>Reopen your request for <i><%= @event.book %></i><% end %></b>
+</p>
+
+Or, if you'd like to place a brand new request, use this link:
+
+<p><%= link_to "Make a new book request", new_request_url %></p>
+
+<p>Be sure to write a clear and compelling statement of why you want the book, to motivate a donor to choose you.</p>
+
+<% if @mention_donor_drive %>
+<p>By the way, we'll be launching a new program soon and a new donor drive that I expect to bring a lot more donations.
+  So if may be worth reopening your request, even if it's been open for a long time.
+</p>
+<% end %>

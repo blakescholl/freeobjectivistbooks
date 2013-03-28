@@ -2,7 +2,7 @@
 class Event < ActiveRecord::Base
   self.inheritance_column = 'class'  # anything other than "type", to let us use "type" for something else
 
-  TYPES = %w{grant update flag fix message update_status cancel_donation cancel_request renew}
+  TYPES = %w{grant update flag fix message update_status cancel_donation cancel_request renew autocancel}
 
   #--
   # Associations
@@ -17,7 +17,7 @@ class Event < ActiveRecord::Base
   # Validations
   #++
 
-  validates_presence_of :request, :user, :type
+  validates_presence_of :request, :type
   validates_presence_of :donation, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation}}
   validates_inclusion_of :type, in: TYPES
 

@@ -148,6 +148,10 @@ class Request < ActiveRecord::Base
     open? && Time.since(open_at) > RENEW_THRESHOLD
   end
 
+  def can_autocancel?
+    active? && open? && Time.since(open_at) > AUTOCANCEL_THRESHOLD
+  end
+
   # When this request will be autocanceled (if not renewed).
   def autocancel_at
     open_at + AUTOCANCEL_THRESHOLD if active? && open?
@@ -197,6 +201,14 @@ class Request < ActiveRecord::Base
 
     detail = renew_detail
     renew_events.build detail: detail if detail
+  end
+
+  # Auto-cancels an open request if it is past the AUTOCANCEL_THRESHOLD.
+  def autocancel_if_needed!
+    return if canceled?
+    return unless can_autocancel?
+    update_attributes! canceled: true
+    autocancel_events.create
   end
 
   #--

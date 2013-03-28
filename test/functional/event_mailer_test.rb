@@ -371,4 +371,47 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /Thanks,/
     end
   end
+
+  test "autocancel" do
+    Timecop.freeze "2013-03-28 12:00"
+    created_at = Time.parse "2013-01-25 12:00"
+    request = create :request, created_at: created_at, open_at: created_at
+    event = request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, :student
+    assert_match /We've canceled your request for Book \d+/, mail.subject
+    assert_equal [request.user.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /requested a copy of Book \d+/
+      assert_select 'p', /on Jan 25 \(2 months ago\)/
+      assert_select 'a', /Reopen your request for Book \d+/
+      assert_select 'a', /new book request/
+    end
+  end
+
+  test "autocancel before Apr 10 mentions new donor drive" do
+    Timecop.freeze "2013-04-08"
+    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    event = request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, :student
+
+    verify_mail_body mail do
+      assert_select 'p', /new donor drive/
+    end
+  end
+
+  test "autocancel after Apr 10 doesn't mention new donor drive" do
+    Timecop.freeze "2013-04-12"
+    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    event = request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, :student
+
+    verify_mail_body mail do
+      assert_select 'p', text: /new donor drive/, count: 0
+    end
+  end
 end

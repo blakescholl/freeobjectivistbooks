@@ -44,6 +44,12 @@ module ApplicationHelper
     count == 1 ? noun : "#{count} #{noun.pluralize}"
   end
 
+  def short_date_with_time_ago(date)
+    short_date = I18n.l date.to_date, format: :short
+    time_ago = distance_of_time_in_words_to_now date
+    "#{short_date} (#{time_ago} ago)"
+  end
+
   def title(book)
     raw "<span class=\"title\">#{h book}</span>"
   end

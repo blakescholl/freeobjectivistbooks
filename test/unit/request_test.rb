@@ -245,6 +245,24 @@ class RequestTest < ActiveSupport::TestCase
     assert !request.can_uncancel?
   end
 
+  # Can autocancel?
+
+  test "can autocancel? true if open and old" do
+    request = build :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    assert request.can_autocancel?
+  end
+
+  test "can autocancel? false if recent" do
+    request = build :request, created_at: 9.weeks.ago, open_at: Time.now
+    assert !request.can_autocancel?
+  end
+
+  test "can autocancel? false if granted" do
+    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    request.grant!
+    assert !request.can_autocancel?
+  end
+
   # Grant
 
   test "grant" do

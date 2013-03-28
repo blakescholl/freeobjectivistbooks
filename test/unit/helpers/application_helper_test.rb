@@ -46,6 +46,13 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "2 apples", pluralize_omit_1(2, "apple")
   end
 
+  test "short date with time ago" do
+    Timecop.freeze "2013-03-28 12:00:00" do
+      datetime = Time.parse "2013-03-25 12:00:00"
+      assert_equal "Mar 25 (3 days ago)", short_date_with_time_ago(datetime)
+    end
+  end
+
   # Model-specific formatting
 
   test "student tagline" do

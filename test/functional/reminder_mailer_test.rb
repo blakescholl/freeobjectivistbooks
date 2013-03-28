@@ -42,7 +42,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   end
 
   test "renew request" do
-    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
     mail = ReminderMailer.send_to_target :renew_request, reminder
@@ -55,7 +55,7 @@ class ReminderMailerTest < ActionMailer::TestCase
     assert_select_email do
       assert_select 'p', /Hi Student \d+,/
       assert_select 'p', /requested a copy of Book \d+/
-      assert_select 'p', /on [A-Z][a-z]+ \d+ \(2 months ago\)/
+      assert_select 'p', /on [A-Z][a-z]+ \d+ \(about 1 month ago\)/
       assert_select 'a', /Renew your request for Book \d+/
       assert_select 'a', /cancel/
       assert_select 'p', /hear back from you by [A-Z][a-z]+ \d+,/
@@ -63,7 +63,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   end
 
   test "renew request for very old request doesn't give cancel date" do
-    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    request = create :request, :autocancelable
     reminder = Reminders::RenewRequest.new_for_entity request
 
     mail = ReminderMailer.send_to_target :renew_request, reminder
@@ -75,7 +75,7 @@ class ReminderMailerTest < ActionMailer::TestCase
 
   test "renew request before Apr 10 mentions new donor drive" do
     Timecop.freeze "2013-04-09"
-    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
     mail = ReminderMailer.send_to_target :renew_request, reminder
@@ -87,7 +87,7 @@ class ReminderMailerTest < ActionMailer::TestCase
 
   test "renew request after Apr 10 doesn't mention new donor drive" do
     Timecop.freeze "2013-04-11"
-    request = create :request, created_at: 9.weeks.ago, open_at: 5.weeks.ago
+    request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
     mail = ReminderMailer.send_to_target :renew_request, reminder

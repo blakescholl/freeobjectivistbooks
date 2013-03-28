@@ -3,9 +3,9 @@ require 'test_helper'
 class AutocancelJobTest < ActiveSupport::TestCase
   test "autocancel" do
     recent_request = create :request
-    old_request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    old_request = create :request, :autocancelable
     renewed_request = create :request, created_at: 9.weeks.ago, open_at: 4.weeks.ago
-    granted_request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    granted_request = create :request, :autocancelable
     granted_request.grant!
 
     job = AutocancelJob.new

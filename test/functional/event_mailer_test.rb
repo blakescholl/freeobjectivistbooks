@@ -393,7 +393,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "autocancel before Apr 10 mentions new donor drive" do
     Timecop.freeze "2013-04-08"
-    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    request = create :request, :autocancelable
     event = request.autocancel_if_needed!
 
     mail = EventMailer.mail_for_event event, :student
@@ -405,7 +405,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "autocancel after Apr 10 doesn't mention new donor drive" do
     Timecop.freeze "2013-04-12"
-    request = create :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
+    request = create :request, :autocancelable
     event = request.autocancel_if_needed!
 
     mail = EventMailer.mail_for_event event, :student

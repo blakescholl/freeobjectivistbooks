@@ -393,7 +393,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no cancel request link on canceled request" do
-    request = create :request, canceled: true
+    request = create :request, :canceled
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success
     verify_cancel_request_link false
@@ -497,21 +497,21 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "renew link on old request" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success
     verify_renew_link :renew
   end
 
   test "reopen link on canceled request" do
-    request = create :request, canceled: true
+    request = create :request, :canceled
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success
     verify_renew_link :reopen
   end
 
   test "no reopen link if other open requests" do
-    request = create :request, canceled: true
+    request = create :request, :canceled
     request2 = create :request, user: request.user
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success
@@ -519,7 +519,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no renew link on granted request" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
     donation = create :donation, request: request
     get :show, {id: request.id}, session_for(request.user)
     assert_response :success

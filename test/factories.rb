@@ -51,6 +51,18 @@ FactoryGirl.define do
     reason "I've heard so much about this"
     pledge "1"
 
+    trait(:canceled) {canceled true}
+
+    trait :renewable do
+      created_at 5.weeks.ago
+      open_at 5.weeks.ago
+    end
+
+    trait :autocancelable do
+      created_at 9.weeks.ago
+      open_at 9.weeks.ago
+    end
+
     factory :request_no_address do
       association :user, factory: [:student, :no_address]
     end

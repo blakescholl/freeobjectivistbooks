@@ -260,7 +260,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "can request? true if request canceled" do
-    request = create :request, canceled: true
+    request = create :request, :canceled
     assert request.user.can_request?
   end
 

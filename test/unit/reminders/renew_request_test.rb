@@ -2,7 +2,7 @@ require 'test_helper'
 
 class Reminders::RenewRequestTest < ActiveSupport::TestCase
   def new_reminder
-    @request ||= create :request, open_at: 5.weeks.ago
+    @request ||= create :request, :renewable
     Reminders::RenewRequest.new_for_entity @request
   end
 

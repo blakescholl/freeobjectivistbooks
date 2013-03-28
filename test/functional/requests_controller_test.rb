@@ -508,7 +508,7 @@ class RequestsControllerTest < ActionController::TestCase
   # Renew form
 
   test "renew form" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
 
     get :edit, {id: request.id, renew: true}, session_for(request.user)
     assert_response :success
@@ -522,7 +522,7 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew form for canceled request requires can_request?" do
-    request = create :request, open_at: 5.weeks.ago, canceled: true
+    request = create :request, :renewable, :canceled
     request2 = create :request, user: request.user
 
     get :edit, {id: request.id, renew: true}, session_for(request.user)
@@ -531,7 +531,7 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew form requires open request" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
     request.grant!
 
     get :edit, {id: request.id, renew: true}, session_for(request.user)
@@ -540,14 +540,14 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew form requires login" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
 
     get :edit, {id: request.id, renew: true}
     verify_login_page
   end
 
   test "renew form requires request owner" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
     user = create :user
 
     get :edit, {id: request.id, renew: true}, session_for(user)
@@ -561,7 +561,7 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
 
     put :renew, {id: request.id, request: renew_params}, session_for(request.user)
     assert_redirected_to request
@@ -575,7 +575,7 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew of canceled request is a reopen" do
-    request = create :request, open_at: 5.weeks.ago, canceled: true
+    request = create :request, :renewable, :canceled
 
     put :renew, {id: request.id, request: renew_params}, session_for(request.user)
     assert_redirected_to request
@@ -591,7 +591,7 @@ class RequestsControllerTest < ActionController::TestCase
 
   test "renew of recent canceled request is an uncancel" do
     open_at = 1.day.ago
-    request = create :request, open_at: open_at, canceled: true
+    request = create :request, :canceled, open_at: open_at
 
     put :renew, {id: request.id}, session_for(request.user)
     assert_redirected_to request
@@ -615,7 +615,7 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew for canceled request requires can_request?" do
-    request = create :request, open_at: 5.weeks.ago, canceled: true
+    request = create :request, :renewable, :canceled
     request2 = create :request, user: request.user
 
     put :renew, {id: request.id}, session_for(request.user)
@@ -627,8 +627,8 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew requires open request" do
-    open_at = 5.weeks.ago
-    request = create :request, open_at: open_at
+    request = create :request, :renewable
+    open_at = request.open_at
     request.grant!
 
     put :renew, {id: request.id, request: renew_params}, session_for(request.user)
@@ -640,8 +640,8 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew requires valid shipping info" do
-    open_at = 5.weeks.ago
-    request = create :request, open_at: open_at
+    request = create :request, :renewable
+    open_at = request.open_at
     name = request.user.name
 
     put :renew, {id: request.id, request: renew_params.merge(user_name: "")}, session_for(request.user)
@@ -657,14 +657,14 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew requires login" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
 
     put :renew, {id: request.id, request: renew_params}
     verify_login_page
   end
 
   test "renew requires request owner" do
-    request = create :request, open_at: 5.weeks.ago
+    request = create :request, :renewable
     user = create :user
 
     put :renew, {id: request.id, request: renew_params}, session_for(user)

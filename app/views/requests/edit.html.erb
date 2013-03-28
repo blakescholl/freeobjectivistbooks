@@ -9,6 +9,10 @@
             background-position-x: left;
         }
 
+        .cancel {
+            margin-top: 36px;
+        }
+
         .update {
             background-image: url(/assets/update-button.png);
         }
@@ -42,9 +46,13 @@
       <div class="clear"></div>
 
       <% if @renew %>
-          <%= f.submit "", class: "grid_3 alpha submit confirm button" %><div class="clear"></div>
+          <%= f.submit "", class: "grid_3 alpha submit confirm button" %>
+          <span class="grid_3 omega cancel">Or <%= link_to "cancel and don't renew", @request %></span>
+          <div class="clear"></div>
       <% else %>
-          <%= f.submit "", class: "grid_3 alpha submit update button" %><div class="clear"></div>
+          <%= f.submit "", class: "grid_3 alpha submit update button" %>
+          <span class="grid_3 omega cancel"><%= link_to "Cancel", @request %></span>
+          <div class="clear"></div>
       <% end %>
 
       <% if @request.donor %>

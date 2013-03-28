@@ -325,6 +325,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'p', /you can enter this later/i
     assert_select 'textarea#event_message', false
     assert_select 'input.update[type="submit"]'
+    assert_select 'a', /Cancel/
   end
 
   test "edit with donor" do
@@ -338,6 +339,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'p', text: /you can enter this later/i, count: 0
     assert_select 'input.update[type="submit"]'
     assert_select '.message.error', false
+    assert_select 'a', /Cancel/
   end
 
   test "edit flagged redirects to fix" do
@@ -519,6 +521,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'input[type="text"]#request_user_name'
     assert_select 'textarea#request_address'
     assert_select 'input.confirm[type="submit"]'
+    assert_select 'a', /cancel/
   end
 
   test "renew form for canceled request requires can_request?" do

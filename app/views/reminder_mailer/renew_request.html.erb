@@ -1,7 +1,7 @@
 <p>You requested a copy of <i><%= @request.book %></i> from Free Objectivist Books
-  on <%= l @request.created_at.to_date, format: :short %> (<%= distance_of_time_in_words_to_now @request.created_at %> ago).
-  We're sorry we haven't found a donor for you yet—we get a lot of requests for books, and sometimes we can't get enough
-  donations to grant them all. (We try to find a donor for every request, but no guarantees.)
+  on <%= short_date_with_time_ago @request.created_at %>. We're sorry we haven't found a donor for you yet—we get a lot
+  of requests for books, and sometimes we can't get enough donations to grant them all. (We try to find a donor for
+  every request, but no guarantees.)
 </p>
 
 <p>If you still want this book, please let us know using this link, and we'll put your request back at the top to find a donor:</p>

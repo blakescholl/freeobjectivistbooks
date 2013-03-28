@@ -1,4 +1,4 @@
-Have you received *<%= @donation.book %>* yet? <%= @donation.donor.name %> agreed to send you this book on <%= l @granted_at.to_date, format: :short %> (<%= distance_of_time_in_words_to_now @granted_at %> ago), but we have not yet confirmed that they have sent it.
+Have you received *<%= @donation.book %>* yet? <%= @donation.donor.name %> agreed to send you this book on <%= short_date_with_time_ago @granted_at %>, but we have not yet confirmed that they have sent it.
 
 If you *have* received it, let us know using this link:
 

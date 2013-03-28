@@ -353,7 +353,7 @@ class EventMailerTest < ActionMailer::TestCase
     verify_mail_body mail do
       assert_select 'p', /Hi Robert/
       assert_select 'p', /Howard Roark says they have not yet received Atlas Shrugged/
-      assert_select 'p', /you agreed to donate to them on\s+Jan 20 \(.* ago\)/
+      assert_select 'p', /on Jan 20 \(.* ago\)/
       assert_select 'p', /Yours,/
     end
   end

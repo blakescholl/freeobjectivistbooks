@@ -1,4 +1,4 @@
-You received <%= @donation.book %> on <%= l @received_at.to_date, format: :short %> (<%= distance_of_time_in_words_to_now @received_at %> ago). When you finish reading it, you can now confirm on Free Objectivist Books:
+You received <%= @donation.book %> on <%= short_date_with_time_ago @received_at %>. When you finish reading it, you can now confirm on Free Objectivist Books:
 
 <%= edit_donation_status_url(@donation, status: "read") %>
 

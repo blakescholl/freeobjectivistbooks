@@ -1,6 +1,6 @@
-<p><%= @event.student.name %> says they have not yet received <i><%= @event.book %>,</i> which you agreed to donate to them on
-    <%= l @event.donation.created_at.to_date, format: :short %> (<%= distance_of_time_in_words_to_now @event.donation.created_at %> ago).
-    Since you have not confirmed with us that you sent the book, we have canceled this request to let the student find another donor.
+<p><%= @event.student.name %> says they have not yet received <i><%= @event.book %>,</i> which you agreed to donate to
+  them on <%= short_date_with_time_ago @event.donation.created_at %>. Since you have not confirmed with us that you sent
+  the book, we have canceled this request to let the student find another donor.
 </p>
 
 <p>When you choose students to donate to, please send the books promptly, and confirm that you have sent them using the

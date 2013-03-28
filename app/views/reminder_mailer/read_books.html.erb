@@ -1,5 +1,4 @@
-<p>You received <%= @donation.book %> on <%= l @received_at.to_date, format: :short %>
-    (<%= distance_of_time_in_words_to_now @received_at %> ago). Have you finished reading it yet?
+<p>You received <%= @donation.book %> on <%= short_date_with_time_ago @received_at %>. Have you finished reading it yet?
 </p>
 
 <p>When you do, please confirm on Free Objectivist Books using this link:</p>

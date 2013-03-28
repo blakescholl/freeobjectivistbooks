@@ -1,4 +1,4 @@
-<% if event.user %><%= admin_user_link event.user %><% else %>Someone<% end %>
+<% if event.user %><%= admin_user_link event.user %><% elsif event.user_id %>Someone<% end %>
 <% if event.request %>
     <% case event.type %>
     <% when "grant" %>
@@ -28,6 +28,8 @@
         canceled their request for
     <% when "renew" %>
         <%= event.detail %> their request for
+    <% when "autocancel" %>
+        Autocancel of <%= admin_user_link event.student %>'s request for
     <% else %>
         <%= event.type %>ed
     <% end %>

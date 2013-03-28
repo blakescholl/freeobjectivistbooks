@@ -6,6 +6,8 @@ FreeBooks::Application.routes.draw do
   root to: "home#index"
   get "home" => "home#home"
   get "about" => "home#about"
+  get "terms" => "home#terms"
+  get "privacy" => "home#privacy"
 
   get "profile" => "profile#show"
 

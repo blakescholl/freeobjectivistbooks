@@ -23,4 +23,16 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'h1', /About/
   end
+
+  test "terms" do
+    get :terms
+    assert_response :success
+    assert_select 'h1', /Terms of service/
+  end
+
+  test "privacy" do
+    get :privacy
+    assert_response :success
+    assert_select 'h1', /Privacy policy/
+  end
 end

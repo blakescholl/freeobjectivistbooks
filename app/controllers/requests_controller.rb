@@ -5,6 +5,7 @@ class RequestsController < ApplicationController
   before_filter :fix_if_needed, only: [:edit]
   before_filter :require_unsent_for_cancel, only: [:cancel, :destroy]
   before_filter :require_open_request, if: :is_renew?
+  before_filter :require_renewable_request, only: [:edit], if: :is_renew?
   before_filter :require_can_request_for_reopen, if: :is_reopen?
 
   #--
@@ -54,6 +55,15 @@ class RequestsController < ApplicationController
   def require_open_request
     if !@request.open?
       flash[:error] = "This request has already been granted."
+      redirect_to @request
+    end
+  end
+
+  def require_renewable_request
+    if !@request.can_renew?
+      too_new = Time.since(@request.created_at) < Request::RENEW_THRESHOLD
+      action = too_new ? "created" : "put back at the top of the list"
+      flash[:error] = "Can't renew this request because it was #{action} recently."
       redirect_to @request
     end
   end

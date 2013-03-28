@@ -524,6 +524,22 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'a', /cancel/
   end
 
+  test "renew form requires old request" do
+    request = create :request
+
+    get :edit, {id: request.id, renew: true}, session_for(request.user)
+    assert_redirected_to request
+    assert_match /created recently/, flash[:error]
+  end
+
+  test "renew form requires renewable request" do
+    request = create :request, created_at: 5.weeks.ago, open_at: Time.now
+
+    get :edit, {id: request.id, renew: true}, session_for(request.user)
+    assert_redirected_to request
+    assert_match /put back at the top of the list recently/, flash[:error]
+  end
+
   test "renew form for canceled request requires can_request?" do
     request = create :request, :renewable, :canceled
     request2 = create :request, user: request.user

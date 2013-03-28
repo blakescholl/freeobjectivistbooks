@@ -50,7 +50,9 @@ class Request < ActiveRecord::Base
 
   scope :with_prices, joins(:book).merge(Book.with_prices)
 
-  scope :renewable, lambda { not_granted.where('open_at < ?', Time.now - RENEW_THRESHOLD) }
+  scope :open_longer_than, lambda {|interval| not_granted.where('open_at < ?', Time.now - interval) }
+  scope :renewable, open_longer_than(RENEW_THRESHOLD)
+  scope :autocancelable, open_longer_than(AUTOCANCEL_THRESHOLD)
 
   def self.for_mode(donor_mode)
     requests = not_granted.includes(user: :location).includes(:book).reorder('open_at desc')

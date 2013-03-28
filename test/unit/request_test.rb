@@ -90,6 +90,14 @@ class RequestTest < ActiveSupport::TestCase
     verify_scope(:with_prices) {|request| request.book.price && request.book.price > 0}
   end
 
+  test "renewable" do
+    verify_scope(:renewable) {|request| request.active? && request.can_renew?}
+  end
+
+  test "autocancelable" do
+    verify_scope(:autocancelable) {|request| request.active? && request.can_autocancel?}
+  end
+
   # Pseudo-scopes
 
   test "for send-books mode" do

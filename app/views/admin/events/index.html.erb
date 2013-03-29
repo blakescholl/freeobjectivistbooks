@@ -4,5 +4,5 @@
 <div class="grid_12">
     <p class="overview">Showing <%= @start+1 %>&ndash;<%= @end %></p>
     <%= render partial: "event", collection: @events, spacer_template: "requests/spacer" %>
-    <p class="more"><%= more_link {|params| admin_requests_path params}%></a>
+    <p class="more"><%= more_link {|params| admin_events_path params}%></p>
 </div>

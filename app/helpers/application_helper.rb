@@ -138,8 +138,8 @@ module ApplicationHelper
 
   def more_link
     if has_more?
-      params = {offset: @end, limit: params[:limit]}
-      path = yield params
+      args = {offset: @end, limit: params[:limit]}
+      path = yield args
       link_to 'More', path
     end
   end

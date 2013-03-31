@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130224004953) do
+ActiveRecord::Schema.define(:version => 20130331002027) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
 
   add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
   add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
+  add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
 
   create_table "books", :force => true do |t|
     t.string   "title"
@@ -95,7 +96,6 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
   create_table "events", :force => true do |t|
     t.integer  "request_id"
     t.integer  "user_id"
-    t.integer  "donor_id_deprecated"
     t.string   "type"
     t.string   "detail"
     t.text     "message"
@@ -109,7 +109,6 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
   end
 
   add_index "events", ["donation_id"], :name => "index_events_on_donation_id"
-  add_index "events", ["donor_id_deprecated"], :name => "index_events_on_donor_id"
   add_index "events", ["request_id"], :name => "index_events_on_request_id"
   add_index "events", ["user_id"], :name => "index_events_on_user_id"
 
@@ -177,17 +176,12 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
 
   create_table "requests", :force => true do |t|
     t.integer  "user_id"
-    t.string   "book_deprecated"
     t.text     "reason"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "donor_id_deprecated"
-    t.boolean  "flagged_deprecated"
-    t.boolean  "thanked_deprecated"
-    t.string   "status_deprecated"
     t.integer  "donation_id"
     t.integer  "referral_id"
-    t.boolean  "canceled",            :default => false, :null => false
+    t.boolean  "canceled",    :default => false, :null => false
     t.datetime "open_at"
     t.integer  "book_id"
   end
@@ -198,7 +192,6 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
 
   create_table "reviews", :force => true do |t|
     t.integer  "user_id"
-    t.string   "book_deprecated"
     t.text     "text"
     t.boolean  "recommend"
     t.integer  "donation_id"
@@ -226,16 +219,15 @@ ActiveRecord::Schema.define(:version => 20130224004953) do
     t.string   "name"
     t.string   "email"
     t.string   "password_digest"
-    t.string   "location_deprecated"
     t.string   "school"
     t.string   "studying"
     t.text     "address"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "referral_id"
-    t.boolean  "blocked",             :default => false,        :null => false
-    t.string   "donor_mode",          :default => "send_books", :null => false
-    t.integer  "balance_cents",       :default => 0,            :null => false
+    t.boolean  "blocked",         :default => false,        :null => false
+    t.string   "donor_mode",      :default => "send_books", :null => false
+    t.integer  "balance_cents",   :default => 0,            :null => false
     t.string   "roles"
     t.integer  "location_id"
   end

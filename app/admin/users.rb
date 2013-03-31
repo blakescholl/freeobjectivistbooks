@@ -31,17 +31,43 @@ ActiveAdmin.register User do
     attributes_table do
       row :name
       row :email
-      row :studying
-      row :school
+      row :studying if user.studying.present?
+      row :school if user.school.present?
       row :location
-      row :address
+      row :address if user.address.present?
       row(:donor_mode) {user.donor_mode.humanize}
-      row(:balance) {humanized_money_with_symbol user.balance}
-      row :roles
-      row :blocked
+      row(:balance) {humanized_money_with_symbol user.balance} if user.balance > 0
+      row :roles if user.roles.any?
+      row :blocked if user.blocked?
       row :created_at
       row :updated_at
     end
+
+    if user.requests.any?
+      panel "Requests" do
+        table_for user.requests do
+          column :book
+          column :reason
+          column :donor
+          column(:status) {|request| status_headline request}
+          column(:view) {|request| link_to "View", admin2_request_path(request)}
+        end
+      end
+    end
+
+    if user.donations.any?
+      panel "Donations" do
+        table_for user.donations do
+          column :student
+          column :book
+          column(:status) {|donation| donation.status.humanize}
+          column(:donor_mode) {|donation| donation.donor_mode.humanize}
+          column(:paid) {|donation| donation.paid? if donation.donor_mode.send_money?}
+          column(:view_request) {|donation| link_to "View request", admin2_request_path(donation.request)}
+        end
+      end
+    end
+
     panel "Contributions" do
       table_for user.contributions do
         column :created_at do |contribution|
@@ -53,6 +79,7 @@ ActiveAdmin.register User do
         link_to "Add contribution", new_admin2_user_contribution_path(user), class: "button"
       end
     end
+
     active_admin_comments
   end
 

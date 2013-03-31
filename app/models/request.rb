@@ -83,7 +83,7 @@ class Request < ActiveRecord::Base
 
   delegate :address, :address=, to: :user
   delegate :name, :name=, to: :user, prefix: true
-  delegate :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
+  delegate :status, :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
     :flag_message, :needs_fix?, :fulfiller, :sender, to: :donation, allow_nil: true
 
   # Alias for the user who created the request.
@@ -161,6 +161,11 @@ class Request < ActiveRecord::Base
 
   def actions_for(user, options)
     Actions.new self, user, options
+  end
+
+  # Display title, e.g., for admin detail page
+  def title
+    "#{user} wants #{book}"
   end
 
   #--

@@ -13,7 +13,7 @@ td, th {
 
 .metric_header {
     font-size: 0.9em;
-    width: 54px;
+    width: 56px;
 }
 
 .overview {
@@ -38,8 +38,8 @@ td, th {
 
 <h1 class="grid_16">Admin</h1>
 
-<div class="grid_12 overview">
-    <p>
+<div class="grid_16 overview">
+    <p class="alpha grid_12 omega">
         <%= link_to pluralize(@user_count, 'user'), admin_users_path %>
         &ndash; <%= link_to pluralize(@request_count, 'request'), admin_requests_path %>
         &ndash; <%= link_to pluralize(@pledge_count, 'pledge'), admin_pledges_path %>
@@ -48,6 +48,7 @@ td, th {
         &ndash; <%= link_to pluralize(@testimonial_count, 'testimonials'), admin_testimonials_path %>
         &ndash; <%= link_to pluralize(@referral_count, 'referral'), admin_referrals_path %>
     </p>
+    <div class="clear"></div>
 
     <h2>User search</h2>
     <%= form_tag admin_users_path, method: :get do %>

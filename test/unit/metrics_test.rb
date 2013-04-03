@@ -37,7 +37,7 @@ class MetricsTest < ActiveSupport::TestCase
 
   test "pipeline breakdown" do
     metrics = @metrics.pipeline_breakdown
-    values = values_for metrics[:rows]
+    values = values_for metrics.rows
 
     assert_equal Request.active.count, Request.granted.count + values['Open requests'], "granted + open != total: #{values.inspect}"
 
@@ -68,7 +68,7 @@ class MetricsTest < ActiveSupport::TestCase
 
   test "book leaderboard" do
     metrics = @metrics.book_leaderboard
-    rows = metrics[:rows]
+    rows = metrics.rows
 
     request_sum = rows.inject(0) {|sum,row| sum += row[:values]["Requested"]}
     assert_equal Request.active.count, request_sum

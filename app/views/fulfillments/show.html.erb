@@ -54,7 +54,7 @@
         http://freeobjectivistbooks.org to let us know you have received your book. Happy reading!
     </p>
 
-    <h2>4. Confirm</h3>
+    <h2>4. Confirm</h2>
     <p>Let us know when you have sent the book:</p>
     <%= form_for @fulfillment.donation, url: donation_status_path(@fulfillment.donation, redirect: volunteer_url) do |f| %>
         <%= f.hidden_field :status, value: "sent" %>

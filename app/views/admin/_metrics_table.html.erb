@@ -1,21 +1,21 @@
 <table>
     <tr>
         <th></th>
-        <% metrics_table[:columns].each do |column| %>
-        <th class="metric_header"><%= column %></th>
+        <% metrics_table.columns.each do |column| %>
+        <th class="metric_header"><%= metrics_table.column_name column %></th>
         <% end %>
     </tr>
-    <% metrics_table[:rows].each do |row| %>
+    <% metrics_table.rows.each do |row| %>
     <tr class="metric">
         <td class="name">
-            <% if defined?(links) && links && links[row[:name]] %>
-            <%= link_to row[:name], links[row[:name]] %>
+            <% if metrics_table.has_link? row %>
+            <%= link_to metrics_table.row_name(row), metrics_table.row_target(row) %>
             <% else %>
-            <%= row[:name] %>
+            <%= metrics_table.row_name row %>
             <% end %>
         </td>
-        <% metrics_table[:columns].each do |column| %>
-        <td class="value"><%= format_number row[:values][column] %></td>
+        <% metrics_table.columns.each do |column| %>
+        <td class="value"><%= format_number metrics_table.value(row, column) %></td>
         <% end %>
     </tr>
     <% end %>

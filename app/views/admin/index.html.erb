@@ -65,16 +65,15 @@ td, th {
     <%= render partial: "admin/metrics", object: @metrics.send_money_pipeline %>
 
     <h2>Pipeline breakdown</h2>
-    <%= render partial: "admin/metrics_table", object: @metrics.pipeline_breakdown, locals: {
-        links: {
+    <%= render partial: "admin/metrics_table", object: @metrics.pipeline_breakdown.with_links(
             'Open requests' => admin_requests_path(type: :not_granted),
             'Needs sending' => admin_requests_path(type: :needs_sending),
             'Needs payment' => admin_requests_path(type: :needs_payment),
             'Needs fulfillment' => admin_requests_path(type: :needs_fulfillment),
             'In transit' => admin_requests_path(type: :in_transit),
             'Reading' => admin_requests_path(type: :reading),
-        }
-    } %>
+        )
+    %>
 
     <h2>Donation metrics</h2>
     <%= render partial: "admin/metrics", object: @metrics.donation_metrics %>

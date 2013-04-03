@@ -68,12 +68,13 @@ class Metrics
 
   def pipeline_breakdown
     rows = [
-        {name: 'Open requests',     values: breakdown_by_time(Request.not_granted)},
-        {name: 'Needs sending',     values: breakdown_by_time(Donation.send_books.needs_sending, 'donations.created_at')},
-        {name: 'Needs payment',     values: breakdown_by_time(Donation.needs_payment, 'donations.created_at')},
-        {name: 'Needs fulfillment', values: breakdown_by_time(Donation.needs_fulfillment, 'donations.updated_at')},
-        {name: 'In transit',        values: breakdown_by_time(Donation.in_transit, :status_updated_at)},
-        {name: 'Reading',           values: breakdown_by_time(Donation.reading, :status_updated_at)},
+        {name: 'Open requests',              values: breakdown_by_time(Request.not_granted)},
+        {name: 'Needs sending by donor',     values: breakdown_by_time(Donation.send_books.needs_sending, 'donations.created_at')},
+        {name: 'Needs sending by volunteer', values: breakdown_by_time(Donation.send_money.fulfilled.needs_sending, 'donations.created_at')},
+        {name: 'Needs payment',              values: breakdown_by_time(Donation.needs_payment, 'donations.created_at')},
+        {name: 'Needs fulfillment',          values: breakdown_by_time(Donation.needs_fulfillment, 'donations.updated_at')},
+        {name: 'In transit',                 values: breakdown_by_time(Donation.in_transit, :status_updated_at)},
+        {name: 'Reading',                    values: breakdown_by_time(Donation.reading, :status_updated_at)},
     ]
     Metrics::Table.new time_columns, rows
   end

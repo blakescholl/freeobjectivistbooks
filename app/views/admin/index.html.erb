@@ -13,7 +13,7 @@ td, th {
 
 .metric_header {
     font-size: 0.9em;
-    width: 48px;
+    width: 54px;
 }
 
 .overview {
@@ -74,6 +74,12 @@ td, th {
             'Reading' => admin_requests_path(type: :reading),
         )
     %>
+
+    <h2>Daily fulfillments</h2>
+    <%= render partial: "admin/metrics_table", object: @metrics.daily_fulfillments %>
+
+    <h2>Weekly fulfillments</h2>
+    <%= render partial: "admin/metrics_table", object: @metrics.weekly_fulfillments %>
 
     <h2>Donation metrics</h2>
     <%= render partial: "admin/metrics", object: @metrics.donation_metrics %>

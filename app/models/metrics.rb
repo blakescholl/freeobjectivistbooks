@@ -78,6 +78,14 @@ class Metrics
     Metrics::Table.new time_columns, rows
   end
 
+  def daily_fulfillments
+    Metrics::FulfillmentsTable.new group: 'date(created_at)', since: 1.week.ago
+  end
+
+  def weekly_fulfillments
+    Metrics::FulfillmentsTable.new group: "date_trunc('week', created_at)", since: 6.weeks.ago
+  end
+
   def donation_metrics
     calculate_metrics [
       {name: 'Flagged',      value: Donation.flagged.count,      denominator_name: 'Not sent', denominator_value: Donation.not_sent.count},

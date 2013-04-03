@@ -79,11 +79,11 @@ class Metrics
   end
 
   def daily_fulfillments
-    Metrics::FulfillmentsTable.new group: 'date(created_at)', since: 1.week.ago
+    Metrics::FulfillmentsTable.new group: :day, since: 10.days.ago
   end
 
   def weekly_fulfillments
-    Metrics::FulfillmentsTable.new group: "date_trunc('week', created_at)", since: 6.weeks.ago
+    Metrics::FulfillmentsTable.new group: :week, since: 9.weeks.ago
   end
 
   def donation_metrics

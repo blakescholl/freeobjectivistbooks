@@ -7,11 +7,19 @@ class Metrics::FulfillmentsTable
     populate
   end
 
-  def populate
+  def fulfillments_query
     query = Fulfillment.group(:user_id)
-    query = query.group(@group) if @group
-    query = query.where('fulfillments.created_at >= ?', @since) if @since
-    @counts = query.count
+
+    query = case @group
+      when :day then query.group('date(created_at)')
+      when :week then query.group("date(date_trunc('week', created_at))")
+    end
+
+    query.where('fulfillments.created_at >= ?', @since)
+  end
+
+  def populate
+    @counts = fulfillments_query.count
 
     col_ids = Set.new
     row_ids = Set.new
@@ -28,7 +36,16 @@ class Metrics::FulfillmentsTable
       @total += count
     end
 
-    sorted_col_ids = col_ids.sort.reverse
+    if col_ids.any?
+      start_date = Date.parse col_ids.min
+      end_date = Date.parse col_ids.max
+      range = (start_date .. end_date)
+      range = range.step(7) if @group == :week
+      sorted_col_ids = range.map {|date| date.to_s}.reverse
+    else
+      sorted_col_ids = []
+    end
+
     sorted_row_ids = row_ids.sort_by {|row| -@row_totals[row]}
 
     @columns = sorted_col_ids + [:total]

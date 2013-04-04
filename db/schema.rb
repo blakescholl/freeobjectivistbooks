@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130331002027) do
+ActiveRecord::Schema.define(:version => 20130404012742) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -106,6 +106,7 @@ ActiveRecord::Schema.define(:version => 20130331002027) do
     t.boolean  "public"
     t.boolean  "is_thanks"
     t.integer  "donation_id"
+    t.integer  "recipient_id"
   end
 
   add_index "events", ["donation_id"], :name => "index_events_on_donation_id"

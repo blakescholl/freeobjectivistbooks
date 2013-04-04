@@ -11,6 +11,7 @@ class Event < ActiveRecord::Base
   belongs_to :request
   belongs_to :user
   belongs_to :donation
+  belongs_to :recipient, class_name: "User"
   has_one :testimonial, as: :source
 
   #--

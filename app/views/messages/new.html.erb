@@ -9,6 +9,11 @@
     background-position-x: left;
 }
 
+.recipients label {
+    font-size: 1.4em;
+    padding-right: 12px;
+}
+
 .cancel {
     height: 46px;
     margin-top: 36px;
@@ -16,7 +21,7 @@
 </style>
 <% end %>
 
-<h1 class="grid_16">Send a message to <%= @event.recipients.to_sentence %></h1>
+<h1 class="grid_16">Send a message to <%= @event.recipients.to_sentence two_words_connector: " or ", last_word_connector: " or " %></h1>
 
 <div class="grid_12">
     <div class="overview">
@@ -35,6 +40,15 @@
         <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>
         <%= f.text_area :message, rows: 6, cols: 60 %>
         <div class="clear"></div>
+
+        <% if @event.recipients.size > 1 %>
+          <div class="recipients">
+            <% @event.recipients.each do |recipient| %>
+                <label><%= f.radio_button :recipient_id, recipient.id %> To <%= recipient %></label>
+            <% end %>
+            <label><%= f.radio_button :recipient_id, nil %> To both</label>
+          </div>
+        <% end %>
 
         <%= f.submit "", class: "grid_3 alpha submit button" %>
         <%= link_to 'Cancel', @donation.request, class: "grid_2 omega cancel" %>

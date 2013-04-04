@@ -1,9 +1,10 @@
 require 'test_helper'
 
 class MessagesControllerTest < ActionController::TestCase
-  def params(donation, message = nil)
+  def params(donation, message = nil, recipient = nil)
     params = {donation_id: donation.id}
     params[:event] = {message: message} if message
+    params[:event][:recipient_id] = recipient.id if recipient
     params
   end
 
@@ -25,6 +26,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Send a message to Quentin Daniels/
     assert_select '.overview', /Quentin Daniels requested The Virtue of Selfishness/
     assert_select 'textarea#event_message'
+    assert_select "input[type=radio][name='event[recipient_id]']", false
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -35,6 +37,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
+    assert_select "input[type=radio][name='event[recipient_id]']", false
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -45,6 +48,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated Capitalism: The Unknown Ideal/
     assert_select 'textarea#event_message'
+    assert_select "input[type=radio][name='event[recipient_id]']", false
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -54,9 +58,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@kira)
     assert_response :success
-    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia and Henry Cameron/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Henry Cameron donated Objectivism/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Henry Cameron/
+    assert_select "input[type=radio][name='event[recipient_id]']", 3
   end
 
   test "new for student with fulfiller" do
@@ -64,9 +69,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@frisco)
     assert_response :success
-    assert_select 'h1', /Send a message to Henry Cameron and Kira Argounova/
     assert_select 'p', /Henry Cameron donated Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
+    assert_select 'h1', /Send a message to Henry Cameron or Kira Argounova/
+    assert_select "input[type=radio][name='event[recipient_id]']", 3
   end
 
   test "new for donor with fulfiller" do
@@ -74,9 +80,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@cameron)
     assert_response :success
-    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia and Kira Argounova/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Kira Argounova/
+    assert_select "input[type=radio][name='event[recipient_id]']", 3
   end
 
   test "new requires login" do
@@ -97,7 +104,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Thank Henry Cameron/
     assert_select 'p', /Henry Cameron donated Atlas Shrugged/
     assert_select 'textarea#event_message'
-    assert_select 'input[type="radio"]'
+    assert_select "input[type=radio][name='event[public]']", 2
     assert_select 'input[type="submit"]'
   end
 
@@ -110,7 +117,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'p', /Henry Cameron donated Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
     assert_select 'textarea#event_message'
-    assert_select 'input[type="radio"]'
+    assert_select "input[type=radio][name='event[public]']", 2
     assert_select 'input[type="submit"]'
   end
 
@@ -159,6 +166,19 @@ class MessagesControllerTest < ActionController::TestCase
     assert_match /your message to Francisco d'Anconia and Henry Cameron/i, flash[:notice]
 
     verify_event @frisco_donation, "message", user: @kira, message: "Hi everybody!", notified?: true
+  end
+
+  test "create private" do
+    fulfillment = create :fulfillment
+
+    assert_difference "fulfillment.donation.events.count" do
+      post :create, params(fulfillment.donation, "Psst", fulfillment.student), session_for(fulfillment.user)
+    end
+
+    assert_redirected_to fulfillment.request
+    assert_match /your message to Student \d+\./, flash[:notice]
+
+    verify_event fulfillment.donation, "message", recipient: fulfillment.student
   end
 
   test "create requires message" do

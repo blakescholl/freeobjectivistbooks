@@ -9,7 +9,7 @@ class MessagesController < ApplicationController
   end
 
   def new
-    @event = @donation.message_events.build user: @current_user, is_thanks: params[:is_thanks]
+    @event = @donation.new_message @current_user, params[:is_thanks]
     render_form
   end
 

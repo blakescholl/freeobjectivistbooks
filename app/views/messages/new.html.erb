@@ -21,7 +21,7 @@
 </style>
 <% end %>
 
-<h1 class="grid_16">Send a message to <%= @event.recipients.to_sentence two_words_connector: " or ", last_word_connector: " or " %></h1>
+<h1 class="grid_16">Send a message to <%= @event.other_users.to_sentence two_words_connector: " or ", last_word_connector: " or " %></h1>
 
 <div class="grid_12">
     <div class="overview">
@@ -41,10 +41,10 @@
         <%= f.text_area :message, rows: 6, cols: 60 %>
         <div class="clear"></div>
 
-        <% if @event.recipients.size > 1 %>
+        <% if @event.other_users.size > 1 %>
           <div class="recipients">
-            <% @event.recipients.each do |recipient| %>
-                <label><%= f.radio_button :recipient_id, recipient.id %> To <%= recipient %></label>
+            <% @event.other_users.each do |user| %>
+                <label><%= f.radio_button :recipient_id, user.id %> To <%= user %></label>
             <% end %>
             <label><%= f.radio_button :recipient_id, nil %> To both</label>
           </div>

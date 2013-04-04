@@ -20,13 +20,28 @@ class MessagesControllerTest < ActionController::TestCase
 
   # New
 
+  def verify_recipient_radios(user1, user2, options = {})
+    assert_select "input[type=radio][name='event[recipient_id]']", 3
+    assert_select "input[type=radio][name='event[recipient_id]'][value]", 2
+    assert_select "input[type=radio][name='event[recipient_id]'][value=#{user1.id}]", 1
+    assert_select "input[type=radio][name='event[recipient_id]'][value=#{user2.id}]", 1
+
+    assert_select "input[type=radio][name='event[recipient_id]'][checked]"
+    assert_select "input[type=radio][name='event[recipient_id]'][value=#{user1.id}][checked]", (options[:selected] == user1)
+    assert_select "input[type=radio][name='event[recipient_id]'][value=#{user2.id}][checked]", (options[:selected] == user2)
+  end
+
+  def verify_no_recipient_radios
+    assert_select "input[type=radio][name='event[recipient_id]']", false
+  end
+
   test "new for donor" do
     get :new, params(@quentin_donation), session_for(@hugh)
     assert_response :success
     assert_select 'h1', /Send a message to Quentin Daniels/
     assert_select '.overview', /Quentin Daniels requested The Virtue of Selfishness/
     assert_select 'textarea#event_message'
-    assert_select "input[type=radio][name='event[recipient_id]']", false
+    verify_no_recipient_radios
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -37,7 +52,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
-    assert_select "input[type=radio][name='event[recipient_id]']", false
+    verify_no_recipient_radios
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -48,7 +63,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated Capitalism: The Unknown Ideal/
     assert_select 'textarea#event_message'
-    assert_select "input[type=radio][name='event[recipient_id]']", false
+    verify_no_recipient_radios
     assert_select 'input[type="submit"]'
     assert_select 'a', 'Cancel'
   end
@@ -58,10 +73,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@kira)
     assert_response :success
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Henry Cameron/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Henry Cameron donated Objectivism/
-    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Henry Cameron/
-    assert_select "input[type=radio][name='event[recipient_id]']", 3
+    verify_recipient_radios @frisco, @cameron, selected: @frisco
   end
 
   test "new for student with fulfiller" do
@@ -69,10 +84,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@frisco)
     assert_response :success
+    assert_select 'h1', /Send a message to Henry Cameron or Kira Argounova/
     assert_select 'p', /Henry Cameron donated Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
-    assert_select 'h1', /Send a message to Henry Cameron or Kira Argounova/
-    assert_select "input[type=radio][name='event[recipient_id]']", 3
+    verify_recipient_radios @cameron, @kira
   end
 
   test "new for donor with fulfiller" do
@@ -80,10 +95,10 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, params(@frisco_donation), session_for(@cameron)
     assert_response :success
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Kira Argounova/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
-    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Kira Argounova/
-    assert_select "input[type=radio][name='event[recipient_id]']", 3
+    verify_recipient_radios @frisco, @kira, selected: @frisco
   end
 
   test "new requires login" do
@@ -141,7 +156,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_redirected_to @quentin_request
     assert_match /your message to Hugh Akston/i, flash[:notice]
 
-    verify_event @quentin_donation, "message", user: @quentin, message: "Hi Hugh!", notified?: true
+    verify_event @quentin_donation, "message", user: @quentin, message: "Hi Hugh!", recipient: nil, notified?: true
   end
 
   test "create from donor" do
@@ -152,7 +167,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_redirected_to @quentin_request
     assert_match /your message to Quentin Daniels/i, flash[:notice]
 
-    verify_event @quentin_donation, "message", user: @hugh, message: "Hi Quentin!", notified?: true
+    verify_event @quentin_donation, "message", user: @hugh, message: "Hi Quentin!", recipient: nil, notified?: true
   end
 
   test "create from fulfiller" do
@@ -165,7 +180,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_redirected_to @frisco_request
     assert_match /your message to Francisco d'Anconia and Henry Cameron/i, flash[:notice]
 
-    verify_event @frisco_donation, "message", user: @kira, message: "Hi everybody!", notified?: true
+    verify_event @frisco_donation, "message", user: @kira, message: "Hi everybody!", recipient: nil, notified?: true
   end
 
   test "create private" do
@@ -178,7 +193,7 @@ class MessagesControllerTest < ActionController::TestCase
     assert_redirected_to fulfillment.request
     assert_match /your message to Student \d+\./, flash[:notice]
 
-    verify_event fulfillment.donation, "message", recipient: fulfillment.student
+    verify_event fulfillment.donation, "message", user: fulfillment.user, message: "Psst", recipient: fulfillment.student, notified?: true
   end
 
   test "create requires message" do

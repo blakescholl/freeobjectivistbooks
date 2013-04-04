@@ -296,6 +296,12 @@ class Donation < ActiveRecord::Base
     event
   end
 
+  def new_message(user, is_thanks = false)
+    event = message_events.build user: user, is_thanks: is_thanks
+    event.recipient = student unless user == student
+    event
+  end
+
   def flag(params, user = nil)
     self.flagged = true
     params = params.merge(user: user) if user

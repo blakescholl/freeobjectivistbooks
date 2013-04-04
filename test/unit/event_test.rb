@@ -119,35 +119,35 @@ class EventTest < ActiveSupport::TestCase
     assert_equal @quentin, events(:quentin_adds_name).student
   end
 
-  test "from student?" do
-    assert !events(:hugh_grants_quentin).from_student?
-    assert events(:quentin_adds_name).from_student?
+  # Recipients
+
+  test "roles to notify is empty for update before grant" do
+    request = create :request
+    request.address = "123 New Address St"
+    event = request.build_update_event
+    assert_equal [], event.recipients
   end
 
-  test "from donor?" do
-    assert events(:hugh_grants_quentin).from_donor?
-    assert !events(:quentin_adds_name).from_donor?
+  test "roles to notify for message" do
+    donation = create :donation
+    event = donation.message_events.build message: "Hello", user: donation.user
+    assert_equal [donation.student], event.recipients
   end
 
-  test "from fulfiller?" do
-    @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
-    @frisco_donation.save!
-    assert event.from_fulfiller?
-
-    assert !events(:hugh_grants_quentin).from_fulfiller?
+  test "roles to notify for private message" do
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.message_events.build message: "Hello", user: fulfillment.user,
+        recipient: fulfillment.student
+    assert_equal [fulfillment.student], event.recipients
   end
 
-  test "roles to notify" do
-    assert_equal [], events(:howard_updates_info).roles_to_notify
-    assert_equal [:student], events(:hugh_messages_quentin).roles_to_notify
+  test "roles to notify for flag and fix" do
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.flag!
+    assert_equal [fulfillment.student, fulfillment.donor].to_set, event.recipients.to_set
 
-    @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag! @kira
-    assert_equal [:student, :donor], event.roles_to_notify
-
-    event = @frisco_donation.fix!
-    assert_equal [:fulfiller], event.roles_to_notify
+    event = fulfillment.donation.fix!
+    assert_equal [fulfillment.user], event.recipients
   end
 
   # Actions
@@ -166,6 +166,16 @@ class EventTest < ActiveSupport::TestCase
 
     assert !event.notified?
     assert_difference("ActionMailer::Base.deliveries.count", 2) { event.notify }
+    assert event.notified?
+  end
+
+  test "notify for private message" do
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.message_events.build message: "Hello", user: fulfillment.user,
+        recipient: fulfillment.student
+
+    assert !event.notified?
+    assert_difference("ActionMailer::Base.deliveries.count", 1) { event.notify }
     assert event.notified?
   end
 

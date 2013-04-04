@@ -19,7 +19,7 @@
         <%= event.detail %>
     <% when "cancel_donation" %>
         canceled
-        <% if event.from_donor? %>
+        <% if event.user_role == :donor %>
             their donation to <%= admin_user_link event.student %> of
         <% else %>
             <%= admin_user_link event.donor %>'s donation of
@@ -38,7 +38,7 @@
         <% case event.detail %>
         <% when "sent" %>
             to <%= admin_user_link event.student %>
-            <% if event.from_fulfiller? %>on behalf of <%= admin_user_link event.donor %><% end %>
+            <% if event.user_role == :fulfiller %>on behalf of <%= admin_user_link event.donor %><% end %>
         <% when "received", "read" %>
             from <%= admin_user_link event.donor %>
             <% if event.fulfiller %>(fulfiller: <%= admin_user_link event.fulfiller %>)<% end %>

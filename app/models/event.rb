@@ -64,6 +64,7 @@ class Event < ActiveRecord::Base
       self.donation ||= request.donation if request
       self.request ||= donation.request if donation
       self.user ||= default_user
+      self.recipient ||= default_recipient
       self.happened_at ||= Time.now
     end
   end
@@ -83,66 +84,40 @@ class Event < ActiveRecord::Base
   end
   private :default_user
 
+  def default_recipient
+    sender if type.in?(%w{fix update})
+  end
+  private :default_recipient
+
   #--
   # Derived attributes
   #++
 
-  delegate :book, to: :request
+  delegate :book, :student, to: :request
+  delegate :donor, :fulfiller, :sender, to: :donation, allow_nil: true
 
-  def student
-    request.user
-  end
-
-  def donor
-    donation && donation.user
-  end
-
-  def fulfiller
-    donation && donation.fulfiller
-  end
-
-  def from_student?
-    user == student
-  end
-
-  def from_donor?
-    user == donor
-  end
-
-  def from_fulfiller?
-    user == fulfiller
+  def role_for(user)
+    case user
+    when student then :student
+    when donor then :donor
+    when fulfiller then :fulfiller
+    end
   end
 
   def user_role
-    return :student if from_student?
-    return :donor if from_donor?
-    return :fulfiller if from_fulfiller?
+    role_for user
   end
 
-  def notify_student?
-    true
+  def all_users
+    [student, donor, fulfiller].compact.uniq
   end
 
-  def notify_donor?
-    return false if !donation
-    return false if donation.donor_mode.send_money? && type.in?(%w{fix update})
-    return true
-  end
-
-  def notify_fulfiller?
-    true
-  end
-
-  def roles_to_notify
-    roles = []
-    roles << :student if student && notify_student? && !from_student?
-    roles << :donor if donor && notify_donor? && !from_donor?
-    roles << :fulfiller if fulfiller && notify_fulfiller? && !from_fulfiller?
-    roles
+  def other_users
+    all_users - [user]
   end
 
   def recipients
-    roles_to_notify.map {|role| self.send role}
+    recipient.present? ? [recipient] : other_users
   end
 
   # True if the notification for this event has been sent.
@@ -168,9 +143,9 @@ class Event < ActiveRecord::Base
   # Sends a notification email for this event.
   def notify
     return if notified?
-    roles_to_notify.each do |role|
-      mail = EventMailer.mail_for_event self, role
-      Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{role} (#{mail.to})"
+    recipients.each do |recipient|
+      mail = EventMailer.mail_for_event self, recipient
+      Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{recipient} (#{mail.to})"
       mail.deliver
     end
     self.notified!

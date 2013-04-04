@@ -84,16 +84,11 @@ class Request < ActiveRecord::Base
   delegate :address, :address=, to: :user
   delegate :name, :name=, to: :user, prefix: true
   delegate :status, :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
-    :flag_message, :needs_fix?, :fulfiller, :sender, to: :donation, allow_nil: true
+    :flag_message, :needs_fix?, :donor, :fulfiller, :sender, to: :donation, allow_nil: true
 
   # Alias for the user who created the request.
   def student
     user
-  end
-
-  # Current donor who is going to grant this request, if any.
-  def donor
-    donation && donation.user
   end
 
   # Whether this request can be granted with a "send-money" donation.

@@ -43,6 +43,7 @@
 
         <% if @event.other_users.size > 1 %>
           <div class="recipients">
+            <p class="field_with_errors"><%= @event.errors[:recipient].join(", ") %></p>
             <% @event.other_users.each do |user| %>
                 <label><%= f.radio_button :recipient_id, user.id %> To <%= user %></label>
             <% end %>

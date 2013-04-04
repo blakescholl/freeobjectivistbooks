@@ -203,6 +203,7 @@ class MessagesControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'h1', /Send a message/i
+    assert_select '.field_with_errors'
   end
 
   test "create requires login" do
@@ -213,6 +214,19 @@ class MessagesControllerTest < ActionController::TestCase
   test "create requires student or donor" do
     post :create, params(@quentin_donation, "Hello"), session_for(@howard)
     verify_wrong_login_page
+  end
+
+  test "create requires valid recipient" do
+    fulfillment = create :fulfillment
+    user = create :user
+
+    assert_no_difference "fulfillment.donation.events.count" do
+      post :create, params(fulfillment.donation, "Hello", user), session_for(fulfillment.donor)
+    end
+
+    assert_response :success
+    assert_select 'h1', /Send a message/i
+    assert_select '.field_with_errors'
   end
 
   # Thank

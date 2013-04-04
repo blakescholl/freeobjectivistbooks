@@ -25,6 +25,7 @@ class Event < ActiveRecord::Base
   validates_presence_of :message, if: :requires_message?, message: "Please enter a message."
   validates_inclusion_of :public, in: [true, false], if: :is_thanks?, message: 'Please choose "Yes" or "No".'
   validate :message_or_detail_must_be_present, if: lambda {|e| e.type == "fix" && e.request.address.present?}
+  validates_inclusion_of :recipient, in: lambda {|e| e.all_users}, allow_nil: true, message: "Please choose a recipient."
 
   def requires_message?
     case type

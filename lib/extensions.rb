@@ -18,6 +18,12 @@ class String
   end
 end
 
+class Array
+  def to_disjunctive_sentence
+    to_sentence two_words_connector: " or ", last_word_connector: ", or "
+  end
+end
+
 class Hash
   def subhash(*keys)
     keys = keys.flatten

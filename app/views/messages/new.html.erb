@@ -25,7 +25,7 @@
   <% if @event.reply_to_event %>
       Reply to <%= @event.reply_to_event.user %>
   <% else %>
-      Send a message to <%= @event.potential_recipients.to_sentence two_words_connector: " or ", last_word_connector: " or " %>
+      Send a message to <%= @event.potential_recipients.to_disjunctive_sentence %>
   <% end %>
 </h1>
 

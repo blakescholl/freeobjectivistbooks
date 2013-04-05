@@ -47,7 +47,7 @@
     <% when :flag %>
         <%= link_to 'Flag problem with shipping info', new_donation_flag_path(actions.donation) %>
     <% when :message %>
-        <%= link_to "Send a message to #{actions.other_users.to_sentence}", new_donation_message_path(actions.donation) %>
+        <%= link_to "Send a message to #{actions.other_users.to_disjunctive_sentence}", new_donation_message_path(actions.donation) %>
     <% when :thank %>
         <%= link_to "Thank #{actions.donor}", new_donation_thank_url(actions.donation) %>
     <% when :update_address %>

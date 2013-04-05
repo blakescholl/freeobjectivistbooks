@@ -14,6 +14,13 @@ class ExtensionsTest < ActiveSupport::TestCase
     assert_equal "foo%20bar", "foo bar".urlencode
   end
 
+  test "to disjunctive sentence" do
+    assert_equal "", [].to_disjunctive_sentence
+    assert_equal "foo", %w{foo}.to_disjunctive_sentence
+    assert_equal "foo or bar", %w{foo bar}.to_disjunctive_sentence
+    assert_equal "foo, bar, or baz", %w{foo bar baz}.to_disjunctive_sentence
+  end
+
   test "subhash" do
     hash = {a: 1, b: 2, c: 2}
     subhash = {a: 1, b: 2}

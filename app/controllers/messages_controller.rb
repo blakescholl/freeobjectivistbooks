@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
     super
     reply_to_event_id = params[:reply_to_event_id]
     reply_to_event_id ||= params[:event][:reply_to_event_id] if params[:event]
-    @reply_to_event = Event.find reply_to_event_id if reply_to_event_id
+    @reply_to_event = Event.find reply_to_event_id if reply_to_event_id.present?
   end
 
   def allowed_users

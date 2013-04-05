@@ -49,7 +49,7 @@ class MessagesControllerTest < ActionController::TestCase
   test "new for donor" do
     get :new, new_params(@quentin_donation), session_for(@hugh)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Quentin Daniels/
+    assert_select 'h1', /Send a message to Quentin Daniels/
     assert_select '.overview', /Quentin Daniels requested The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     verify_no_recipient_radios
@@ -60,7 +60,7 @@ class MessagesControllerTest < ActionController::TestCase
   test "new for student" do
     get :new, new_params(@quentin_donation), session_for(@quentin)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Hugh Akston/
+    assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated The Virtue of Selfishness/
     assert_select 'textarea#event_message'
     verify_no_recipient_radios
@@ -71,7 +71,7 @@ class MessagesControllerTest < ActionController::TestCase
   test "new for student book not sent" do
     get :new, new_params(@dagny_donation), session_for(@dagny)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Hugh Akston/
+    assert_select 'h1', /Send a message to Hugh Akston/
     assert_select '.overview', /Hugh Akston donated Capitalism: The Unknown Ideal/
     assert_select 'textarea#event_message'
     verify_no_recipient_radios
@@ -84,7 +84,7 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, new_params(@frisco_donation), session_for(@kira)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Francisco d&#x27;Anconia or Henry Cameron/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Henry Cameron/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Henry Cameron donated Objectivism/
     verify_recipient_radios @frisco, @cameron, selected: @frisco
@@ -95,7 +95,7 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, new_params(@frisco_donation), session_for(@frisco)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Henry Cameron or Kira Argounova/
+    assert_select 'h1', /Send a message to Henry Cameron or Kira Argounova/
     assert_select 'p', /Henry Cameron donated Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
     verify_recipient_radios @cameron, @kira
@@ -106,21 +106,33 @@ class MessagesControllerTest < ActionController::TestCase
 
     get :new, new_params(@frisco_donation), session_for(@cameron)
     assert_response :success
-    assert_select 'h1', /Send a message to\s+Francisco d&#x27;Anconia or Kira Argounova/
+    assert_select 'h1', /Send a message to Francisco d&#x27;Anconia or Kira Argounova/
     assert_select 'p', /Francisco d&#x27;Anconia requested Objectivism/
     assert_select 'p', /Kira Argounova.*sent/
     verify_recipient_radios @frisco, @kira, selected: @frisco
   end
 
-  test "new reply" do
+  test "new reply to thanks" do
     fulfillment = create :fulfillment
     orig = fulfillment.donation.thank!
 
     get :new, new_params(fulfillment.donation, reply_to_event: orig), session_for(fulfillment.user)
     assert_response :success
-    assert_select 'h1', /Reply to\s+Student \d+$/
+    assert_select 'h1', /Reply to Student \d+$/
     assert_select 'p', /Student \d+ requested Book \d+/
     verify_no_recipient_radios
+  end
+
+  test "new reply to broadcast message" do
+    fulfillment = create :fulfillment
+    orig = fulfillment.donation.message! fulfillment.donor
+
+    get :new, new_params(fulfillment.donation, reply_to_event: orig), session_for(fulfillment.user)
+    assert_response :success
+    assert_select 'h1', /Reply to Donor \d+$/
+    assert_select 'p', /Student \d+ requested Book \d+/
+    assert_select 'p', /Donor \d+ donated Book \d+/
+    verify_recipient_radios fulfillment.student, fulfillment.donor, selected: fulfillment.donor
   end
 
   test "new requires login" do

@@ -298,7 +298,11 @@ class Donation < ActiveRecord::Base
 
   def new_message(user, attributes = {})
     event = message_events.build attributes.merge(user: user)
-    event.recipient = student unless user == student
+    if event.reply_to_event
+      event.recipient = event.reply_to_event.user
+    elsif user != student
+      event.recipient = student
+    end
     event
   end
 

@@ -22,8 +22,11 @@
 <% end %>
 
 <h1 class="grid_16">
-  <% if @event.reply_to_event %>Reply<% else %>Send a message<% end %> to
-  <%= @event.potential_recipients.to_sentence two_words_connector: " or ", last_word_connector: " or " %>
+  <% if @event.reply_to_event %>
+      Reply to <%= @event.reply_to_event.user %>
+  <% else %>
+      Send a message to <%= @event.potential_recipients.to_sentence two_words_connector: " or ", last_word_connector: " or " %>
+  <% end %>
 </h1>
 
 <div class="grid_12">

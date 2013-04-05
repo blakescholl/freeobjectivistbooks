@@ -2,6 +2,6 @@
 
 "<%= @event.message %>"
 
-Reply to <%= @event.user %>: <%= new_donation_message_url @event.donation %>
+Reply to <%= @event.user %>: <%= new_donation_message_url @event.donation, reply_to_event_id: @event.id %>
 
 Full details for this request: <%= request_url(@event.request) %>

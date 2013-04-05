@@ -1,7 +1,7 @@
 Recently you got a thank-you message from <%= @event.user %> for <%= @event.book %>, but you couldn't reply to it. (If you hit "reply" on the email, it went to me, Jason, instead.)
 
 Now you can reply to <%= @event.user %> if you want:
-<%= new_donation_message_url @event.donation %>
+<%= new_donation_message_url @event.donation, reply_to_event_id: @event.id %>
 
 As a reminder, the thank-you message was:
 

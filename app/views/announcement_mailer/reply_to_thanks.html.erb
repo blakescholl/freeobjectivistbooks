@@ -2,7 +2,7 @@
 
 <p>Now you can reply to <%= @event.user %> if you want:</p>
 
-<p><strong><%= link_to "Reply to #{@event.user}", new_donation_message_url(@event.donation) %></strong></p>
+<p><strong><%= link_to "Reply to #{@event.user}", new_donation_message_url(@event.donation, reply_to_event_id: @event.id) %></strong></p>
 
 <p>As a reminder, the thank-you message was:</p>
 

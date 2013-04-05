@@ -1,6 +1,8 @@
 <p><%= @event.student.name %> has finished reading <%= @event.book %>!<% if @review %> Here's what they thought of it:</p>
 
-<p>"<%= format_block @review.text %>"<% end %></p>
+<p>"<%= format_block @review.text %>"</p>
+
+<p><%= link_to "Reply to #{@event.user}", new_donation_message_url(@event.donation, reply_to_event_id: @event.id) %><% end %></p>
 
 <p>Thank you for being a <% if @role == :donor %>donor on<% else %>volunteer for<% end %> Free Objectivist Books.</p>
 

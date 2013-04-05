@@ -26,7 +26,8 @@ class Event < ActiveRecord::Base
   validates_presence_of :message, if: :requires_message?, message: "Please enter a message."
   validates_inclusion_of :public, in: [true, false], if: :is_thanks?, message: 'Please choose "Yes" or "No".'
   validate :message_or_detail_must_be_present, if: lambda {|e| e.type == "fix" && e.request.address.present?}
-  validates_inclusion_of :recipient, in: lambda {|e| e.all_users}, allow_nil: true, message: "Please choose a recipient."
+  validates_inclusion_of :recipient, in: lambda {|e| e.potential_recipients}, allow_nil: true, message: "Please choose a recipient."
+  validate :reply_to_event_must_match, if: :reply_to_event
 
   def requires_message?
     case type
@@ -39,6 +40,14 @@ class Event < ActiveRecord::Base
   def message_or_detail_must_be_present
     if detail.blank? && message.blank?
       errors[:message] << "If you don't need to update your shipping info, please enter a message for your donor."
+    end
+  end
+
+  def reply_to_event_must_match
+    if reply_to_event.request != request
+      errors[:reply_to_event] << "Request doesn't match."
+    elsif reply_to_event.donation != donation
+      errors[:reply_to_event] << "Donation doesn't match."
     end
   end
 
@@ -66,7 +75,6 @@ class Event < ActiveRecord::Base
       self.donation ||= request.donation if request
       self.request ||= donation.request if donation
       self.user ||= default_user
-      self.recipient ||= default_recipient
       self.happened_at ||= Time.now
     end
   end
@@ -85,11 +93,6 @@ class Event < ActiveRecord::Base
     end
   end
   private :default_user
-
-  def default_recipient
-    sender if type.in?(%w{fix update})
-  end
-  private :default_recipient
 
   #--
   # Derived attributes
@@ -110,6 +113,14 @@ class Event < ActiveRecord::Base
     role_for user
   end
 
+  def is_private?
+    recipient.present?
+  end
+
+  def gets_private_reply?
+    is_private? || is_thanks? || (type == "update_status" && user == student)
+  end
+
   def all_users
     [student, donor, fulfiller].compact.uniq
   end
@@ -118,8 +129,18 @@ class Event < ActiveRecord::Base
     all_users - [user]
   end
 
+  def potential_recipients
+    if type.in? %w{update fix}
+      [sender].compact
+    elsif type == "message" && reply_to_event && reply_to_event.gets_private_reply?
+      [reply_to_event.user]
+    else
+      other_users
+    end
+  end
+
   def recipients
-    recipient.present? ? [recipient] : other_users
+    recipient.present? ? [recipient] : potential_recipients
   end
 
   # True if the notification for this event has been sent.

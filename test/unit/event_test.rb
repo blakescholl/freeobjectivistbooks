@@ -121,30 +121,63 @@ class EventTest < ActiveSupport::TestCase
 
   # Recipients
 
-  test "roles to notify is empty for update before grant" do
+  test "recipients empty for update before grant" do
     request = create :request
     request.address = "123 New Address St"
     event = request.build_update_event
     assert_equal [], event.recipients
   end
 
-  test "roles to notify for message" do
+  test "recipients for message" do
     donation = create :donation
-    event = donation.message_events.build message: "Hello", user: donation.user
+    event = donation.message! donation.user
     assert_equal [donation.student], event.recipients
   end
 
-  test "roles to notify for private message" do
+  test "recipients for broaadcast message" do
     fulfillment = create :fulfillment
-    event = fulfillment.donation.message_events.build message: "Hello", user: fulfillment.user,
-        recipient: fulfillment.student
+    event = fulfillment.donation.message! fulfillment.student
+    assert_equal [fulfillment.donor, fulfillment.user], event.recipients
+  end
+
+  test "recipients for private message" do
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.message! fulfillment.user, recipient: fulfillment.student
     assert_equal [fulfillment.student], event.recipients
   end
 
-  test "roles to notify for flag and fix" do
+  test "recipients for reply to thank-you" do
+    fulfillment = create :fulfillment
+    orig = fulfillment.donation.thank!
+    event = fulfillment.donation.message! fulfillment.user, reply_to_event: orig
+    assert_equal [fulfillment.student], event.recipients
+  end
+
+  test "recipients for reply to broadcast message" do
+    fulfillment = create :fulfillment
+    orig = fulfillment.donation.message! fulfillment.student
+    event = fulfillment.donation.message! fulfillment.user, reply_to_event: orig
+    assert_equal [fulfillment.student, fulfillment.donor], event.recipients
+  end
+
+  test "recipients for private reply to broadcast message" do
+    fulfillment = create :fulfillment
+    orig = fulfillment.donation.message! fulfillment.student
+    event = fulfillment.donation.message! fulfillment.user, reply_to_event: orig, recipient: fulfillment.student
+    assert_equal [fulfillment.student], event.recipients
+  end
+
+  test "recipients for reply to status update" do
+    fulfillment = create :fulfillment
+    orig = fulfillment.donation.update_status! "read"
+    event = fulfillment.donation.message! fulfillment.user, reply_to_event: orig
+    assert_equal [fulfillment.student], event.recipients
+  end
+
+  test "recipients for flag and fix" do
     fulfillment = create :fulfillment
     event = fulfillment.donation.flag!
-    assert_equal [fulfillment.student, fulfillment.donor].to_set, event.recipients.to_set
+    assert_equal [fulfillment.student, fulfillment.donor], event.recipients
 
     event = fulfillment.donation.fix!
     assert_equal [fulfillment.user], event.recipients
@@ -171,12 +204,11 @@ class EventTest < ActiveSupport::TestCase
 
   test "notify for private message" do
     fulfillment = create :fulfillment
-    event = fulfillment.donation.message_events.build message: "Hello", user: fulfillment.user,
-        recipient: fulfillment.student
 
-    assert !event.notified?
-    assert_difference("ActionMailer::Base.deliveries.count", 1) { event.notify }
-    assert event.notified?
+    assert_difference("ActionMailer::Base.deliveries.count", 1) do
+      event = fulfillment.donation.message! fulfillment.user, recipient: fulfillment.student
+      assert event.notified?
+    end
   end
 
   test "notify on fix only goes to fulfiller" do

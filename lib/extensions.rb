@@ -21,12 +21,12 @@ end
 class Hash
   def subhash(*keys)
     keys = keys.flatten
-    select {|k,v| keys.include? k}
+    keys.inject({}) {|h,k| h.merge(k => self[k])}
   end
 
   def subhash_without(*keys)
     keys = keys.flatten
-    subhash (self.keys - keys)
+    keys.inject(dup) {|h,k| h.delete k; h}
   end
 
   def to_query_string(options = {})

@@ -206,6 +206,10 @@ class Donation
     update_status! 'received', user, "Thanks!", time
   end
 
+  def read!
+    update_status! 'read', student, "It was great!"
+  end
+
   def flag!(user = nil)
     user ||= sender
     params = {message: "Fix this"}
@@ -230,5 +234,14 @@ class Donation
     save!
     event.save! if event
     event
+  end
+
+  def message!(user, attributes = {})
+    attributes[:message] ||= "Hello"
+    message_events.create attributes.merge(user: user)
+  end
+
+  def thank!(message = "Thanks!")
+    message! student, message: message, is_thanks: true, public: false
   end
 end

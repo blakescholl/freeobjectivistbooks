@@ -175,9 +175,9 @@ class ApplicationController < ActionController::Base
   rescue_from BlockedUserException, with: :render_blocked_user
 
   def redirect_to_ssl
-    redirect_options = {protocol: 'https', status: :moved_permanently}
+    redirect_options = request.query_parameters.merge protocol: 'https'
     redirect_options.merge! Rails.application.config.ssl_options
-    redirect_to request.query_parameters.merge(redirect_options)
+    redirect_to url_for(redirect_options), status: :moved_permanently
   end
 
   # Renders an HTTP 401 Unauthorized response for HTML or JSON.

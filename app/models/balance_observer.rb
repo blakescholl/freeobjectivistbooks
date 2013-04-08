@@ -24,8 +24,8 @@ class BalanceObserver < ActiveRecord::Observer
   end
 
   def after_update(object)
-    case object
-    when Donation
+    case object.class.name
+    when "Donation"
       donation = object
       donation.unpay if donation.canceled_changed? && donation.canceled?
     end

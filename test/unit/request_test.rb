@@ -98,31 +98,6 @@ class RequestTest < ActiveSupport::TestCase
     verify_scope(:autocancelable) {|request| request.active? && request.can_autocancel?}
   end
 
-  # Pseudo-scopes
-
-  test "for send-books mode" do
-    requests = Request.for_mode(ActiveSupport::StringInquirer.new("send_books"))
-    assert requests.any?, "no requests for send-books mode"
-    requests.each do |request|
-      assert request.active?, "request #{request.id} is not active"
-      assert request.open?, "request #{request.id} is not open"
-    end
-  end
-
-  test "for send-money mode" do
-    requests = Request.for_mode(ActiveSupport::StringInquirer.new("send_money"))
-    assert requests.any?, "no requests for send-money mode"
-    requests.each do |request|
-      assert request.active?, "request #{request.id} is not active"
-      assert request.open?, "request #{request.id} is not open"
-      assert request.book.price, "request #{request.id} has no price for #{request.book}"
-      assert request.book.price > 0, "request #{request.id} has price of zero for #{request.book}"
-
-      assert_not_nil request.user.location
-      assert_equal "United States", request.user.location.country
-    end
-  end
-
   # Derived attributes
 
   test "active?" do

@@ -80,7 +80,7 @@ class RequestsController < ApplicationController
   #++
 
   def index
-    @requests = Request.for_mode @current_user.donor_mode
+    @requests = Request.not_granted.includes(user: :location).includes(:book).reorder('open_at desc').first(25)
 
     all_donations = @current_user.donations.active
     @donations = all_donations.not_sent.unpaid.reorder(:created_at)

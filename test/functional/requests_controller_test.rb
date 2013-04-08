@@ -7,9 +7,17 @@ class RequestsControllerTest < ActionController::TestCase
     get :index, params, session_for(@hugh)
     assert_response :success
 
-    assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
-    assert_select '.request .headline', "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand"
-    assert_select '.request .headline', "Francisco d&#x27;Anconia wants We the Living"
+    assert_select '.request', /Howard Roark/ do
+      assert_select '.headline', "Howard Roark wants Atlas Shrugged"
+      assert_select '.book_price', "$9.99"
+      assert_select '.send_yourself', /or send it yourself/i
+    end
+
+    assert_select '.request', /Quentin Daniels/ do
+      assert_select '.headline', "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand"
+      assert_select '.book_price', false
+      assert_select '.send_yourself', /not eligible/i
+    end
 
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
@@ -18,24 +26,6 @@ class RequestsControllerTest < ActionController::TestCase
       assert_select 'ul'
     end
 
-    assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
-  end
-
-  test "index for send-money donor" do
-    get :index, params, session_for(@cameron)
-    assert_response :success
-
-    assert_select '.request .headline', "Howard Roark wants Atlas Shrugged"
-
-    assert_select '.sidebar' do
-      assert_select 'h2', "Your donations"
-      assert_select 'p', "You have pledged to donate 1 book."
-      assert_select 'p', /You have promised/
-      assert_select 'ul'
-    end
-
-    assert_select '.request .headline', text: "Quentin Daniels wants Objectivism: The Philosophy of Ayn Rand", count: 0
-    assert_select '.request .headline', text: "Francisco d&#x27;Anconia wants We the Living", count: 0
     assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
   end
 

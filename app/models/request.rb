@@ -54,15 +54,6 @@ class Request < ActiveRecord::Base
   scope :renewable, open_longer_than(RENEW_THRESHOLD)
   scope :autocancelable, open_longer_than(AUTOCANCEL_THRESHOLD)
 
-  def self.for_mode(donor_mode)
-    requests = not_granted.includes(user: :location).includes(:book).reorder('open_at desc')
-    if donor_mode.send_money?
-      requests = requests.with_prices
-      requests = requests.select {|request| request.can_send_money?}
-    end
-    requests
-  end
-
   #--
   # Callbacks
   #++

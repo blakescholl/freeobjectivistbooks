@@ -1,163 +1,163 @@
 <% content_for :title do %>Donate<% end %>
 
 <% content_for :stylesheet do %>
-<style>
-.donate, .loading {
-    height: 56px;
-}
+    <style>
+        .donate, .loading {
+            height: 56px;
+        }
 
-.donate {
-    background-image: url(/assets/donate-one-button.png);
-}
+        .donate {
+            background-image: url(/assets/donate-one-button.png);
+        }
 
-.send-payment {
-    height: 46px;
-    margin-top: 8px;
-    background-image: url(/assets/send-payment-button.png);
-}
+        .send-payment {
+            height: 46px;
+            margin-top: 8px;
+            background-image: url(/assets/send-payment-button.png);
+        }
 
-.center {
-    margin-top: 5px;
-}
+        .center {
+            margin-top: 5px;
+        }
 
-.sidebar li {
-    margin-left: 18px;
-    padding: 3px 0;
-}
+        .sidebar li {
+            margin-left: 18px;
+            padding: 3px 0;
+        }
 
-.any-donations, .no-donations {
-    display: none;
-}
+        .any-donations, .no-donations {
+            display: none;
+        }
 
-.send_options {
-    width: 117px;
-    text-align: center;
-}
+        .send_options {
+            width: 117px;
+            text-align: center;
+        }
 
-.book_price {
-    font-size: 1.4em;
-}
+        .book_price {
+            font-size: 1.4em;
+        }
 
-.send_yourself {
-    font-size: 0.9em;
-}
-</style>
+        .send_yourself {
+            font-size: 0.9em;
+        }
+    </style>
 <% end %>
 
 <h1 class="grid_16">Donate</h1>
 
 <div class="grid_16 overview">
-    <% if @requests.any? %>
-    <p>These students have pledged to read Objectivist books. Choose which ones you want to fulfill.</p>
-    <% else %>
-    <p>All student requests have been granted for now! Check back soon for more eager minds.</p>
-    <% end %>
+  <% if @requests.any? %>
+      <p>These students have pledged to read Objectivist books. Choose which ones you want to fulfill.</p>
+  <% else %>
+      <p>All student requests have been granted for now! Check back soon for more eager minds.</p>
+  <% end %>
 </div>
 
 <div class="grid_11 center">
-    <%= render @requests %>
+  <%= render @requests %>
 </div>
 
 <div class="grid_5 sidebar">
-    <div class="grid_5 fixed">
-        <div class="top_5">&nbsp;</div>
-        <div class="content_5">
-            <h2>Your donations</h2>
-            <% if @pledge %>
-            <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
-            <% end %>
-            <p class="no-donations">
-                <% if @previous_count > 0 %>
-                You previously donated <%= pluralize @previous_count, 'book' %>.
-                <% else %>
-                You haven't donated any books yet.
-                <% end %>
-            </p>
-            <div class="any-donations">
-                <p>You have promised <span id="donation-count"></span>:</p>
-                <ul id="donations-list"></ul>
-                <% if @current_user.donor_mode.send_money? %>
-                <p>Total: <span id="donation-total" class="money"></span></p>
-                <%= link_to new_contribution_path do %><div class="send-payment button"></div><% end %>
-                <% else %>
-                <p><%= link_to 'See student addresses and send books', donations_path %></p>
-                <% end %>
-            </div>
-        </div>
-        <div class="bottom_5">&nbsp;</div>
+  <div class="grid_5 fixed">
+    <div class="top_5">&nbsp;</div>
+    <div class="content_5">
+      <h2>Your donations</h2>
+      <% if @pledge %>
+          <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
+      <% end %>
+      <p class="no-donations">
+        <% if @previous_count > 0 %>
+            You previously donated <%= pluralize @previous_count, 'book' %>.
+        <% else %>
+            You haven't donated any books yet.
+        <% end %>
+      </p>
+      <div class="any-donations">
+        <p>You have promised <span id="donation-count"></span>:</p>
+        <ul id="donations-list"></ul>
+        <% if @current_user.donor_mode.send_money? %>
+            <p>Total: <span id="donation-total" class="money"></span></p>
+            <%= link_to new_contribution_path do %><div class="send-payment button"></div><% end %>
+        <% else %>
+            <p><%= link_to 'See student addresses and send books', donations_path %></p>
+        <% end %>
+      </div>
     </div>
+    <div class="bottom_5">&nbsp;</div>
+  </div>
 </div>
 
 <% content_for :javascript do %>
-<script>
-$(document).ready(function () {
-    var donations = <%= raw @donations.to_json %>;
+    <script>
+        $(document).ready(function () {
+            var donations = <%= raw @donations.to_json %>;
 
-    function formatMoney(amount) {
-        var fmt = "";
-        if (amount % 1 === 0) {
-            fmt = amount.toString();
-        } else {
-            fmt = amount.toFixed(2);
-        }
-        return "$" + fmt;
-    }
+            function formatMoney(amount) {
+                var fmt = "";
+                if (amount % 1 === 0) {
+                    fmt = amount.toString();
+                } else {
+                    fmt = amount.toFixed(2);
+                }
+                return "$" + fmt;
+            }
 
-    function donationTotal() {
-        var sum = 0;
-        $.each(donations, function (i, donation) {
-            sum += donation.price_cents;
+            function donationTotal() {
+                var sum = 0;
+                $.each(donations, function (i, donation) {
+                    sum += donation.price_cents;
+                });
+                return sum/100;
+            }
+
+            function addDonationToList(donation, animated) {
+                var item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
+                        ' in ' + donation.student.location.name + '</li>');
+                $('#donations-list').append(item);
+                if (animated) item.hide().fadeAndSlideIn();
+            }
+
+            function updateTotals() {
+                $('#donation-count').text(donations.length + " book" + (donations.length === 1 ? "" : "s"));
+                $('#donation-total').text(formatMoney(donationTotal()));
+            }
+
+            function render(animated) {
+                var duration = animated ? null : 0;
+
+                if (donations.length == 0) {
+                    $('.no-donations').fadeAndSlideIn(duration);
+                    $('.any-donations').fadeAndSlideOut(duration);
+                    return;
+                }
+
+                $('#donations-list').empty();
+                $.each(donations, function (i, donation) {
+                    addDonationToList(donation);
+                });
+                updateTotals();
+                $('.no-donations').fadeAndSlideOut(duration);
+                $('.any-donations').fadeAndSlideIn(duration);
+            }
+
+            $('div.request').handleAjax(function (event, response, status, xhr) {
+                var donation = response;
+
+                var first = donations.length === 0;
+                donations.push(donation);
+
+                $(this).fadeAndSlideOut();
+
+                if (first) {
+                    render(true);
+                } else {
+                    addDonationToList(donation, true);
+                    updateTotals();
+                }
+            });
+
+            render();
         });
-        return sum/100;
-    }
-
-    function addDonationToList(donation, animated) {
-        var item = $('<li><span class="title">' + donation.book.title + '</span> to ' + donation.student.name +
-            ' in ' + donation.student.location.name + '</li>');
-        $('#donations-list').append(item);
-        if (animated) item.hide().fadeAndSlideIn();
-    }
-
-    function updateTotals() {
-        $('#donation-count').text(donations.length + " book" + (donations.length === 1 ? "" : "s"));
-        $('#donation-total').text(formatMoney(donationTotal()));
-    }
-
-    function render(animated) {
-        var duration = animated ? null : 0;
-
-        if (donations.length == 0) {
-            $('.no-donations').fadeAndSlideIn(duration);
-            $('.any-donations').fadeAndSlideOut(duration);
-            return;
-        }
-
-        $('#donations-list').empty();
-        $.each(donations, function (i, donation) {
-            addDonationToList(donation);
-        });
-        updateTotals();
-        $('.no-donations').fadeAndSlideOut(duration);
-        $('.any-donations').fadeAndSlideIn(duration);
-    }
-
-    $('div.request').handleAjax(function (event, response, status, xhr) {
-        var donation = response;
-
-        var first = donations.length === 0;
-        donations.push(donation);
-
-        $(this).fadeAndSlideOut();
-
-        if (first) {
-            render(true);
-        } else {
-            addDonationToList(donation, true);
-            updateTotals();
-        }
-    });
-
-    render();
-});
-</script>
+    </script>
 <% end %>

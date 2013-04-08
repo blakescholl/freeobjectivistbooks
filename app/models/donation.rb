@@ -96,7 +96,7 @@ class Donation < ActiveRecord::Base
   # Derived attributes
   #++
 
-  delegate :book, to: :request
+  delegate :book, :can_send_money?, to: :request
   delegate :address, :address=, to: :student
   delegate :name, :name=, to: :student, prefix: true
 
@@ -334,6 +334,6 @@ class Donation < ActiveRecord::Base
   #++
 
   def as_json(options = {})
-    hash_from_methods :id, :donor, :student, :book, :price_cents
+    hash_from_methods :id, :donor, :student, :book, :price_cents, :flagged, :can_send_money?
   end
 end

@@ -4,7 +4,9 @@ class RequestsControllerTest < ActionController::TestCase
   # Index
 
   test "index" do
-    get :index, params, session_for(@hugh)
+    user = create :donor
+
+    get :index, params, session_for(user)
     assert_response :success
 
     assert_select '.request', /Howard Roark/ do
@@ -22,11 +24,29 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
       assert_select 'p', "You have pledged to donate 5 books."
-      assert_select 'p', "You previously donated 1 book."
+      assert_select 'p', "You haven't donated any books yet."
       assert_select 'ul'
     end
 
     assert_select '.request .headline', text: "Howard Roark wants The Fountainhead", count: 0
+  end
+
+  test "index for user with previous donations" do
+    donation = create :donation, :sent
+
+    get :index, params, session_for(donation.user)
+    assert_response :success
+
+    assert_select '.sidebar p', /previously donated 1 book/
+  end
+
+  test "index for user with flagged donations" do
+    donation = create :donation_for_request_no_address
+
+    get :index, params, session_for(donation.user)
+    assert_response :success
+
+    assert_select '.sidebar p', /1 book flagged/
   end
 
   test "index requires login" do
@@ -222,8 +242,8 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select '.address', /\d+ Main St/
   end
 
-  test "show to send-money donor doesn't display address" do
-    donation = create :donation_with_send_money_donor
+  test "show to donor doesn't display address if paid" do
+    donation = create :donation, :paid
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     assert_select '.address', false

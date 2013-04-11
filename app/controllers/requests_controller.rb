@@ -83,8 +83,9 @@ class RequestsController < ApplicationController
     @requests = Request.not_granted.includes(user: :location).includes(:book).reorder('open_at desc').first(25)
 
     all_donations = @current_user.donations.active
-    @donations = all_donations.not_sent.unpaid.reorder(:created_at)
+    @donations = all_donations.needs_donor_action.reorder(:created_at)
     @previous_count = all_donations.count - @donations.count
+    @flag_count = all_donations.unpaid.not_sent.flagged.count
     @pledge = @current_user.pledges.first
   end
 

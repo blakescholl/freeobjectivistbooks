@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130404233858) do
+ActiveRecord::Schema.define(:version => 20130410225951) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -55,8 +55,10 @@ ActiveRecord::Schema.define(:version => 20130404233858) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "transaction_id"
+    t.integer  "order_id"
   end
 
+  add_index "contributions", ["order_id"], :name => "index_contributions_on_order_id"
   add_index "contributions", ["user_id"], :name => "index_contributions_on_user_id"
 
   create_table "delayed_jobs", :force => true do |t|
@@ -88,8 +90,10 @@ ActiveRecord::Schema.define(:version => 20130404233858) do
     t.integer  "price_cents"
     t.boolean  "paid",              :default => false,        :null => false
     t.string   "donor_mode",        :default => "send_books", :null => false
+    t.integer  "order_id"
   end
 
+  add_index "donations", ["order_id"], :name => "index_donations_on_order_id"
   add_index "donations", ["request_id"], :name => "index_donations_on_request_id"
   add_index "donations", ["user_id"], :name => "index_donations_on_user_id"
 
@@ -132,6 +136,18 @@ ActiveRecord::Schema.define(:version => 20130404233858) do
   end
 
   add_index "locations", ["name"], :name => "index_locations_on_name"
+
+  create_table "orders", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "description"
+    t.integer  "subtotal_cents"
+    t.integer  "balance_applied_cents"
+    t.integer  "total_cents"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "orders", ["user_id"], :name => "index_orders_on_user_id"
 
   create_table "pledges", :force => true do |t|
     t.integer  "user_id"

@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
   has_many :requests
   has_many :pledges
   has_many :donations
+  has_many :orders
   has_many :contributions
   has_many :fulfillments
   has_many :reviews

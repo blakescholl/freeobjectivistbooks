@@ -12,6 +12,7 @@ class Donation < ActiveRecord::Base
   belongs_to :request, autosave: true
   belongs_to :user
   has_many :events, dependent: :destroy
+  belongs_to :order
   has_one :fulfillment
   has_one :review
   has_many :reminder_entities, as: :entity

@@ -2,6 +2,7 @@ class Contribution < ActiveRecord::Base
   monetize :amount_cents
 
   belongs_to :user
+  belongs_to :order
 
   validates_presence_of :user, :amount_cents
 

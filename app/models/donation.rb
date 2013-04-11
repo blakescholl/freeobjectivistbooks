@@ -40,7 +40,7 @@ class Donation < ActiveRecord::Base
   end
 
   #--
-  # Scopes
+  # Scopes and pseudo-scopes
   #++
 
   default_scope order("created_at desc")
@@ -75,6 +75,16 @@ class Donation < ActiveRecord::Base
   scope :needs_thanks, active.received.not_thanked
   scope :needs_payment, active.send_money.unpaid
   scope :needs_fulfillment, active.needs_sending.paid.unfulfilled
+
+  scope :needs_donor_action, active.unpaid.not_flagged.not_sent
+
+  def self.no_donor_action
+    t = arel_table
+    flagged = t[:flagged].eq true
+    paid = t[:paid].eq true
+    sent = t[:status].not_eq 'not_sent'
+    active.where(flagged.or paid.or sent)
+  end
 
   #--
   # Callbacks
@@ -126,7 +136,7 @@ class Donation < ActiveRecord::Base
 
   # User who is responsible for sending the book.
   def sender
-    donor_mode.send_books? ? donor : fulfiller
+    paid? ? fulfiller : donor
   end
 
   def fulfilled?
@@ -175,9 +185,14 @@ class Donation < ActiveRecord::Base
     active? && flagged?
   end
 
-  # True if the ball is in the donor's court to send the book.
+  # True if the ball is in the sender's court to send the book.
   def needs_sending?
     !sent? && !flagged?
+  end
+
+  # True if this is an "outstanding" donation that the donor needs to do something with--either send or pay for.
+  def needs_donor_action?
+    needs_sending? && !paid?
   end
 
   # True if we should show the "sent" button to the donor.

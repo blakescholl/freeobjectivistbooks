@@ -148,52 +148,47 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   test "show for donor" do
-    get :show, params, session_for(@hugh)
-    assert_response :success
-    assert_select 'h1', "Hugh Akston"
+    user = create :donor
+    donation = create :donation, user: user
+    ineligible_donation = create :donation_for_request_not_amazon, user: user
+    create :donation_for_request_no_address, user: user
+    create :donation, :sent, user: user
+    create :donation, :paid, user: user
 
-    assert_select '.pledge .headline', /You pledged to donate 5 books/
-    assert_select 'h2', 'Outstanding donations'
-
-    assert_select '.donation', text: /The Virtue of Selfishness/, count: 0      # sent
-    assert_select '.donation', text: /Capitalism: The Unknown Ideal/, count: 0  # flagged
-    assert_select '.donation', text: /Atlas Shrugged/, count: 0                 # also flagged
-
-    assert_select '.donation', /The Fountainhead to/ do
-      assert_select '.request .name', /Quentin Daniels/
-      assert_select '.request .address', /123 Main St/
-      assert_select '.request .flagged', false
-      assert_select '.actions a', /see full/i
-      assert_select '.actions a', /flag/i
-      assert_select '.actions a', /cancel/i
-    end
-
-    verify_all_donations_link
-    verify_new_request_link false
-    verify_one_request_text false
-    verify_volunteer_links false
-  end
-
-  test "show for send-money donor" do
-    donor = create :send_money_donor
-    paid_donation = create :donation, user: donor, paid: true
-    unpaid_donation = create :donation, user: donor, paid: false
-
-    assert_equal 'send_money', paid_donation.donor_mode
-    assert_equal 'send_money', unpaid_donation.donor_mode
-
-    get :show, params, session_for(donor)
+    get :show, params, session_for(user)
     assert_response :success
 
-    assert_select '.donation', text: /#{paid_donation.book}/, count: 0
-
-    assert_select '.donation', /#{unpaid_donation.book}/ do
-      assert_select '.request .name', /Student \d+/
-      assert_select '.request .address', false
-      assert_select '.money', /\$10/
-      assert_select '.actions a', /see full/i
-      assert_select '.actions a', text: /flag/i, count: 0
+    assert_select '.donation', 2 do
+      assert_select '.headline a'
+      assert_select '.shipping'
     end
+
+    assert_select '.donation', /#{donation.book} to #{donation.student}/ do
+      assert_select '.button.send'
+      assert_select '.button.pay'
+      assert_select '.book_price', "$10"
+
+      assert_select '.shipping' do
+        assert_select '.request .name', donation.student.name
+        assert_select '.request .address', /\d+ Main St/
+        assert_select '.actions form'
+        assert_select '.actions a', 3
+      end
+    end
+
+    assert_select '.donation', /#{ineligible_donation.book} to #{ineligible_donation.student}/ do
+      assert_select '.button.send'
+      assert_select '.button.pay', false
+
+      assert_select '.shipping' do
+        assert_select '.request .name', ineligible_donation.student.name
+        assert_select '.request .address', /\d+ Main St/
+        assert_select '.actions form'
+        assert_select '.actions a', 2
+      end
+    end
+
+    assert_select '#payment-button-row'
 
     verify_all_donations_link
     verify_new_request_link false

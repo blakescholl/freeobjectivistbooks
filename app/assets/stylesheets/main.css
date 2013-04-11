@@ -254,6 +254,61 @@ a:active {
     background-position-y: bottom;
 }
 
+.button.cancel {
+    height: 46px;
+    background-image: url(/assets/cancel-button.png);
+}
+
+.button.delete {
+    height: 56px;
+    background-image: url(/assets/delete-button.png);
+}
+
+.button.edit {
+    height: 56px;
+    background-image: url(/assets/edit-button.png);
+}
+
+.button.flag {
+    height: 46px;
+    background-image: url(/assets/flag-button.png);
+}
+
+.button.pay {
+    height: 36px;
+    background-image: url(/assets/pay-button.png);
+}
+
+.button.pay-for-all {
+    height: 36px;
+    background-image: url(/assets/pay-for-all-button.png);
+}
+
+.button.pay-for-selected {
+    height: 36px;
+    background-image: url(/assets/pay-for-selected-button.png);
+}
+
+.button.send {
+    height: 36px;
+    background-image: url(/assets/send-button.png);
+}
+
+.button.send-payment {
+    height: 46px;
+    background-image: url(/assets/send-payment-button.png);
+}
+
+.button.sent {
+    height: 46px;
+    background-image: url(/assets/sent-button.png);
+}
+
+.button.update {
+    height: 46px;
+    background-image: url(/assets/update-button.png);
+}
+
 /****************************************************************************************************/
 /* Thank-you */
 

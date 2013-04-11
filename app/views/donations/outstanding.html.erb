@@ -1,0 +1,59 @@
+<% content_for :title do %>Outstanding Donations<% end %>
+
+<% content_for :stylesheet do %>
+    <style>
+        .request, .actions {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .name {
+            margin-bottom: 0;
+        }
+
+        .notes {
+            margin-top: 12px;
+        }
+
+        .button, .loading {
+            height: 46px;
+            margin-bottom: 6px;
+            background-position-x: left;
+        }
+
+        .actions p {
+            padding-left: 3px;
+        }
+
+        .any-donations {
+            padding-top: 12px;
+            display: <%= @outstanding_donations.any? ? "block" : "none" %>;
+        }
+
+        .no-donations {
+            display: <%= @outstanding_donations.any? ? "none" : "block" %>;
+        }
+
+        #payment-button-row {
+            display: <%= @any_eligible ? "block" : "none" %>;
+        }
+    </style>
+    <%= stylesheet_link_tag 'donations' %>
+<% end %>
+
+<h1 class="grid_16">Outstanding donations</h1>
+
+<div class="grid_12">
+  <%= render partial: "donations/outstanding_donations", object: @outstanding_donations, locals: {flag_count: @flag_count} %>
+</div>
+<div class="clear"></div>
+
+<% content_for :javascript do %>
+    <%= javascript_include_tag 'donations' %>
+    <script>
+        $(document).ready(function () {
+            var donations = <%= raw @outstanding_donations.to_json %>;
+            initializeDonations(donations);
+        });
+    </script>
+<% end %>

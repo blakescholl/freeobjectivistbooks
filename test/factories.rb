@@ -22,6 +22,7 @@ FactoryGirl.define do
 
     factory :donor do
       sequence(:name) {|n| "Donor #{n}"}
+      after(:create) {|user| create :pledge, user: user}
 
       trait(:send_books) {donor_mode "send_books"}
       trait(:send_money) {donor_mode "send_money"}
@@ -72,9 +73,15 @@ FactoryGirl.define do
     end
   end
 
+  factory :pledge do
+    association :user, factory: :donor
+    quantity 5
+  end
+
   factory :donation do
     association :user, factory: :donor
     request
+    status 'not_sent'
 
     initialize_with { request.grant! user }
 
@@ -93,11 +100,14 @@ FactoryGirl.define do
     factory :donation_with_send_money_donor do
       association :user, factory: :send_money_donor
     end
+
+    trait(:paid) {paid true}
+    trait(:sent) {status 'sent'}
   end
 
   factory :fulfillment do
     association :user, factory: :volunteer
-    association :donation, factory: :donation_with_send_money_donor
+    association :donation, :paid, factory: :donation_with_send_money_donor
   end
 
   factory :review do

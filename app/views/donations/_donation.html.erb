@@ -1,28 +1,28 @@
 <div class="donation">
-    <%= render "requests/spacer" %>
+  <div class="summary">
     <div class="grid_6 alpha request">
-        <p class="headline"><%= title donation.book %> to:</p>
-        <p class="name"><%= donation.student.name %></p>
-        <% if @current_user == donation.sender %>
-        <p class="address"><%= format_address donation.address %></p>
-            <% if donation.needs_fix? %>
-            <p class="flagged">
-                <% if donation.address.present? %>
+      <p class="headline">
+        <%= link_to donation.request do %><%= title donation.book %> to <%= donation.student.name %><% end %>
+      </p>
+    </div>
+    <div class="grid_6 omega buttons">
+      <% if donation.sent? %>
+          <p class="request status"><%= status_headline donation.request %></p>
+      <% elsif donation.needs_fix? %>
+          <p class="request flagged">
+            <% if donation.address.present? %>
                 Shipping info flagged
-                <% else %>
+            <% else %>
                 Student has been contacted to add address
-                <% end %>
-            </p>
             <% end %>
-        <% elsif donation.donor_mode.send_money? && !donation.paid? %>
-        <p class="money book_price"><%= humanized_money_with_symbol donation.price %></p>
-        <% end %>
+          </p>
+      <% elsif donation.paid? %>
+          <p class="request status">Paid</p>
+      <% else %>
+          <p class="request status warning">Not sent</p>
+      <% end %>
     </div>
-    <div class="grid_6 omega actions">
-        <% if donation.sent? %>
-        <p class="status"><%= status_headline donation.request %></p>
-        <% end %>
-        <%= render donation.request.actions_for @current_user, context: :list %>
-    </div>
-    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
 </div>
+<div class="clear"></div>

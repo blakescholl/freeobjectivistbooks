@@ -119,6 +119,14 @@ class DonationTest < ActiveSupport::TestCase
     assert !Donation.needs_fulfillment.include?(@frisco_donation)
   end
 
+  test "needs donor action" do
+    verify_scope(:needs_donor_action) {|donation| donation.needs_donor_action?}
+  end
+
+  test "no donor action" do
+    verify_scope(:no_donor_action) {|donation| !donation.needs_donor_action?}
+  end
+
   # Callbacks
 
   test "default status is not_sent" do

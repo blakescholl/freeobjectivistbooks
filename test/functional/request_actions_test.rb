@@ -87,8 +87,8 @@ class RequestActionsTest < ActionController::TestCase
     verify_flag_link false
   end
 
-  test "no flag link for send-money donor" do
-    donation = create :donation_with_send_money_donor
+  test "no flag link for paid donor" do
+    donation = create :donation, :paid
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     verify_flag_link false
@@ -135,8 +135,8 @@ class RequestActionsTest < ActionController::TestCase
     verify_amazon_link false
   end
 
-  test "no amazon link for send-money donor" do
-    donation = create :donation_with_send_money_donor
+  test "no amazon link for paid donor" do
+    donation = create :donation, :paid
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     verify_amazon_link false
@@ -181,7 +181,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no sent button for send-money donor" do
-    donation = create :donation_with_send_money_donor
+    donation = create :donation, :paid
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     verify_sent_button false

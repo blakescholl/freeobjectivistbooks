@@ -1,56 +1,50 @@
 <% content_for :stylesheet do %>
-<style>
-.request, .pledge, .actions {
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
+    <style>
+        .request, .pledge, .actions {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
 
-.multiple-books {
-    margin-top: 20px;
-}
+        .multiple-books {
+            margin-top: 20px;
+        }
 
-.name {
-    margin-bottom: 0;
-}
+        .name {
+            margin-bottom: 0;
+        }
 
-.notes {
-    margin-top: 12px;
-}
+        .notes {
+            margin-top: 12px;
+        }
 
-.button, .loading {
-    height: 46px;
-    margin-bottom: 6px;
-    background-position-x: left;
-}
+        .button, .loading {
+            height: 46px;
+            margin-bottom: 6px;
+            background-position-x: left;
+        }
 
-.actions p {
-    padding-left: 3px;
-}
+        .actions p {
+            padding-left: 3px;
+        }
 
-.send {
-    background-image: url(/assets/send-button.png);
-}
+        .any-donations {
+            padding-top: 12px;
+            display: <%= @outstanding_donations.any? ? "block" : "none" %>;
+        }
 
-.sent {
-    background-image: url(/assets/sent-button.png);
-}
+        .no-donations {
+            display: <%= @outstanding_donations.any? ? "none" : "block" %>;
+        }
 
-.send-payment {
-    background-image: url(/assets/send-payment-button.png);
-}
+        #payment-button-row {
+            display: <%= @any_eligible ? "block" : "none" %>;
+        }
 
-.any-donations {
-    display: <%= @needs_sending_donations.any? ? "block" : "none" %>;
-}
-
-.no-donations {
-    display: <%= @needs_sending_donations.any? ? "none" : "block" %>;
-}
-
-#donation-nav-links {
-    margin-top: 20px;
-}
-</style>
+        #donation-nav-links {
+            margin-top: 12px;
+        }
+    </style>
+    <%= stylesheet_link_tag 'donations' %>
 <% end %>
 
 <h1 class="grid_16"><%= @current_user.name %></h1>
@@ -116,33 +110,7 @@
 
     <% if @show_donations %>
     <h2>Outstanding donations</h2>
-        <% if @needs_payment_donations.any? %>
-        <% if @needs_sending_donations.any? %><h3>Books to pay for</h3><% end %>
-        <p>Please send a contribution to cover the following books:</p>
-        <%= render @needs_payment_donations %>
-        <%= link_to new_contribution_path do %><div class="send-payment button"></div><% end %>
-        <% end %>
-
-        <% if @needs_sending_donations.any? || @flag_count > 0 %>
-        <% if @needs_payment_donations.any? %><h3>Books to send</h3><% end %>
-        <div class="any-donations">
-            <p>Please send the following books:</p>
-            <%= render @needs_sending_donations %>
-            <%= render "donations/donation_notes" %>
-        </div>
-        <p class="no-donations">None right now.</p>
-        <% if @flag_count > 0 %>
-        <p class="flagged"><%= pluralize @flag_count, 'donation' %> flagged and waiting on student response.</p>
-        <% end %>
-        <% end %>
-
-        <% if @needs_payment_donations.empty? && @needs_sending_donations.empty? && @flag_count == 0 %>
-        <p>None right now.</p>
-        <% end %>
-    <div id="donation-nav-links">
-        <p><%= link_to 'Find students to donate books to', donate_path %></p>
-        <p><%= link_to 'See all your donations', donations_path %></p>
-    </div>
+    <%= render partial: "donations/outstanding_donations", object: @outstanding_donations, locals: {flag_count: @flag_count} %>
     <% end %>
 
     <% if @show_fulfillments %>
@@ -160,16 +128,11 @@
 <div class="clear"></div>
 
 <% content_for :javascript do %>
-<script>
-$(document).ready(function () {
-    $('div.donation').handleAjax(function () {
-        if ($('div.donation:visible').size() === 1) {
-            $('.any-donations').animate({height: 'toggle', opacity: 'toggle'}, {duration: 600});
-            $('.no-donations').animate({height: 'toggle', opacity: 'toggle'}, {duration: 600});
-        } else {
-            $(this).animate({height: 'toggle', opacity: 'toggle'}, {duration: 600});
-        }
-    });
-});
-</script>
+    <%= javascript_include_tag 'donations' %>
+    <script>
+        $(document).ready(function () {
+            var donations = <%= raw @outstanding_donations.to_json %>;
+            initializeDonations(donations);
+        });
+    </script>
 <% end %>

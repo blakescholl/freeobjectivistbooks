@@ -8,11 +8,9 @@ class ProfileController < ApplicationController
     donations = @current_user.donations.active
     @show_donations = donations.any? || @current_user.pledges.any?
 
-    send_books_donations = donations.send_books
-    @needs_sending_donations = send_books_donations.needs_sending
-    @flag_count = send_books_donations.not_sent.flagged.count
-
-    @needs_payment_donations = donations.needs_payment
+    @outstanding_donations = donations.needs_donor_action
+    @flag_count = donations.unpaid.not_sent.flagged.count
+    @any_eligible = @outstanding_donations.any? {|donation| donation.can_send_money?}
 
     @fulfillments = @current_user.fulfillments.needs_sending
     @show_fulfillments = @fulfillments.any? || @current_user.is_volunteer?

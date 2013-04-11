@@ -1,56 +1,34 @@
 <% content_for :title do %>Your Donations<% end %>
 
 <% content_for :stylesheet do %>
-<style>
-.request, .actions {
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
+    <style>
+        .request, .actions {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
 
-.name {
-    margin-bottom: 0;
-}
+        .actions p {
+            padding-left: 3px;
+        }
+    </style>
+    <%= stylesheet_link_tag 'donations' %>
+<% end %>
 
-.notes {
-    margin-top: 12px;
-}
 
-.button, .loading {
-    height: 46px;
-    margin-bottom: 6px;
-    background-position-x: left;
-}
-
-.actions p {
-    padding-left: 3px;
-}
-
-.sent {
-    background-image: url(/assets/sent-button.png);
-}
-</style>
+<% if @any_need_action %>
+    <div class="grid_12 message error">
+      <p class="headline">You have unsent donations.</p>
+      <p class="body">Please <%= link_to "send these books or pay for them", send_donations_path %>.</p>
+    </div>
 <% end %>
 
 <h1 class="grid_16">Your donations</h1>
 
 <div class="grid_12">
-    <% if @donations.any? %>
-    <%= render @donations %>
-    <%= render "donation_notes" %>
-    <% else %>
-    <p>None yet. <%= link_to 'Find students to donate books to', donate_path %></p>
-    <% end %>
+  <% if @donations.any? %>
+      <%= render @donations %>
+  <% else %>
+      <p>None yet. <%= link_to 'Find students to donate books to', donate_path %></p>
+  <% end %>
 </div>
 <div class="clear"></div>
-
-<% content_for :javascript do %>
-<script>
-$(document).ready(function () {
-    $('div.donation').handleAjax(function () {
-        $(this).find('form').before('<p class="status">Book sent</p>');
-        $(this).find('form').fadeAndSlide();
-        $(this).find('.not-sent').fadeAndSlide();
-    });
-});
-</script>
-<% end %>

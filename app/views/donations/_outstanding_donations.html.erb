@@ -1,0 +1,29 @@
+<div class="any-donations">
+  <%= render partial: "donations/donation_with_actions", collection: outstanding_donations %>
+
+  <div id="payment-button-row">
+    <div class="grid_7 alpha">&nbsp;</div>
+    <%= form_tag new_contribution_path, id: "payment-form" do %>
+        <div id="payment-button" class="grid_3 button pay-for-all"></div>
+    <% end %>
+    <span class="grid_1 money book_price" id="donations-total"></span>
+    <div class="clear"></div>
+  </div>
+
+  <%= render "requests/spacer" %>
+  <div class="notes">
+    <p>If ordering online to ship directly to the student, you may need to put in a phone number. We don't collect
+      student's phone numbers right now; it's best to enter your own number.
+    </p>
+  </div>
+</div>
+
+<p class="no-donations">None right now.</p>
+
+<% if flag_count > 0 %>
+    <p class="flagged"><%= pluralize flag_count, 'donation' %> flagged and waiting on student response.</p>
+<% end %>
+
+<p class="no-donations"><%= link_to 'Find students to donate books to', donate_path %></p>
+
+<p><%= link_to 'See all your donations', donations_path %></p>

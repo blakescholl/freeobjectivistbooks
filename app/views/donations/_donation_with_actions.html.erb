@@ -1,0 +1,52 @@
+<% donation = donation_with_actions %>
+<div class="donation" id="donation-<%= donation.id %>">
+
+  <div class="summary">
+    <div class="grid_6 alpha request">
+      <p class="headline">
+        <%= link_to donation.request do %><%= title donation.book %> to <%= donation.student.name %><% end %>
+      </p>
+    </div>
+    <div class="grid_6 omega buttons">
+      <% if donation.sent? %>
+          <p class="request status"><%= status_headline donation.request %></p>
+      <% elsif donation.needs_fix? %>
+          <p class="request flagged">
+            <% if donation.address.present? %>
+                Shipping info flagged
+            <% else %>
+                Student has been contacted to add address
+            <% end %>
+          </p>
+      <% elsif donation.paid? %>
+          <p class="request status">Paid</p>
+      <% else %>
+          <% if donation.can_send_money? %>
+              <div class="alpha grid_2 button send"></div>
+              <div class="grid_2 button pay"></div>
+              <span class="grid_1 money book_price"><%= humanized_money_with_symbol donation.price %></span>
+              <div class="grid_1 omega checkmark"><%= image_tag 'checkmark.png' %></div>
+          <% else %>
+              <div class="alpha grid_2 omega button send"></div>
+          <% end %>
+      <% end %>
+    </div>
+  </div>
+  <div class="clear"></div>
+
+  <% if !donation.flagged? && !donation.sent? && !donation.paid? %>
+      <div class="shipping">
+        <div class="grid_6 alpha request">
+          <p class="headline">Ship to:</p>
+          <p class="name"><%= donation.student %></p>
+          <p class="address"><%= format_address donation.address %></p>
+        </div>
+        <div class="grid_6 omega actions">
+          <%= render donation.request.actions_for @current_user, only: [:amazon_link, :flag], context: :list %>
+          <p><%= link_to "Close", 'javascript:void(0);', class: "close_link" %></p>
+        </div>
+      </div>
+      <div class="clear"></div>
+  <% end %>
+</div>
+<div class="clear"></div>

@@ -41,11 +41,14 @@ class DonationsController < ApplicationController
 
   def index
     @donations = @current_user.donations.active
+    @any_need_action = @donations.needs_donor_action.any?
   end
 
-  def pay
-    @donations = @current_user.donations.needs_payment
-    @total = @donations.map {|donation| donation.price}.sum
+  def outstanding
+    donations = @current_user.donations.active
+    @outstanding_donations = donations.needs_donor_action
+    @flag_count = donations.unpaid.not_sent.flagged.count
+    @any_eligible = @outstanding_donations.any? {|donation| donation.can_send_money?}
   end
 
   def create

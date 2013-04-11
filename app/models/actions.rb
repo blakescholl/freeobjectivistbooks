@@ -10,6 +10,7 @@ class Actions
     @request = request
     @donation = request.donation
     @context = options[:context]
+    @only = options[:only]
   end
 
   def for_student?
@@ -124,7 +125,12 @@ class Actions
   end
 
   def other_actions
-    relevant_actions.select {|action| available? action}
+    actions = relevant_actions.select {|action| available? action}
+    if @only
+      only = Array(@only).flatten
+      actions = actions.select {|action| action.in? only}
+    end
+    actions
   end
 
   def any?

@@ -1,0 +1,19 @@
+.donation .summary {
+    height: 48px;
+}
+
+.book_price {
+    font-size: 1.4em;
+}
+
+.donation .shipping, .donation .summary .checkmark {
+    display: none;
+}
+
+.button.pay-for-selected, .button.pay-for-all {
+    background-position-x: right;
+}
+
+#payment-button-row {
+    margin-top: 20px;
+}

@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
+  # Create
+
   def params(*donations)
     ids = Array(donations).flatten.map {|d| d.id}
     {donation_ids: ids}
@@ -72,5 +74,83 @@ class OrdersControllerTest < ActionController::TestCase
     verify_wrong_login_page
 
     verify_order nil, donations
+  end
+
+  # Show
+
+  test "show" do
+    user = create :donor
+    donations = create_list :donation, 2, user: user
+    order = Order.create user: user, donations: donations
+
+    get :show, {id: order.id}, session_for(user)
+    assert_response :success
+
+    assert_select 'h1', "Make a payment"
+
+    assert_select '.donation', 2 do
+      assert_select 'a', /Book \d+ to Student \d+ in Anytown, USA/
+      assert_select '.money', "$10"
+    end
+
+    assert_select '#total' do
+      assert_select 'span', /total/i
+      assert_select '.money', "$20"
+    end
+
+    assert_select '#balance', false
+    assert_select '#contribution', false
+
+    assert_select 'form[action*="amazon.com"]'
+    assert_select 'form[action^="/orders"]', false
+  end
+
+  test "show with partial balance" do
+    user = create :donor, balance: 2
+    donation = create :donation, user: user
+    order = Order.create user: user, donations: [donation]
+
+    get :show, {id: order.id}, session_for(user)
+    assert_response :success
+
+    assert_select '#total' do
+      assert_select 'span', /total/i
+      assert_select '.money', "$10"
+    end
+
+    assert_select '#balance' do
+      assert_select 'span', /balance/i
+      assert_select '.money', "$2"
+    end
+
+    assert_select '#contribution' do
+      assert_select 'span', /new contribution/i
+      assert_select '.money', "$8"
+    end
+
+    assert_select 'form[action*="amazon.com"]'
+    assert_select 'form[action^="/orders"]', false
+  end
+
+  test "show with full balance" do
+    user = create :donor, balance: 10
+    donation = create :donation, user: user
+    order = Order.create user: user, donations: [donation]
+
+    get :show, {id: order.id}, session_for(user)
+    assert_response :success
+
+    assert_select '#total' do
+      assert_select 'span', /total/i
+      assert_select '.money', "$10"
+    end
+
+    assert_select '#balance', false
+    assert_select '#contribution', false
+
+    assert_select 'p', /existing balance/
+
+    assert_select 'form[action^="/orders"]'
+    assert_select 'form[action*="amazon.com"]', false
   end
 end

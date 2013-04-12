@@ -281,11 +281,13 @@ a:active {
 
 .button.pay-for-all {
     height: 36px;
+    min-width: 140px;
     background-image: url(/assets/pay-for-all-button.png);
 }
 
 .button.pay-for-selected {
     height: 36px;
+    min-width: 140px;
     background-image: url(/assets/pay-for-selected-button.png);
 }
 

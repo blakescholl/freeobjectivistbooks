@@ -33,7 +33,9 @@ FreeBooks::Application.routes.draw do
     resource :fulfillment, only: [:create]
   end
 
-  resources :orders, only: [:create, :show]
+  resources :orders, only: [:create, :show] do
+    put "pay", on: :member
+  end
 
   resources :contributions, only: [:new, :create] do
     collection do

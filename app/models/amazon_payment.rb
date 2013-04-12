@@ -4,6 +4,8 @@
 # Relies on aws_access_key and aws_secret_key being set in Rails.application.config. It will hit
 # the live payments environment if aws_payments_live is true; otherwise it will use the sandbox.
 class AmazonPayment
+  extend ActiveModel::Naming
+
   attr_reader :reference_id, :amount, :description
   attr_reader :is_donation_widget, :collect_shipping_address, :process_immediate, :immediate_return, :cobranding_style
   attr_reader :ipn_url, :return_url, :abandon_url

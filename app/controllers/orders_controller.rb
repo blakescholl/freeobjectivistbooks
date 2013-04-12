@@ -19,4 +19,12 @@ class OrdersController < ApplicationController
     @order = Order.create! user: @current_user, donations: @donations
     redirect_to @order
   end
+
+  def show
+    @amazon_payment = AmazonPayment.new @order.payment_options.merge(
+        ipn_url: contributions_url,
+        return_url: order_url(@order),
+        abandon_url: order_url(@order, abandoned: true),
+    )
+  end
 end

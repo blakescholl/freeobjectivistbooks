@@ -183,6 +183,15 @@ class Request
     reload
     donation
   end
+
+  def cancel!
+    params = {event: {message: "Don't want it"}}
+    event = cancel params
+    save!
+    donation.save! if donation
+    event.save! if event
+    event
+  end
 end
 
 class Donation

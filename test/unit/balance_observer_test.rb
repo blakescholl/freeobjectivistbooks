@@ -1,67 +1,50 @@
 require 'test_helper'
 
 class BalanceObserverTest < ActiveSupport::TestCase
+  def setup
+    super
+    @user = create :donor, balance: 10
+  end
+
   def build_contribution
-    @contribution = @cameron.contributions.build amount_cents: 5000
+    @contribution = @user.contributions.build amount_cents: 5000
   end
 
   def create_contribution
     build_contribution
     @contribution.save!
-    @cameron.reload
+    @user.reload
   end
 
   test "balance increased when contribution created" do
     build_contribution
-    assert_difference "@cameron.balance", @contribution.amount do
+    assert_difference "@user.balance", @contribution.amount do
       @contribution.save!
-      @cameron.reload
+      @user.reload
     end
   end
 
   test "balance decreased when contribution deleted" do
     create_contribution
-    assert_difference "@cameron.balance", -@contribution.amount do
+    assert_difference "@user.balance", -@contribution.amount do
       @contribution.destroy
-      @cameron.reload
+      @user.reload
     end
   end
 
-  test "new donation paid for if balance covers it" do
-    donation = nil
-    assert_difference "@cameron.balance", -@atlas.price do
-      donation = @howard_request.grant! @cameron
-      @cameron.reload
+  test "balance increased when paid-for donation is canceled" do
+    donation = create :donation, :paid, user: @user
+    assert_difference "@user.balance", donation.price do
+      donation.request.cancel!
+      @user.reload
     end
-
-    assert donation.paid?
   end
 
-  test "new donation not paid for if price exceeds balance" do
-    @atlas.price = @cameron.balance + 25.to_money
-    @atlas.save!
-
-    donation = nil
-    assert_difference "@cameron.balance", 0.to_money do
-      donation = @howard_request.grant! @cameron
-      @cameron.reload
+  test "balance unchanged when unpaid donation is canceled" do
+    donation = create :donation, user: @user
+    assert_difference "@user.balance", Money.parse(0) do
+      donation.cancel! @user
+      @user.reload
     end
-
-    assert !donation.paid?
-  end
-
-  test "new contribution pays for outstanding donations" do
-    @atlas.price = @cameron.balance + 25.to_money
-    @atlas.save!
-    donation = @howard_request.grant! @cameron
-
-    build_contribution
-    assert_difference "@cameron.balance", (@contribution.amount - donation.price) do
-      @contribution.save!
-      @cameron.reload
-    end
-
-    donation.reload
-    assert donation.paid?
   end
 end

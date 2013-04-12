@@ -3,22 +3,18 @@ class CreateOrders < ActiveRecord::Migration
     create_table :orders do |t|
       t.references :user
       t.string :description
-      t.integer :subtotal_cents
-      t.integer :balance_applied_cents
       t.integer :total_cents
+      t.integer :balance_applied_cents
+      t.integer :new_contribution_cents
 
       t.timestamps
     end
     add_index :orders, :user_id
 
-    change_table :donations do |t|
-      t.references :order
-    end
+    add_column :donations, :order_id, :integer
     add_index :donations, :order_id
 
-    change_table :contributions do |t|
-      t.references :order
-    end
+    add_column :contributions, :order_id, :integer
     add_index :contributions, :order_id
   end
 end

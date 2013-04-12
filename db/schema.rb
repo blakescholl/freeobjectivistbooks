@@ -140,9 +140,9 @@ ActiveRecord::Schema.define(:version => 20130410225951) do
   create_table "orders", :force => true do |t|
     t.integer  "user_id"
     t.string   "description"
-    t.integer  "subtotal_cents"
-    t.integer  "balance_applied_cents"
     t.integer  "total_cents"
+    t.integer  "balance_applied_cents"
+    t.integer  "new_contribution_cents"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

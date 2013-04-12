@@ -3,7 +3,7 @@
 
   <div id="payment-button-row">
     <div class="grid_7 alpha">&nbsp;</div>
-    <%= form_tag new_contribution_path, id: "payment-form" do %>
+    <%= form_tag orders_path, id: "payment-form" do %>
         <div id="payment-button" class="grid_3 button pay-for-all"></div>
     <% end %>
     <span class="grid_1 money book_price" id="donations-total"></span>

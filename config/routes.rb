@@ -33,6 +33,8 @@ FreeBooks::Application.routes.draw do
     resource :fulfillment, only: [:create]
   end
 
+  resources :orders, only: [:create, :show]
+
   resources :contributions, only: [:new, :create] do
     collection do
       get "thankyou"

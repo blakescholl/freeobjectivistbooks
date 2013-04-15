@@ -6,12 +6,13 @@ class BalanceObserverTest < ActiveSupport::TestCase
     @user = create :donor, balance: 10
   end
 
-  def build_contribution
-    @contribution = @user.contributions.build amount_cents: 5000
+  def build_contribution(amount = nil)
+    amount ||= 50
+    @contribution = @user.contributions.build amount_cents: amount.to_money.cents
   end
 
-  def create_contribution
-    build_contribution
+  def create_contribution(amount = nil)
+    build_contribution amount
     @contribution.save!
     @user.reload
   end
@@ -22,6 +23,15 @@ class BalanceObserverTest < ActiveSupport::TestCase
       @contribution.save!
       @user.reload
     end
+  end
+
+  test "associated order paid for when contribution created" do
+    donations = create_list :donation, 2, user: @user
+    order = Order.create user: @user, donations: donations
+    contribution = build_contribution 10
+    order.contributions << contribution
+    order.reload
+    assert order.paid?, "order is not paid"
   end
 
   test "balance decreased when contribution deleted" do

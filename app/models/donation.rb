@@ -35,9 +35,14 @@ class Donation < ActiveRecord::Base
   validates_inclusion_of :donor_mode, in: User::DONOR_MODES
   validates_uniqueness_of :request_id, scope: :canceled, if: :active?, message: "has already been granted", on: :create
   validate :donor_cannot_be_requester, on: :create
+  validate :order_belongs_to_user, if: :order
 
   def donor_cannot_be_requester
     errors.add :base, "You can't donate to yourself!" if donor == student
+  end
+
+  def order_belongs_to_user
+    errors.add :order, "doesn't belong to this user" if order.user != user
   end
 
   #--
@@ -268,7 +273,7 @@ class Donation < ActiveRecord::Base
   #++
 
   def pay_if_covered
-    return unless donor_mode.send_money? && price.present?
+    return unless can_send_money? && price.present?
     return if paid?
     self.paid = user.decrement_balance_if_covered! price
     save!

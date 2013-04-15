@@ -16,6 +16,14 @@ class BalanceObserver < ActiveRecord::Observer
     end
   end
 
+  def after_save(object)
+    case object.class.name
+    when "Contribution"
+      contribution = object
+      contribution.order.pay! if contribution.order
+    end
+  end
+
   def after_update(object)
     case object.class.name
     when "Donation"

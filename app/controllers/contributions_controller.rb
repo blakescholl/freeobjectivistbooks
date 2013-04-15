@@ -5,6 +5,11 @@ class ContributionsController < ApplicationController
   before_filter :require_login, except: :create
   before_filter :verify_signature, only: :create
 
+  def load_models
+    super
+    @order = Order.find params[:order_id] if params[:order_id]
+  end
+
   def verify_signature
     signature_params = params.subhash_without('controller', 'action')
     @signature = AmazonSignature.new signature_params, request.url
@@ -46,8 +51,21 @@ class ContributionsController < ApplicationController
     @amazon_payment = new_payment amount: @amount, reference_id: @current_user.id, description: "test", is_live: false
   end
 
+  def create_contribution
+    return if @signature.sandbox?
+
+    contribution = Contribution.find_or_initialize_from_amazon_ipn params
+    return if !contribution
+
+    if @order
+      @order.contributions << contribution
+    else
+      contribution.save!
+    end
+  end
+
   def create
-    Contribution.create_from_amazon_ipn params unless @signature.sandbox?
+    create_contribution
     render nothing: true
   end
 

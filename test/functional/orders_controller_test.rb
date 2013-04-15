@@ -29,24 +29,6 @@ class OrdersControllerTest < ActionController::TestCase
     assert_equal user, order.user
   end
 
-  test "create requires donations" do
-    user = create :donor
-
-    post :create, params([]), session_for(user)
-    assert_response 500
-  end
-
-  test "create requires eligible donations" do
-    user = create :donor
-    eligible = create :donation, user: user
-    ineligible = create :donation_for_request_not_amazon, user: user
-
-    post :create, params(eligible, ineligible), session_for(user)
-    assert_response 500
-
-    verify_order nil, eligible, ineligible
-  end
-
   test "create requires login" do
     donation = create :donation
 
@@ -78,6 +60,16 @@ class OrdersControllerTest < ActionController::TestCase
 
   # Show
 
+  def verify_payment_footer(which)
+    assert_select '#payment' do
+      assert_select 'form', (which.in? [:amazon, :balance])
+      assert_select 'form[action*="amazon.com"]', (which == :amazon)
+      assert_select '.summary', text: /existing balance/, count: (which == :balance ? 1 : 0)
+      assert_select 'form[action^="/orders"]', (which == :balance)
+      assert_select '.summary', text: /books have been paid for/, count: (which == :paid ? 1 : 0)
+    end
+  end
+
   test "show" do
     user = create :donor
     donations = create_list :donation, 2, user: user
@@ -86,7 +78,7 @@ class OrdersControllerTest < ActionController::TestCase
     get :show, {id: order.id}, session_for(user)
     assert_response :success
 
-    assert_select 'h1', "Make a payment"
+    assert_select 'h1', "Your donations"
 
     assert_select '.donation', 2 do
       assert_select 'a', /Book \d+ to Student \d+ in Anytown, USA/
@@ -101,8 +93,7 @@ class OrdersControllerTest < ActionController::TestCase
     assert_select '#balance', false
     assert_select '#contribution', false
 
-    assert_select 'form[action*="amazon.com"]'
-    assert_select 'form[action^="/orders"]', false
+    verify_payment_footer :amazon
   end
 
   test "show with partial balance" do
@@ -128,8 +119,7 @@ class OrdersControllerTest < ActionController::TestCase
       assert_select '.money', "$8"
     end
 
-    assert_select 'form[action*="amazon.com"]'
-    assert_select 'form[action^="/orders"]', false
+    verify_payment_footer :amazon
   end
 
   test "show with full balance" do
@@ -148,9 +138,110 @@ class OrdersControllerTest < ActionController::TestCase
     assert_select '#balance', false
     assert_select '#contribution', false
 
-    assert_select 'p', /existing balance/
+    verify_payment_footer :balance
+  end
 
-    assert_select 'form[action^="/orders"]'
-    assert_select 'form[action*="amazon.com"]', false
+  test "show paid" do
+    user = create :donor
+    donations = create_list :donation, 2, :paid, user: user
+    order = Order.create user: user, donations: donations
+
+    get :show, {id: order.id}, session_for(user)
+    assert_response :success
+
+    assert_select '.donation', 2 do
+      assert_select 'a', /Book \d+ to Student \d+ in Anytown, USA/
+      assert_select '.money', "$10"
+    end
+
+    assert_select '#total' do
+      assert_select 'span', /total/i
+      assert_select '.money', "$20"
+    end
+
+    assert_select '#balance', false
+    assert_select '#contribution', false
+
+    verify_payment_footer :paid
+  end
+
+  def amazon_params(user, amount, status = 'PS')
+    {
+        'status' => status,
+        'transactionId' => "17O7NM3S2524Z32Q53J7KRD8R4JLQQ2ZQGV",
+        'referenceId' => user.id.to_s,
+        'transactionAmount' => amount.to_money.to_s,
+    }
+  end
+
+  test "show payment return" do
+    user = create :donor
+    donations = create_list :donation, 1, user: user
+    order = user.orders.create donations: donations
+    amazon_params = amazon_params(user, 10)
+    order.contributions << Contribution.find_or_initialize_from_amazon_ipn(amazon_params)
+
+    get :show, amazon_params.merge(id: order.id), session_for(user)
+    assert_response :success
+
+    assert_select '.notice' do
+      assert_select '.headline', /thank/i
+      assert_select '.detail', /received your contribution of \$10/
+    end
+    assert_select '.error', false
+
+    verify_payment_footer :paid
+  end
+
+  test "show payment return before payment has been received" do
+    user = create :donor
+    donations = create_list :donation, 1, user: user
+    order = user.orders.create donations: donations
+    amazon_params = amazon_params(user, 10)
+
+    get :show, amazon_params.merge(id: order.id), session_for(user)
+    assert_response :success
+
+    assert_select '.notice' do
+      assert_select '.headline', /thank/i
+      assert_select '.detail', /being processed/
+    end
+    assert_select '.error', false
+
+    verify_payment_footer :none
+  end
+
+  test "show payment abandon" do
+    user = create :donor
+    donations = create_list :donation, 1, user: user
+    order = user.orders.create donations: donations
+    amazon_params = amazon_params(user, 10, 'A')
+
+    get :show, amazon_params.merge(id: order.id, abandoned: true), session_for(user)
+    assert_response :success
+
+    assert_select '.error' do
+      assert_select '.headline', /canceled/i
+    end
+    assert_select '.false', false
+
+    verify_payment_footer :amazon
+  end
+
+  test "show payment error" do
+    user = create :donor
+    donations = create_list :donation, 1, user: user
+    order = user.orders.create donations: donations
+    amazon_params = amazon_params(user, 10, 'PF')
+
+    get :show, amazon_params.merge(id: order.id), session_for(user)
+    assert_response :success
+
+    assert_select '.error' do
+      assert_select '.headline', /problem/i
+    end
+    assert_select '.false', false
+
+    verify_payment_footer :amazon
   end
 end

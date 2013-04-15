@@ -10,9 +10,13 @@
             font-size: 1.3em;
         }
 
-        .totals {
+        #totals {
             padding-top: 12px;
             font-weight: bold;
+        }
+
+        #payment {
+            padding-top: 20px;
         }
 
         form {
@@ -29,11 +33,38 @@
     </style>
 <% end %>
 
-<h1 class="grid_16">Make a payment</h1>
+<% if @is_payment_return %>
+    <div class="grid_12 flash">
+      <% if @payment_success %>
+          <div class="message notice">
+            <p class="headline">Thank you!</p>
+            <p class="detail">
+              <% if @contribution %>
+                  We received your contribution of <%= humanized_money_with_symbol @contribution.amount %>.
+              <% else %>
+                  Your contribution is being processed; refresh this page in a moment to confirm.
+              <% end %>
+            </p>
+          </div>
+      <% else %>
+          <div class="message error">
+            <p class="headline">
+              <% if @abandoned %>
+                  You appear to have canceled your payment.
+              <% else %>
+                  There was a problem with your payment. Try again or
+                    <%= mail_to 'jason@rationalegoist.com', "contact us" %> if you need help.
+              <% end %>
+            </p>
+          </div>
+      <% end %>
+    </div>
+<% end %>
+
+<h1 class="grid_16">Your donations</h1>
 
 <div class="main grid_12">
   <div class="summary">
-    <p>You chose to pay for:</p>
     <% @order.donations.each do |donation| %>
         <div class="donation">
           <span class="grid_8 alpha">
@@ -41,40 +72,64 @@
                 <%= title donation.book %> to <%= donation.student %> in <%= donation.student.location %>
             <% end %>
           </span>
-          <span class="grid_1 money"><%= humanized_money_with_symbol donation.price %></span>
+          <% if donation.can_send_money? %>
+              <span class="grid_1 money">
+                <% if !@order.paid? && donation.paid? %>
+                    PAID
+                <% else %>
+                    <%= humanized_money_with_symbol donation.price %>
+                <% end %>
+              </span>
+          <% else %>
+              <span class="grid_1 warning">Not eligible</span>
+          <% end %>
           <div class="clear"></div>
         </div>
     <% end %>
 
-    <div class="totals">
-      <div id="total">
-        <span class="grid_8 alpha">Total</span>
-        <span class="grid_1 money"><%= humanized_money_with_symbol @order.total %></span>
-        <div class="clear"></div>
-      </div>
-      <% if @order.balance_to_be_applied != 0 && @order.new_contribution_needed != 0 %>
-          <div id="balance">
-            <span class="grid_8 alpha">Your previous balance</span>
-            <span class="grid_1 money"><%= humanized_money_with_symbol @order.balance_to_be_applied %></span>
-            <div class="clear"></div>
-          </div>
-          <div id="contribution">
-            <span class="grid_8 alpha">New contribution needed</span>
-            <span class="grid_1 money"><%= humanized_money_with_symbol @order.new_contribution_needed %></span>
+    <div id="totals">
+      <% if @order.paid? %>
+          <div id="total">
+            <span class="grid_8 alpha">Total</span>
+            <span class="grid_1 money"><%= humanized_money_with_symbol @order.total %></span>
             <div class="clear"></div>
           </div>
       <% else %>
+          <div id="total">
+            <span class="grid_8 alpha">Total</span>
+            <span class="grid_1 money"><%= humanized_money_with_symbol @order.unpaid_total %></span>
+            <div class="clear"></div>
+          </div>
+          <% if @order.balance != 0 && @order.contribution != 0 %>
+              <div id="balance">
+                <span class="grid_8 alpha">Your previous balance</span>
+                <span class="grid_1 money"><%= humanized_money_with_symbol @order.balance %></span>
+                <div class="clear"></div>
+              </div>
+              <div id="contribution">
+                <span class="grid_8 alpha">New contribution needed</span>
+                <span class="grid_1 money"><%= humanized_money_with_symbol @order.contribution %></span>
+                <div class="clear"></div>
+              </div>
+          <% else %>
+          <% end %>
       <% end %>
     </div>
   </div>
 
-  <% if @order.new_contribution_needed > 0 %>
-      <%= render @amazon_payment %>
-  <% else %>
-      <p class="summary">These donations are covered by your existing balance. No new contribution is needed.</p>
-      <%= form_for @order, url: pay_order_path(@order) do |f| %>
-          <%= f.submit "", class: "button pay-for-all" %>
-      <% end %>
-  <% end %>
+  <div id="payment">
+    <% if @order.paid? %>
+        <p class="summary">All these books have been paid for, thanks! A volunteer will send them soon.</p>
+    <% elsif !@payment_success %>
+        <% if @order.needs_contribution? %>
+            <%= render @amazon_payment %>
+        <% else %>
+            <p class="summary">These donations are covered by your existing balance. No new contribution is needed.</p>
+            <%= form_for @order, url: pay_order_path(@order) do |f| %>
+                <%= f.submit "", class: "button pay-for-all" %>
+            <% end %>
+        <% end %>
+    <% end %>
+  </div>
 </div>
 <div class="clear"></div>

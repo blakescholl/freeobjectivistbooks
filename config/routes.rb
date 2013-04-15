@@ -35,6 +35,7 @@ FreeBooks::Application.routes.draw do
 
   resources :orders, only: [:create, :show] do
     put "pay", on: :member
+    resources :contributions, only: [:create]
   end
 
   resources :contributions, only: [:new, :create] do

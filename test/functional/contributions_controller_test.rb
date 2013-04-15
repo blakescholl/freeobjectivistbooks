@@ -98,6 +98,26 @@ class ContributionsControllerTest < ActionController::TestCase
     assert_equal Money.parse(10), contribution.amount
   end
 
+  test "create for order" do
+    donations = create_list :donation, 1, user: @donor
+    order = Order.create user: @donor, donations: donations
+
+    assert_difference "@donor.balance", Money.parse(0) do
+      post :create, amazon_ipn_params.merge(order_id: order.id)
+      assert_response :success
+      @donor.reload
+    end
+
+    contribution = Contribution.find_by_transaction_id "17J3JCDIN2HZCSKGTCIVOJ1MB81RGOIEV5P"
+    assert_not_nil contribution
+    assert_equal @donor, contribution.user
+    assert_equal order, contribution.order
+    assert_equal Money.parse(10), contribution.amount
+
+    order.reload
+    assert order.paid?, "order is not paid"
+  end
+
   test "create is idempotent" do
     post :create, amazon_ipn_params
     assert_response :success

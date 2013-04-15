@@ -1,5 +1,9 @@
 # Manages Orders.
 class OrdersController < ApplicationController
+  def parse_params
+    @abandoned = params[:abandoned].to_bool
+  end
+
   def load_models
     super
     @donations = Donation.find_all_by_id params[:donation_ids] if params[:donation_ids]
@@ -20,11 +24,21 @@ class OrdersController < ApplicationController
     redirect_to @order
   end
 
-  def show
-    @amazon_payment = AmazonPayment.new @order.payment_options.merge(
-        ipn_url: contributions_url,
-        return_url: order_url(@order),
-        abandon_url: order_url(@order, abandoned: true),
+  def new_amazon_payment(order)
+    AmazonPayment.new order.payment_options.merge(
+        ipn_url: order_contributions_url(order),
+        return_url: order_url(order),
+        abandon_url: order_url(order, abandoned: true)
     )
+  end
+
+  def show
+    if params['status'] && params['referenceId']
+      @is_payment_return = true
+      @payment_success = AmazonPayment.success_status?(params['status'])
+      @contribution = Contribution.find_by_transaction_id params['transactionId'] if params['transactionId']
+    end
+
+    @amazon_payment = new_amazon_payment(@order) if !@payment_success && @order.needs_contribution?
   end
 end

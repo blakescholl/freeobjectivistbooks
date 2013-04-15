@@ -7,61 +7,6 @@ class ContributionsControllerTest < ActionController::TestCase
     @donor = create :send_money_donor
   end
 
-  # New
-
-  test "new" do
-    donations = create_list :donation, 2, user: @donor
-
-    get :new, params, session_for(@donor)
-    assert_response :success
-
-    assert_select 'h1', "Your donations"
-    assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA –\s+\$10/, count: 2
-    assert_select 'p', /Total for your donations: \$20/
-    assert_select 'form'
-  end
-
-  test "new with no donations" do
-    get :new, params, session_for(@donor)
-    assert_response :success
-
-    assert_select 'h1', "Your donations"
-    assert_select 'li', false
-    assert_select 'form', false
-    assert_select 'p', /No donations/
-    assert_select 'a', /Find students/
-  end
-
-  test "new with no donations in send-books mode" do
-    donor2 = create :send_books_donor
-
-    get :new, params, session_for(donor2)
-    assert_response :success
-
-    assert_select 'h1', "Your donations"
-    assert_select 'li', false
-    assert_select 'form', false
-    assert_select 'p', /Your account is set up to send books directly/
-  end
-
-  test "new shows warning to Chrome users" do
-    donation = create :donation, user: @donor
-
-    @request.user_agent = user_agent_for :chrome
-    get :new, params, session_for(@donor)
-    assert_response :success
-    assert_select '.error .headline', /Chrome/
-  end
-
-  test "new doesn't show warning to Safari users" do
-    donation = create :donation, user: @donor
-
-    @request.user_agent = user_agent_for :safari
-    get :new, params, session_for(@donor)
-    assert_response :success
-    assert_select '.error .headline', false
-  end
-
   # Create
 
   def amazon_ipn_params
@@ -149,35 +94,6 @@ class ContributionsControllerTest < ActionController::TestCase
     end
 
     assert_nil Contribution.find_by_transaction_id "17J3JCDIN2HZCSKGTCIVOJ1MB81RGOIEV5P"
-  end
-
-  # Thank-you
-
-  test "thankyou" do
-    get :thankyou, amazon_ipn_params, session_for(@donor)
-    assert_response :success
-    assert_select 'h1', "Thank you"
-    assert_select 'p', /Thank you/
-    assert_select 'a', /Find more/
-  end
-
-  test "thankyou for failed payment" do
-    get :thankyou, amazon_ipn_params.merge('status' => "PF"), session_for(@donor)
-    assert_redirected_to action: :new
-  end
-
-  # Cancel
-
-  test "cancel" do
-    donations = create_list :donation, 2, user: @donor
-
-    get :new, {abandoned: true}, session_for(@donor)
-    assert_response :success
-
-    assert_select 'h1', "Your donations"
-    assert_select 'li', 2
-    assert_select 'form'
-    assert_select '.error .headline', /canceled/
   end
 
   # Test

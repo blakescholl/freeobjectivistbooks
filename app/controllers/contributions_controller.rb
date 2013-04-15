@@ -1,7 +1,5 @@
 # Manages creating new Contributions; i.e., paying for donations.
 class ContributionsController < ApplicationController
-  include ActionView::Helpers::TextHelper
-
   before_filter :require_login, except: :create
   before_filter :verify_signature, only: :create
 
@@ -24,31 +22,23 @@ class ContributionsController < ApplicationController
     )
   end
 
-  def new
-    @donations = @current_user.donations.needs_payment
-
-    if @donations.any?
-      @total = @donations.map {|donation| donation.price}.sum
-
-      donation = @donations.first
-      description = "#{donation.book} to #{donation.student} in #{donation.student.location}"
-      rest = @donations.count - 1
-      description += " and " + pluralize(rest, "more book") if rest > 0
-
-      @amazon_payment = new_payment amount: @total, reference_id: @current_user.id, description: description
-
-      if params[:abandoned].to_bool
-        flash.now[:error] = {
-          headline: "Your contribution has been canceled.",
-          detail: "We won't be able to send these books until you make a contribution to cover them."
-        }
-      end
-    end
-  end
-
   def test
     @amount = Money.parse(params[:amount] || 10)
-    @amazon_payment = new_payment amount: @amount, reference_id: @current_user.id, description: "test", is_live: false
+    @amazon_payment = AmazonPayment.new(
+        amount: @amount,
+        reference_id: @current_user.id,
+        description: "#{@amount.format} test",
+        is_live: false,
+        ipn_url: contributions_url,
+        return_url: test_contributions_url,
+        abandon_url: test_contributions_url(abandoned: true),
+    )
+
+    if params[:abandoned].to_bool
+      flash.now[:error] = "Test payment abandoned"
+    elsif AmazonPayment.success_status?(params['status'])
+      flash.now[:notice] = "Payment received: #{params['transactionAmount']}"
+    end
   end
 
   def create_contribution
@@ -67,15 +57,5 @@ class ContributionsController < ApplicationController
   def create
     create_contribution
     render nothing: true
-  end
-
-  def thankyou
-    if !AmazonPayment.success_status?(params['status'])
-      flash[:error] = {
-        headline: "Something went wrong with your payment. Try again?",
-        detail: "We won't be able to send these books until you make a contribution to cover them."
-      }
-      redirect_to action: :new
-    end
   end
 end

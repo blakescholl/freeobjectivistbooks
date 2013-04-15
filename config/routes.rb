@@ -38,12 +38,8 @@ FreeBooks::Application.routes.draw do
     resources :contributions, only: [:create]
   end
 
-  resources :contributions, only: [:new, :create] do
-    collection do
-      get "thankyou"
-      get "cancel" => "contributions#new", defaults: {abandoned: true}
-      get "test"
-    end
+  resources :contributions, only: [:create] do
+    get "test", on: :collection
   end
 
   resources :fulfillments, only: [:index, :show]

@@ -165,6 +165,28 @@ class OrdersControllerTest < ActionController::TestCase
     verify_payment_footer :paid
   end
 
+  test "show gives warning to Chrome users" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    @request.user_agent = user_agent_for :chrome
+    get :show, {id: order.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.error .headline', /Chrome/
+  end
+
+  test "new doesn't show warning to Safari users" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    @request.user_agent = user_agent_for :safari
+    get :show, {id: order.id}, session_for(donation.user)
+    assert_response :success
+    assert_select '.error .headline', false
+  end
+
+  # Payment return
+
   def amazon_params(user, amount, status = 'PS')
     {
         'status' => status,

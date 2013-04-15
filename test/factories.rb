@@ -103,6 +103,7 @@ FactoryGirl.define do
 
     trait(:paid) {paid true}
     trait(:sent) {status 'sent'}
+    trait(:flagged) {flagged true}
   end
 
   factory :fulfillment do

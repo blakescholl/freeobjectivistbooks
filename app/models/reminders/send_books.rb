@@ -2,11 +2,11 @@
 # confirmed that they have done so.
 class Reminders::SendBooks < Reminder
   def self.new_for_entity(user)
-    new user: user, donations: user.donations.needs_sending
+    new user: user, donations: user.donations.needs_donor_action
   end
 
   def self.all_key_entities
-    User.donors_with_unsent_books
+    User.donors_with_outstanding_donations
   end
 
   def key_entity

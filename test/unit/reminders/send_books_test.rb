@@ -2,6 +2,11 @@ require 'test_helper'
 
 class Reminders::SendBooksTest < ActiveSupport::TestCase
   test "all reminders" do
+    donation = create :donation
+    paid_donation = create :donation, :paid
+    sent_donation = create :donation, :sent
+    flagged_donation = create :donation, :flagged
+
     reminders = Reminders::SendBooks.all_reminders
     assert reminders.any?
 
@@ -9,10 +14,15 @@ class Reminders::SendBooksTest < ActiveSupport::TestCase
       assert_not_nil reminder.user
       reminder.donations.each do |donation|
         assert_equal reminder.user, donation.user
-        assert donation.donor_mode.send_books?
-        assert donation.needs_sending?
+        assert donation.needs_donor_action?, "donation got a reminder but needs no action"
       end
     end
+
+    all_donations = reminders.map {|r| r.donations}.flatten
+    assert donation.in?(all_donations), "donation not found"
+    assert !paid_donation.in?(all_donations), "paid donation got a reminder"
+    assert !sent_donation.in?(all_donations), "sent donation got a reminder"
+    assert !flagged_donation.in?(all_donations), "flagged donation got a reminder"
   end
 
   def new_reminder

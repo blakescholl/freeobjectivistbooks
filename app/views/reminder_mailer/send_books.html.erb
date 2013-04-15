@@ -14,12 +14,32 @@
 <p>Have you sent these books yet?</p>
 <% end %>
 
-<p>If so, please go to your donations list to confirm, using this link:</p>
+<% if @eligible.any? %>
+    <p>
+      If not, please send <%= @single ? "it" : "them" %> soon! Or if you prefer, we can send
+      <% if @single %>
+          this book
+      <% elsif @eligible.size == 1 %>
+          one of these books
+      <% elsif @all_eligible %>
+          these books
+      <% else %>
+          up to <%= @eligible.size %> of these books
+      <% end %>
+      on your behalf for a contribution of <%= humanized_money_with_symbol @eligible_total %>.
+    </p>
 
-<p><strong><%= link_to 'See your donations and mark them sent', profile_url %></strong></p>
+    <p>You can see all your options and take care of your donations at this link:</p>
+<% else %>
+    <p>
+      If not, please send <%= @single ? "it" : "them" %> soon! You can find your outstanding donations and student
+      addresses at this link:
+    </p>
+<% end %>
 
-<p>That will let us know for our records, and notify the <%= @single ? "student" : "students" %> that the <% if @single %>book is on its<% else %>books are on their<% end %> way.</p>
+<p><strong><%= link_to 'See your outstanding donations', send_donations_url %></strong></p>
 
-<p>If not, please send <%= @single ? "it" : "them" %> soon! And then go to your donations list to confirm using the link above.</p>
-
-<p>If you need to cancel any donation, you can do that from your donations list as well.</p>
+<p>
+  If you've already sent these books, please use that link anyway to confirm. That will let us know for our records, and
+  notify the <%= @single ? "student" : "students" %> that the <% if @single %>book is on its<% else %>books are on their<% end %> way.
+</p>

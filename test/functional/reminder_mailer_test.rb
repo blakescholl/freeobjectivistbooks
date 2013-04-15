@@ -98,95 +98,161 @@ class ReminderMailerTest < ActionMailer::TestCase
   end
 
   test "send books for donor with one outstanding donation" do
-    reminder = Reminders::SendBooks.new_for_entity @hugh
+    donation = create :donation
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::SendBooks.new_for_entity donation.user
 
     mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_equal "Have you sent The Fountainhead to Quentin Daniels yet?", mail.subject
-    assert_equal [@hugh.email], mail.to
+    assert_match /Have you sent Book \d+ to Student \d+ yet?/, mail.subject
+    assert_equal [donation.user.email], mail.to
 
     assert !reminder.new_record?
     assert_equal mail.subject, reminder.subject
 
     assert_select_email do
-      assert_select 'p', /Hi Hugh/
-      assert_select 'p', /said you would donate The Fountainhead to Quentin Daniels in Boston, MA/
-      assert_select 'p', /notify the student that the book is on its way/
-      assert_select 'a', /donations/
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /said you would donate Book \d+ to Student \d+ in Anytown, USA/
       assert_select 'p', /please send it soon/
+      assert_select 'p', /we can send\s+this book\s+on your behalf for a contribution of \$10/
+      assert_select 'p', /take care of your donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the student that the book is on its way/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end
   end
 
   test "send books for donor with multiple outstanding donations" do
-    @dagny_donation.address = "123 Somewhere"
-    @dagny_donation.flagged = false
-    @dagny_donation.save!
+    user = create :donor
+    create_list :donation, 2, user: user
+    ActionMailer::Base.deliveries = []
 
-    reminder = Reminders::SendBooks.new_for_entity @hugh
+    reminder = Reminders::SendBooks.new_for_entity user
 
     mail = ReminderMailer.send_to_target :send_books, reminder
     assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
-    assert_equal [@hugh.email], mail.to
+    assert_equal [user.email], mail.to
 
     assert !reminder.new_record?
     assert_equal mail.subject, reminder.subject
 
     assert_select_email do
-      assert_select 'p', /Hi Hugh/
+      assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate these books/
-      assert_select 'li', minimum: 2
-      assert_select 'li', /Capitalism: The Unknown Ideal to Dagny in Chicago, IL/
-      assert_select 'li', /The Fountainhead to Quentin Daniels in Boston, MA/
-      assert_select 'p', /notify the students that the books are on their way/
-      assert_select 'a', /donations/
+      assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
       assert_select 'p', /please send them soon/
+      assert_select 'p', /we can send\s+these books\s+on your behalf for a contribution of \$20/
+      assert_select 'p', /take care of your donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the students that the books are on their way/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end
   end
 
-  test "send money for donor with one outstanding donation" do
-    donor = create :send_money_donor
-    donation = create :donation, user: donor, created_at: 1.year.ago
+  test "send books for donor with one ineligible outstanding donation" do
+    donation = create :donation_for_request_not_amazon
     ActionMailer::Base.deliveries = []
 
-    reminder = Reminders::SendMoney.new_for_entity donor
+    reminder = Reminders::SendBooks.new_for_entity donation.user
 
-    mail = ReminderMailer.send_to_target :send_money, reminder
-    assert_equal "Please send a contribution of $10 for your donations on Free Objectivist Books", mail.subject
-    assert_equal [donor.email], mail.to
+    mail = ReminderMailer.send_to_target :send_books, reminder
+    assert_match /Have you sent Book \d+ to Student \d+ yet?/, mail.subject
+    assert_equal [donation.user.email], mail.to
 
     assert !reminder.new_record?
     assert_equal mail.subject, reminder.subject
 
     assert_select_email do
-      assert_select 'p', /Hi Donor \d+/
-      assert_select 'p', /contribution from you of \$10/
-      assert_select 'p', /cover sending Book \d+ to Student \d+ in Anytown, USA/
-      assert_select 'a', /pay/i
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /said you would donate Book \d+ to Student \d+ in Anytown, USA/
+      assert_select 'p', /please send it soon/
+      assert_select 'p', text: /on your behalf/, count: 0
+      assert_select 'p', /find your outstanding donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the student that the book is on its way/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end
   end
 
-  test "send money for donor with multiple outstanding donations" do
-    donor = create :send_money_donor
-    donations = create_list :donation, 3, user: donor, created_at: 1.year.ago
+  test "send books for donor with multiple outstanding donations, all ineligible" do
+    user = create :donor
+    create_list :donation_for_request_not_amazon, 2, user: user
     ActionMailer::Base.deliveries = []
 
-    reminder = Reminders::SendMoney.new_for_entity donor
+    reminder = Reminders::SendBooks.new_for_entity user
 
-    mail = ReminderMailer.send_to_target :send_money, reminder
-    assert_equal "Please send a contribution of $30 for your donations on Free Objectivist Books", mail.subject
-    assert_equal [donor.email], mail.to
+    mail = ReminderMailer.send_to_target :send_books, reminder
+    assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
+    assert_equal [user.email], mail.to
 
     assert !reminder.new_record?
     assert_equal mail.subject, reminder.subject
 
     assert_select_email do
-      assert_select 'p', /Hi Donor \d+/
-      assert_select 'p', /contribution from you of \$30/
-      assert_select 'p', /will cover the following books/
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /said you would donate these books/
+      assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
+      assert_select 'p', /please send them soon/
+      assert_select 'p', text: /on your behalf/, count: 0
+      assert_select 'p', /find your outstanding donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the students that the books are on their way/
+      assert_select 'p', /Thanks,\nFree Objectivist Books/
+    end
+  end
+
+  test "send books for donor with multiple outstanding donations, one eligible" do
+    user = create :donor
+    create :donation, user: user
+    create :donation_for_request_not_amazon, user: user
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::SendBooks.new_for_entity user
+
+    mail = ReminderMailer.send_to_target :send_books, reminder
+    assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
+    assert_equal [user.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /said you would donate these books/
+      assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
+      assert_select 'p', /please send them soon/
+      assert_select 'p', /we can send\s+one of these books\s+on your behalf for a contribution of \$10/
+      assert_select 'p', /take care of your donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the students that the books are on their way/
+      assert_select 'p', /Thanks,\nFree Objectivist Books/
+    end
+  end
+
+  test "send books for donor with multiple outstanding donations, multiple but not all eligible" do
+    user = create :donor
+    create_list :donation, 2, user: user
+    create :donation_for_request_not_amazon, user: user
+    ActionMailer::Base.deliveries = []
+
+    reminder = Reminders::SendBooks.new_for_entity user
+
+    mail = ReminderMailer.send_to_target :send_books, reminder
+    assert_equal "Have you sent your 3 Objectivist books to students yet?", mail.subject
+    assert_equal [user.email], mail.to
+
+    assert !reminder.new_record?
+    assert_equal mail.subject, reminder.subject
+
+    assert_select_email do
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /said you would donate these books/
       assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 3
-      assert_select 'a', /pay/i
+      assert_select 'p', /please send them soon/
+      assert_select 'p', /we can send\s+up to 2 of these books\s+on your behalf for a contribution of \$20/
+      assert_select 'p', /take care of your donations/
+      assert_select 'a', /outstanding donations/
+      assert_select 'p', /notify the students that the books are on their way/
       assert_select 'p', /Thanks,\nFree Objectivist Books/
     end
   end

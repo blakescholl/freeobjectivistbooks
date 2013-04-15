@@ -95,13 +95,8 @@ class User < ActiveRecord::Base
     return user if user && user.authenticate(password)
   end
 
-  def self.donors_with_unsent_books
-    donations = Donation.send_books.needs_sending
-    donations.map {|donation| donation.user}.uniq
-  end
-
-  def self.donors_with_unpaid_donations
-    donations = Donation.needs_payment.includes(:user)
+  def self.donors_with_outstanding_donations
+    donations = Donation.needs_donor_action
     donations.map {|donation| donation.user}.uniq
   end
 

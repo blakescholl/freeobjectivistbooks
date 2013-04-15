@@ -91,6 +91,16 @@ FreeBooks::Application.routes.draw do
     resources :campaign_targets, only: [:index, :new, :create, :destroy]
   end
 
+  # Workaround for ActiveAdmin problem as per https://github.com/gregbell/active_admin/issues/221
+  namespace :admin2 do
+    resources :users do
+      resources :contributions
+    end
+    resources :orders do
+      resources :contributions
+    end
+  end
+
   # Test
   match "test/noop"
   match "test/exception"

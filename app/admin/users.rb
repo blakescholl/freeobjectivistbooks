@@ -68,12 +68,23 @@ ActiveAdmin.register User do
       end
     end
 
+    if user.orders.any?
+      panel "Orders" do
+        table_for user.orders do
+          column :description
+          column :total
+          column :paid?
+          column(:view) {|order| link_to "View", admin2_order_path(order)}
+        end
+      end
+    end
+
     panel "Contributions" do
       table_for user.contributions do
-        column :created_at do |contribution|
-          link_to I18n.l(contribution.created_at), admin2_contribution_path(contribution)
-        end
+        column :created_at
+        column :order
         column(:amount) {|contribution| contribution.amount.format}
+        column(:view) {|contribution| link_to "View", admin2_contribution_path(contribution)}
       end
       div do
         link_to "Add contribution", new_admin2_user_contribution_path(user), class: "button"

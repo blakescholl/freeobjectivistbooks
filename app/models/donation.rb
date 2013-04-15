@@ -270,18 +270,14 @@ class Donation < ActiveRecord::Base
   def pay_if_covered
     return unless donor_mode.send_money? && price.present?
     return if paid?
-    if user.balance >= price
-      user.balance -= price
-      user.save!
-      self.paid = true
-      save!
-    end
+    self.paid = user.decrement_balance_if_covered! price
+    save!
   end
 
   def unpay
+    return if price.nil?
     return if !paid?
-    user.balance += price
-    user.save!
+    user.increment_balance! price
     self.paid = false
     save!
   end

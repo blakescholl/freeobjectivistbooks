@@ -15,13 +15,11 @@ class Contribution < ActiveRecord::Base
   end
 
   def add_to_user_balance
-    user.balance += amount
-    user.save!
+    user.increment_balance! amount
   end
 
   def subtract_from_user_balance
-    user.balance -= amount
-    user.save!
+    user.decrement_balance! amount
   end
 
   def title

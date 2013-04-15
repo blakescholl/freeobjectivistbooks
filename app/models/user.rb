@@ -186,6 +186,23 @@ class User < ActiveRecord::Base
     end
   end
 
+  def increment_balance!(amount)
+    User.update_counters id, balance_cents: amount.cents
+    reload
+  end
+
+  def decrement_balance!(amount)
+    User.update_counters id, balance_cents: -amount.cents
+    reload
+  end
+
+  def decrement_balance_if_covered!(amount)
+    reload
+    covered = (balance >= amount)
+    decrement_balance! amount if covered
+    covered
+  end
+
   #--
   # Actions
   #++

@@ -73,7 +73,7 @@ class OrdersControllerTest < ActionController::TestCase
   test "show" do
     user = create :donor
     donations = create_list :donation, 2, user: user
-    order = Order.create user: user, donations: donations
+    order = user.orders.create donations: donations
 
     get :show, {id: order.id}, session_for(user)
     assert_response :success
@@ -99,7 +99,7 @@ class OrdersControllerTest < ActionController::TestCase
   test "show with partial balance" do
     user = create :donor, balance: 2
     donation = create :donation, user: user
-    order = Order.create user: user, donations: [donation]
+    order = user.orders.create donations: [donation]
 
     get :show, {id: order.id}, session_for(user)
     assert_response :success
@@ -125,7 +125,7 @@ class OrdersControllerTest < ActionController::TestCase
   test "show with full balance" do
     user = create :donor, balance: 10
     donation = create :donation, user: user
-    order = Order.create user: user, donations: [donation]
+    order = user.orders.create donations: [donation]
 
     get :show, {id: order.id}, session_for(user)
     assert_response :success
@@ -144,7 +144,7 @@ class OrdersControllerTest < ActionController::TestCase
   test "show paid" do
     user = create :donor
     donations = create_list :donation, 2, :paid, user: user
-    order = Order.create user: user, donations: donations
+    order = user.orders.create donations: donations
 
     get :show, {id: order.id}, session_for(user)
     assert_response :success

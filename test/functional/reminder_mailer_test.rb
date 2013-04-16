@@ -1,17 +1,27 @@
 require 'test_helper'
 
 class ReminderMailerTest < ActionMailer::TestCase
-  test "fulfill pledge" do
-    reminder = Reminders::FulfillPledge.new_for_entity @hugh_pledge
+  def verify_reminder(reminder, subject = nil, &block)
+    ActionMailer::Base.deliveries = []
 
-    mail = ReminderMailer.send_to_target :fulfill_pledge, reminder
-    assert_equal "Fulfill your pledge of 5 Objectivist books", mail.subject
-    assert_equal [@hugh.email], mail.to
+    mail = ReminderMailer.send_to_target reminder.class.type_name, reminder
+    case subject
+    when String then assert_equal subject, mail.subject
+    when Regexp then assert_match subject, mail.subject
+    end
+    assert_equal [reminder.user.email], mail.to
 
     assert !reminder.new_record?
     assert_equal mail.subject, reminder.subject
 
-    assert_select_email do
+    assert mail.body.encoded.present?, "mail is blank"
+    assert_select_email &block
+  end
+
+  test "fulfill pledge" do
+    reminder = Reminders::FulfillPledge.new_for_entity @hugh_pledge
+
+    verify_reminder reminder, "Fulfill your pledge of 5 Objectivist books" do
       assert_select 'p', /Hi Hugh/
       assert_select 'p', /Thank you for\s+donating 3 books so far/
       assert_select 'p', /On Jan 15, you pledged to donate 5 books/
@@ -24,14 +34,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "fulfill pledge for donor with no donations" do
     reminder = Reminders::FulfillPledge.new_for_entity @stadler_pledge
 
-    mail = ReminderMailer.send_to_target :fulfill_pledge, reminder
-    assert_equal "Fulfill your pledge of 3 Objectivist books", mail.subject
-    assert_equal [@stadler.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Fulfill your pledge of 3 Objectivist books" do
       assert_select 'p', /Hi Robert/
       assert_select 'p', /Thank you for\s+signing up to donate books/
       assert_select 'p', /On Jan 17, you pledged to donate 3 books/
@@ -45,14 +48,7 @@ class ReminderMailerTest < ActionMailer::TestCase
     request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
-    mail = ReminderMailer.send_to_target :renew_request, reminder
-    assert_match /Do you still want Book \d+\?/, mail.subject
-    assert_equal [request.user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, /Do you still want Book \d+\?/ do
       assert_select 'p', /Hi Student \d+,/
       assert_select 'p', /requested a copy of Book \d+/
       assert_select 'p', /on [A-Z][a-z]+ \d+ \(about 1 month ago\)/
@@ -66,9 +62,7 @@ class ReminderMailerTest < ActionMailer::TestCase
     request = create :request, :autocancelable
     reminder = Reminders::RenewRequest.new_for_entity request
 
-    mail = ReminderMailer.send_to_target :renew_request, reminder
-
-    assert_select_email do
+    verify_reminder reminder do
       assert_select 'p', /hear back from you soon,/
     end
   end
@@ -78,9 +72,7 @@ class ReminderMailerTest < ActionMailer::TestCase
     request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
-    mail = ReminderMailer.send_to_target :renew_request, reminder
-
-    assert_select_email do
+    verify_reminder reminder do
       assert_select 'p', /new donor drive/
     end
   end
@@ -90,27 +82,17 @@ class ReminderMailerTest < ActionMailer::TestCase
     request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request
 
-    mail = ReminderMailer.send_to_target :renew_request, reminder
-
-    assert_select_email do
+    verify_reminder reminder do
       assert_select 'p', text: /new donor drive/, count: 0
     end
   end
 
   test "send books for donor with one outstanding donation" do
     donation = create :donation
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity donation.user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_match /Have you sent Book \d+ to Student \d+ yet?/, mail.subject
-    assert_equal [donation.user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, /Have you sent Book \d+ to Student \d+ yet?/ do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate Book \d+ to Student \d+ in Anytown, USA/
       assert_select 'p', /please send it soon/
@@ -125,18 +107,10 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "send books for donor with multiple outstanding donations" do
     user = create :donor
     create_list :donation, 2, user: user
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
-    assert_equal [user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you sent your 2 Objectivist books to students yet?" do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate these books/
       assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
@@ -151,18 +125,10 @@ class ReminderMailerTest < ActionMailer::TestCase
 
   test "send books for donor with one ineligible outstanding donation" do
     donation = create :donation_for_request_not_amazon
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity donation.user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_match /Have you sent Book \d+ to Student \d+ yet?/, mail.subject
-    assert_equal [donation.user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, /Have you sent Book \d+ to Student \d+ yet?/ do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate Book \d+ to Student \d+ in Anytown, USA/
       assert_select 'p', /please send it soon/
@@ -177,18 +143,10 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "send books for donor with multiple outstanding donations, all ineligible" do
     user = create :donor
     create_list :donation_for_request_not_amazon, 2, user: user
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
-    assert_equal [user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you sent your 2 Objectivist books to students yet?" do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate these books/
       assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
@@ -205,18 +163,10 @@ class ReminderMailerTest < ActionMailer::TestCase
     user = create :donor
     create :donation, user: user
     create :donation_for_request_not_amazon, user: user
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_equal "Have you sent your 2 Objectivist books to students yet?", mail.subject
-    assert_equal [user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you sent your 2 Objectivist books to students yet?" do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate these books/
       assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 2
@@ -233,18 +183,10 @@ class ReminderMailerTest < ActionMailer::TestCase
     user = create :donor
     create_list :donation, 2, user: user
     create :donation_for_request_not_amazon, user: user
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::SendBooks.new_for_entity user
 
-    mail = ReminderMailer.send_to_target :send_books, reminder
-    assert_equal "Have you sent your 3 Objectivist books to students yet?", mail.subject
-    assert_equal [user.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you sent your 3 Objectivist books to students yet?" do
       assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /said you would donate these books/
       assert_select 'li', text: /Book \d+ to Student \d+ in Anytown, USA/, count: 3
@@ -260,14 +202,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "confirm receipt unsent" do
     reminder = Reminders::ConfirmReceiptUnsent.new_for_entity @quentin_donation_unsent
 
-    mail = ReminderMailer.send_to_target :confirm_receipt_unsent, reminder
-    assert_equal "Have you received The Fountainhead yet?", mail.subject
-    assert_equal [@quentin.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you received The Fountainhead yet?" do
       assert_select 'p', /Hi Quentin/
       assert_select 'p', /Have you received The Fountainhead/
       assert_select 'p', /Hugh Akston agreed to send you this book on\s+May 1 \(.* ago\)/
@@ -280,14 +215,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "confirm receipt" do
     reminder = Reminders::ConfirmReceipt.new_for_entity @quentin_donation
 
-    mail = ReminderMailer.send_to_target :confirm_receipt, reminder
-    assert_equal "Have you received The Virtue of Selfishness yet?", mail.subject
-    assert_equal [@quentin.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you received The Virtue of Selfishness yet?" do
       assert_select 'p', /Hi Quentin/
       assert_select 'p', /Have you received The Virtue of Selfishness/
       assert_select 'p', /Hugh Akston has sent you this book \(confirmed on Jan 19\)/
@@ -299,18 +227,10 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "confirm receipt from fulfiller" do
     @frisco_donation.fulfill @kira
     @frisco_donation.send! @kira, (Time.now - 2.weeks)
-    ActionMailer::Base.deliveries = []
 
     reminder = Reminders::ConfirmReceipt.new_for_entity @frisco_donation
 
-    mail = ReminderMailer.send_to_target :confirm_receipt, reminder
-    assert_equal "Have you received Objectivism: The Philosophy of Ayn Rand yet?", mail.subject
-    assert_equal [@frisco.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you received Objectivism: The Philosophy of Ayn Rand yet?" do
       assert_select 'p', /Hi Francisco/
       assert_select 'p', /Have you received Objectivism: The Philosophy of Ayn Rand/
       assert_select 'p', /Kira Argounova has sent you this book/
@@ -322,14 +242,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   test "read books" do
     reminder = Reminders::ReadBooks.new_for_entity @hank_donation_received
 
-    mail = ReminderMailer.send_to_target :read_books, reminder
-    assert_equal "Have you finished reading The Fountainhead?", mail.subject
-    assert_equal [@hank.email], mail.to
-
-    assert !reminder.new_record?
-    assert_equal mail.subject, reminder.subject
-
-    assert_select_email do
+    verify_reminder reminder, "Have you finished reading The Fountainhead?" do
       assert_select 'p', /Hi Hank/
       assert_select 'p', /You received The Fountainhead on Jan 19\s+\((about )?\d+ \w+ ago\)/
       assert_select 'a', /Yes, I have finished reading The Fountainhead/

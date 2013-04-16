@@ -9,7 +9,7 @@ p {
 }
 
 .button {
-    background-image: url(/assets/update-button.png);
+    background-image: url(<%= asset_path 'update-button.png' %>);
 }
 </style>
 <% end %>
@@ -18,7 +18,7 @@ p {
     <p>Click some buttons:</p>
     <% %w{alpha bravo charlie}.each do |item| %>
     <div class="item">
-        <img class="hr grid_12 alpha omega" src="/assets/hr.png">
+        <%= image_tag "hr.png", class: "hr grid_12 alpha omega" %>
         <div class="grid_8 alpha"><p class="headline"><%= item.titleize %></p></div>
         <%= form_tag test_noop_path, remote: true do %>
             <div class="grid_1 loading">&nbsp;</div>

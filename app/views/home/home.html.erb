@@ -22,16 +22,16 @@ h2 {
 
 .main .top {
     height: 18px;
-    background: url(/assets/content-bg-710-top.png);
+    background: url(<%= asset_path 'content-bg-710-top.png' %>);
 }
 
 .main .bottom {
     height: 18px;
-    background: url(/assets/content-bg-710-bottom.png);
+    background: url(<%= asset_path 'content-bg-710-bottom.png' %>);
 }
 
 .main .content {
-    background: url(/assets/content-bg-710-middle.png) repeat-y;
+    background: url(<%= asset_path 'content-bg-710-middle.png' %>) repeat-y;
     padding: 18px 40px;
 }
 
@@ -41,8 +41,8 @@ h2 {
     height: 116px;
 }
 
-.read { background-image: url(/assets/read-button.png); }
-.donate { background-image: url(/assets/donate-button.png); }
+.read { background-image: url(<%= asset_path 'read-button.png' %>); }
+.donate { background-image: url(<%= asset_path 'donate-button.png' %>); }
 </style>
 <% end %>
 
@@ -86,7 +86,7 @@ h2 {
         <h2>What recipients are saying</h2>
 
         <div class="thankyou">
-            <div class="alpha grid_2"><img src="/assets/poojas.png"></div>
+            <div class="alpha grid_2"><%= image_tag "poojas.png" %></div>
             <div class="grid_14 omega">
                 <p class="text">I have been an avid Rand enthusiast, ever since I read Atlas Shrugged at the age of
                     fifteen. It changed my life, and since then, I've pushed myself as never before. ... I am incredibly
@@ -97,10 +97,10 @@ h2 {
             </div>
         </div>
 
-        <img class="hr alpha grid_16 omega" src="/assets/hr.png">
+        <%= image_tag "hr.png", class: "hr alpha grid_16 omega" %>
 
         <div class="thankyou">
-            <div class="alpha grid_2"><img src="/assets/danielk.png"></div>
+            <div class="alpha grid_2"><%= image_tag "danielk.png" %></div>
             <div class="grid_14 omega">
                 <p class="text">I can't describe how great I think it is what you do&mdash;giving away Objectivist books
                     so that people will get to know (more of) Objectivism. ... When I see people like you, doing such

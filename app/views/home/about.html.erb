@@ -30,7 +30,7 @@
     <h2>How it works</h2>
     <p>Students create a simple public profile with their name and school, and say what book they want to
         read. Donors browse a list of students and choose which ones they want to send books to. The donors send the books
-        to the students directly.
+        to the students directly, or they contribute money and have a site volunteer send the books.
     </p>
 
     <h1>FAQ</h1>
@@ -38,9 +38,9 @@
     <h2>General</h2>
 
     <p class="question">Why are people willing to donate these books?</p>
-    <p>The donors are big fans of Ayn Rand and her philosophy. Most of us would say that reading her
+    <p>The donors are big fans of Ayn Rand and her philosophy. Many of us would say that reading her
         works changed our lives. We want to spread her ideas and we're happy to help students discover her work.
-        Read our <%= link_to 'testimonials', testimonials_path %> for quotes from our donors.
+        Read our <%= link_to 'testimonials', donors_testimonials_path %> for quotes from our donors.
     </p>
 
     <p class="question">Who is Ayn Rand? What is “Objectivism”?</p>
@@ -51,8 +51,7 @@
     </p>
 
     <p class="question">Do you send books outside the US?</p>
-    <p>Yes! Our donors have sent books to students in Australia, Bolivia, Canada, Finland, Guatemala, Iceland, Israel,
-        Kenya, Morocco, the Netherlands, New Zealand, Nigeria, Sweden, Tunisia, Turkey, and more.
+    <p>Yes! Our donors have sent books to students <%= link_to "from Australia to Zimbabwe", locations_path %>.
     </p>
 
     <p class="question">Who is behind this?</p>
@@ -73,6 +72,14 @@
         <%= link_to signup_read_url, signup_read_url %>
     </p>
 
+    <p class="question">What if no one grants my book request?</p>
+    <p>We get a lot of requests for books, and sometimes we can't get enough donations to grant them all. (We try to
+        find a donor for every request, but no guarantees.)
+    </p>
+    <p>If we haven't found a donor for you after a month, you'll have a chance to renew your request and put it back at
+        the top of the list for donors to find. You can do this once a month.
+    </p>
+
     <p class="question">My donor sent the book a while ago, but I haven't received it. What do I do?</p>
     <p>Send your donor a message through the site and ask them for an update or a tracking number. If they don't
         respond or if you still don't get your book, contact me at
@@ -89,17 +96,26 @@
         pack boxes or visit the post office.
     </p>
 
-    <p class="question">Can I just give money?</p>
-    <p>The best way to contribute is to send books directly to students. If you aren't willing to do that,
-        but still want to help, we may be able to use a cash contribution: contact me at
-        <%= mail_to 'jason@rationalegoist.com', 'jason@rationalegoist.com' %>. (We have not yet been recognized as a
-        501(c)(3) public charity and cannot guarantee that contributions are tax-deductible.)
+    <p class="question">Even buying online is a hassle. Can I just give money?</p>
+    <p>Yes, for many requests. We have a team of volunteers who will buy books online for you and ship them to the
+        students on your behalf, if you make a contribution to cover it. When browsing student requests, you'll see
+        which ones are eligible for this option and how much they cost.
+    </p>
+    <p>Of course, you always have the option to send the books yourself, as well. You can often get a better price on
+        books this way, and it's currently the only option for students outside the US.
+    </p>
+    <p>(Note that we have not yet been recognized as a 501(c)(3) public charity and cannot guarantee that
+        contributions are tax-deductible.)
     </p>
 
     <p class="question">Why not list requests in the order they are received?</p>
     <p>Requests are listed with the most recent on top to give each student a turn in the most prominent position. If
         a request is immediately appealing to donors, it will be granted right away. Otherwise, it is moved down the
         page to give newer appeals a chance to be seen.
+    </p>
+    <p>After one month, if no one has granted a request, the student can renew it and put it back at the top. They can
+        do this once a month. (If a student neglects to renew a request for two months, we take it off the list. That
+        keeps the list of open requests fresh for donors who are browsing.)
     </p>
 
     <h2>Privacy</h2>

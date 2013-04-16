@@ -41,6 +41,10 @@
             <p class="detail">
               <% if @contribution %>
                   We received your contribution of <%= humanized_money_with_symbol @contribution.amount %>.
+              <% elsif @payment_pending %>
+                  Your contribution has been delayed by Amazon. Please check back in 24 hours to verify that your books have been paid for.
+                  <strong>There is no need to make another contribution for these books.</strong>
+                  <%= mail_to 'jason@rationalegoist.com', "Contact Jason" %> if your books don't show as paid by tomorrow.
               <% else %>
                   Your contribution is being processed; refresh this page in a moment to confirm.
               <% end %>

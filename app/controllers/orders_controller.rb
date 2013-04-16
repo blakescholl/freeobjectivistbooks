@@ -36,6 +36,7 @@ class OrdersController < ApplicationController
     if params['status'] && params['referenceId']
       @is_payment_return = true
       @payment_success = AmazonPayment.success_status?(params['status'])
+      @payment_pending = AmazonPayment.pending_status?(params['status'])
       @contribution = Contribution.find_by_transaction_id params['transactionId'] if params['transactionId']
     end
 

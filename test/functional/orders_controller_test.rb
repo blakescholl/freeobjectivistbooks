@@ -226,7 +226,25 @@ class OrdersControllerTest < ActionController::TestCase
 
     assert_select '.notice' do
       assert_select '.headline', /thank/i
-      assert_select '.detail', /being processed/
+      assert_select '.detail', /in a moment/
+    end
+    assert_select '.error', false
+
+    verify_payment_footer :none
+  end
+
+  test "show payment pending" do
+    user = create :donor
+    donations = create_list :donation, 1, user: user
+    order = user.orders.create donations: donations
+    amazon_params = amazon_params(user, 10, 'PI')
+
+    get :show, amazon_params.merge(id: order.id), session_for(user)
+    assert_response :success
+
+    assert_select '.notice' do
+      assert_select '.headline', /thank/i
+      assert_select '.detail', /tomorrow/
     end
     assert_select '.error', false
 

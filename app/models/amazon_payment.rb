@@ -17,6 +17,11 @@ class AmazonPayment
     status.in? %w{PS PI}
   end
 
+  def self.pending_status?(status)
+    # http://docs.aws.amazon.com/AmazonSimplePay/latest/ASPAdvancedUserGuide/ipn-statuscodes.html
+    status == "PI"
+  end
+
   def initialize(attributes = {})
     @is_donation_widget = 0
     @collect_shipping_address = 0

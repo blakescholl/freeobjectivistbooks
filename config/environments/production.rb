@@ -43,7 +43,7 @@ FreeBooks::Application.configure do
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( *.js application.css homepage.css hover.css active_admin.css active_admin/print.css )
+  config.assets.precompile += %w( *.js application.css homepage.css hover.css active_admin.css active_admin/print.css donations.css )
 
   routes.default_url_options = { host: 'freeobjectivistbooks.org' }
 

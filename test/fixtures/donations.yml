@@ -5,7 +5,6 @@ hugh_grants_quentin_wants_fountainhead:
   user: hugh
   status: not_sent
   created_at: 2012-05-01 16:30:00
-  donor_mode: send_books
 
 cameron_grants_frisco_wants_opar:
   request: frisco_wants_opar
@@ -14,7 +13,6 @@ cameron_grants_frisco_wants_opar:
   created_at: 2012-06-01 16:30:00
   price_cents: 1500
   paid: true
-  donor_mode: send_money
 
 # Flagged
 
@@ -24,14 +22,12 @@ hugh_grants_dagny_wants_cui:
   flagged: true
   thanked: true
   status: not_sent
-  donor_mode: send_books
 
 cameron_grants_hank_wants_atlas:
   request: hank_wants_atlas
   user: cameron
   flagged: true
   status: not_sent
-  donor_mode: send_books
 
 # Sent
 
@@ -39,7 +35,6 @@ hugh_grants_quentin_wants_vos:
   request: quentin_wants_vos
   user: hugh
   status: sent
-  donor_mode: send_books
 
 # Received
 
@@ -47,7 +42,6 @@ cameron_grants_hank_wants_fountainhead:
   request: hank_wants_fountainhead
   user: cameron
   status: received
-  donor_mode: send_books
 
 # Read
 
@@ -56,7 +50,6 @@ cameron_grants_quentin_wants_atlas:
   user: cameron
   status: read
   thanked: true
-  donor_mode: send_books
 
 # Canceled
 
@@ -65,7 +58,6 @@ stadler_grants_quentin_wants_opar:
   user: stadler
   status: not_sent
   canceled: true
-  donor_mode: send_books
 
 stadler_grants_howard_wants_atlas:
   request: howard_wants_atlas
@@ -73,11 +65,9 @@ stadler_grants_howard_wants_atlas:
   status: not_sent
   canceled: true
   created_at: 2012-01-21 00:15:25
-  donor_mode: send_books
 
 hugh_grants_dagny_wants_atlas:
   request: dagny_wants_atlas
   user: hugh
   status: not_sent
   canceled: true
-  donor_mode: send_books

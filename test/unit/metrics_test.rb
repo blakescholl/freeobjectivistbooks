@@ -23,16 +23,13 @@ class MetricsTest < ActiveSupport::TestCase
     assert_equal Request.count, values['Canceled'] + values['Active'], metrics.inspect
   end
 
-  test "donor mode pipelines" do
-    books_metrics = @metrics.send_books_pipeline
-    money_metrics = @metrics.send_money_pipeline
-    books_values = values_for books_metrics
-    money_values = values_for money_metrics
+  test "send money pipeline" do
+    metrics = @metrics.send_money_pipeline
+    values = values_for metrics
 
-    assert_equal Request.granted.count, books_values['Granted'] + money_values['Granted'], "granted total doesn't match"
-    assert_equal money_values['Granted'], money_values['Paid'] + Donation.send_money.unpaid.count, "paid + unpaid != granted"
-    assert_equal money_values['Paid'], money_values['Fulfilled'] + Donation.needs_fulfillment.count, "fulfilled + unfulfilled != paid"
-    assert_equal Donation.sent.count, books_values['Sent'] + money_values['Sent'], "send total doesn't match"
+    assert_equal Request.granted.count, values['Paid'] + Donation.unpaid.count, "paid + unpaid != granted"
+    assert_equal values['Paid'], values['Fulfilled'] + Donation.needs_fulfillment.count, "fulfilled + unfulfilled != paid"
+    assert_equal Donation.fulfilled.count, values['Sent by volunteer'] + Donation.fulfilled.not_sent.count, "sent + not sent != fulfilled"
   end
 
   test "pipeline breakdown" do
@@ -41,13 +38,12 @@ class MetricsTest < ActiveSupport::TestCase
 
     assert_equal Request.active.count, Request.granted.count + values['Open requests'], "granted + open != total: #{values.inspect}"
 
-    donations = Donation.send_books.not_sent
-    assert_equal donations.count, values['Needs sending by donor'] + donations.flagged.count, "needs sending by donor + flagged != not sent: #{values.inspect}"
+    donations = Donation.unpaid.not_sent
+    assert_equal donations.count, values['Needs donor action'] + donations.flagged.count, "needs donor action + flagged != unpaid + unsent: #{values.inspect}"
 
-    donations = Donation.send_money.fulfilled.not_sent
+    donations = Donation.fulfilled.not_sent
     assert_equal donations.count, values['Needs sending by volunteer'] + donations.flagged.count, "needs sending by volunteer + flagged != not sent: #{values.inspect}"
 
-    assert_equal Donation.send_money.count, values['Needs payment'] + Donation.paid.count, "needs payment + paid != payable: #{values.inspect}"
     assert_equal Donation.paid.count, values['Needs fulfillment'] + Donation.fulfilled.count, "needs fulfillment + fulfilled != paid: #{values.inspect}"
     assert_equal Donation.sent.count, values['In transit'] + Donation.received.count, "in transit + received != sent: #{values.inspect}"
   end

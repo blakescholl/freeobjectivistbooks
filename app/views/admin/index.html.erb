@@ -59,19 +59,15 @@ td, th {
     <h2>Request pipeline</h2>
     <%= render partial: "admin/metrics", object: @metrics.request_pipeline %>
 
-    <h2>Send-books sub-pipeline</h2>
-    <%= render partial: "admin/metrics", object: @metrics.send_books_pipeline %>
-
     <h2>Send-money sub-pipeline</h2>
     <%= render partial: "admin/metrics", object: @metrics.send_money_pipeline %>
 
     <h2>Pipeline breakdown</h2>
     <%= render partial: "admin/metrics_table", object: @metrics.pipeline_breakdown.with_links(
             'Open requests' => admin_requests_path(type: :not_granted),
-            'Needs sending by donor' => admin_requests_path(type: :needs_sending_by_donor),
-            'Needs sending by volunteer' => admin_requests_path(type: :needs_sending_by_volunteer),
-            'Needs payment' => admin_requests_path(type: :needs_payment),
+            'Needs donor action' => admin_requests_path(type: :needs_donor_action),
             'Needs fulfillment' => admin_requests_path(type: :needs_fulfillment),
+            'Needs sending by volunteer' => admin_requests_path(type: :needs_sending_by_volunteer),
             'In transit' => admin_requests_path(type: :in_transit),
             'Reading' => admin_requests_path(type: :reading),
         )

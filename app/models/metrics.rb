@@ -11,25 +11,11 @@ class Metrics
     ]
   end
 
-  def send_books_pipeline
-    all_donations = Donation.unscoped.active
-    donations = all_donations.send_books
-
-    calculate_metrics [
-      {name: 'Granted', value: donations.count,      denominator_name: 'Total granted', denominator_value: all_donations.count},
-      {name: 'Sent',    value: donations.sent.count, denominator_name: 'Granted'},
-    ]
-  end
-
   def send_money_pipeline
-    all_donations = Donation.unscoped.active
-    donations = all_donations.send_money
-
     calculate_metrics [
-      {name: 'Granted',   value: donations.count,           denominator_name: 'Total granted', denominator_value: all_donations.count},
-      {name: 'Paid',      value: donations.paid.count,      denominator_name: 'Granted'},
-      {name: 'Fulfilled', value: donations.fulfilled.count, denominator_name: 'Paid'},
-      {name: 'Sent',      value: donations.sent.count,      denominator_name: 'Fulfilled'},
+      {name: 'Paid',              value: Donation.paid.count,           denominator_name: 'Total granted', denominator_value: Donation.active.count},
+      {name: 'Fulfilled',         value: Donation.fulfilled.count,      denominator_name: 'Paid'},
+      {name: 'Sent by volunteer', value: Donation.fulfilled.sent.count, denominator_name: 'Fulfilled'},
     ]
   end
 
@@ -69,10 +55,9 @@ class Metrics
   def pipeline_breakdown
     rows = [
         {name: 'Open requests',              values: breakdown_by_time(Request.not_granted)},
-        {name: 'Needs sending by donor',     values: breakdown_by_time(Donation.send_books.needs_sending, 'donations.created_at')},
-        {name: 'Needs sending by volunteer', values: breakdown_by_time(Donation.send_money.fulfilled.needs_sending, 'donations.created_at')},
-        {name: 'Needs payment',              values: breakdown_by_time(Donation.needs_payment, 'donations.created_at')},
+        {name: 'Needs donor action',         values: breakdown_by_time(Donation.needs_donor_action, 'donations.created_at')},
         {name: 'Needs fulfillment',          values: breakdown_by_time(Donation.needs_fulfillment, 'donations.updated_at')},
+        {name: 'Needs sending by volunteer', values: breakdown_by_time(Donation.fulfilled.needs_sending, 'donations.created_at')},
         {name: 'In transit',                 values: breakdown_by_time(Donation.in_transit, :status_updated_at)},
         {name: 'Reading',                    values: breakdown_by_time(Donation.reading, :status_updated_at)},
     ]

@@ -4,7 +4,7 @@ require 'test_helper'
 
 class ContributionsControllerTest < ActionController::TestCase
   def setup
-    @donor = create :send_money_donor
+    @donor = create :donor
   end
 
   # Create

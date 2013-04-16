@@ -111,12 +111,6 @@ class UserTest < ActiveSupport::TestCase
     assert_nil User.find_by_email("nobody@nowhere.com")
   end
 
-  test "donors with unsent books" do
-    verify_scope User, :donors_with_unsent_books do |user|
-      user.donations.active.any? {|donation| donation.donor_mode.send_books? && donation.needs_sending?}
-    end
-  end
-
   test "search" do
     users = User.search "h"
     assert users.any?
@@ -262,11 +256,6 @@ class UserTest < ActiveSupport::TestCase
   test "can request? true if request canceled" do
     request = create :request, :canceled
     assert request.user.can_request?
-  end
-
-  test "donor mode" do
-    assert @hugh.donor_mode.send_books?, "donor mode is not send_books"
-    assert !@hugh.donor_mode.send_money?, "donor mode is send_money"
   end
 
   test "is volunteer?" do

@@ -16,7 +16,6 @@ class UsersControllerTest < ActionController::TestCase
       location_name: "Atlantis, CO",
       password: "dagny",
       password_confirmation: "dagny",
-      donor_mode: "send_books"
     }
   end
 
@@ -142,32 +141,6 @@ class UsersControllerTest < ActionController::TestCase
     assert_equal "galt@gulch.com", user.email
     assert_equal "Atlantis, CO", user.location.name
     assert user.authenticate "dagny"
-    assert_equal "send_books", user.donor_mode
-
-    assert_equal user.id, session[:user_id]
-
-    pledge = user.pledges.first
-    assert_not_nil pledge
-    assert_equal 5, pledge.quantity
-    assert_equal pledge_reason, pledge.reason
-
-    assert_equal [], user.requests
-  end
-
-  test "create donor in send-money mode" do
-    user = user_attributes
-    user[:donor_mode] = "send_money"
-    pledge = pledge_attributes
-
-    post :create, user: user, pledge: pledge, from_action: "donate"
-    assert_redirected_to donate_url
-
-    user = User.find_by_name "John Galt"
-    assert_not_nil user
-    assert_equal "galt@gulch.com", user.email
-    assert_equal "Atlantis, CO", user.location.name
-    assert user.authenticate "dagny"
-    assert_equal "send_money", user.donor_mode
 
     assert_equal user.id, session[:user_id]
 

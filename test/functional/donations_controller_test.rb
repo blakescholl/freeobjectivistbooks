@@ -186,7 +186,7 @@ class DonationsControllerTest < ActionController::TestCase
 
   test "create" do
     request = create :request
-    donor = create :send_books_donor
+    donor = create :donor
 
     post :create, {request_id: request.id, format: "json"}, session_for(donor)
     assert_response :success
@@ -200,29 +200,7 @@ class DonationsControllerTest < ActionController::TestCase
     assert request.granted?
     donation = request.donation
     assert_equal donor, donation.user
-    assert donation.donor_mode.send_books?
-    assert !donation.flagged?
-
-    verify_event donation, "grant", notified?: true
-  end
-
-  test "create send-money" do
-    request = create :request
-    donor = create :send_money_donor
-
-    post :create, {request_id: request.id, format: "json"}, session_for(donor)
-    assert_response :success
-
-    hash = decode_json_response
-    assert_equal request.book.title, hash['book']['title']
-    assert_equal request.student.name, hash['student']['name']
-    assert_equal request.student.location.name, hash['student']['location']['name']
-
-    request.reload
-    assert request.granted?
-    donation = request.donation
-    assert_equal donor, donation.user
-    assert donation.donor_mode.send_money?
+    assert !donation.paid?
     assert !donation.flagged?
 
     verify_event donation, "grant", notified?: true

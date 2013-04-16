@@ -210,6 +210,25 @@ class DonationTest < ActiveSupport::TestCase
     assert !@dagny_donation.can_flag?    # already flagged
   end
 
+  # Can send money
+
+  test "can send money?" do
+    donation = build :donation
+    assert donation.can_send_money?
+  end
+
+  test "can send money? false if book has no price" do
+    donation = build :donation_for_request_not_amazon
+    assert !donation.can_send_money?
+  end
+
+  test "can send money? false if student is foreign" do
+    donation = build :donation_for_request_foreign_student
+    assert !donation.can_send_money?
+  end
+
+  # Can cancel
+
   test "donor can cancel?" do
     assert @hank_donation.donor_can_cancel?
     assert @quentin_donation.donor_can_cancel?
@@ -239,8 +258,8 @@ class DonationTest < ActiveSupport::TestCase
     assert !@quentin_donation_unsent.student_can_cancel?
   end
 
-  test "student can't cancel send-money donation" do
-    donation = build :donation_with_send_money_donor
+  test "student can't cancel if paid" do
+    donation = build :donation, :paid
     assert !donation.student_can_cancel?
   end
 
@@ -264,22 +283,6 @@ class DonationTest < ActiveSupport::TestCase
     @howard_request.grant! @cameron
     @howard_request.reload
     assert_equal @atlas.price, @howard_request.donation.price
-  end
-
-  test "donor mode is send_books if user is send_books" do
-    donation = create :donation_with_send_books_donor
-    assert donation.donor_mode.send_books?
-  end
-
-  test "donor mode is send_money if user is send_money" do
-    donation = create :donation_with_send_money_donor
-    assert donation.donor_mode.send_money?
-  end
-
-  test "donor mode is send_books if donation has no price" do
-    donor = create :send_money_donor
-    donation = create :donation_for_request_not_amazon, user: donor
-    assert donation.donor_mode.send_books?
   end
 
   # Cancel

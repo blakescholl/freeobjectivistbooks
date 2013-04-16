@@ -11,7 +11,7 @@
     <p class="student">Student: <%= admin_user_link request.user %></p>
     <% if request.donation %>
     <p class="donor">Donor: <%= admin_user_link request.donor %> <% if request.thanked? %>&ndash; thanked<% end %></p>
-        <% if request.donation.donor_mode.send_money? %>
+        <% if request.donation.can_send_money? %>
         <p class="fulfiller"><% if request.donation.paid? %>Paid<% else %>Not paid<% end %>
             <% if request.fulfiller %>&ndash; fulfiller: <%= admin_user_link request.fulfiller %><% end %>
         </p>

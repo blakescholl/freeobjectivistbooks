@@ -5,7 +5,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
 
   test "volunteer" do
     user = create :volunteer
-    donation = create :donation_with_send_money_donor, paid: true
+    donation = create :donation, :paid
 
     get :volunteer, params, session_for(user)
     assert_response :success
@@ -22,7 +22,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   test "volunteers index with unsent fulfillments" do
     user = create :volunteer
     fulfillment = create :fulfillment, user: user
-    donation = create :donation_with_send_money_donor, paid: true
+    donation = create :donation, :paid
 
     get :volunteer, params, session_for(user)
     assert_response :success

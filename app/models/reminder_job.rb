@@ -10,7 +10,6 @@ class ReminderJob
     Reminders::FulfillPledge,
     Reminders::RenewRequest,
     Reminders::SendBooks,
-    Reminders::SendMoney,
     Reminders::ConfirmReceiptUnsent,
     Reminders::ConfirmReceipt,
     Reminders::ReadBooks,

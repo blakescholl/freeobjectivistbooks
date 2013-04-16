@@ -2,6 +2,11 @@ FactoryGirl.define do
   factory :location do
     name "Anytown, USA"
     geocoder_results [{'address_components' => [{'long_name' => 'United States', 'types' => ['country']}]}]
+
+    factory :foreign_location do
+      name "Somewhere, UK"
+      geocoder_results [{'address_components' => [{'long_name' => 'United Kingdom', 'types' => ['country']}]}]
+    end
   end
 
   factory :user do
@@ -11,24 +16,19 @@ FactoryGirl.define do
     password "password"
     password_confirmation { password }
 
+    trait(:no_address) {address ""}
+    trait(:foreign) {association :location, factory: :foreign_location}
+
     factory :student do
       sequence(:name) {|n| "Student #{n}"}
       studying "philosophy"
       school "U. of California"
       sequence(:address) {|n| "#{n} Main St\nAnytown, USA"}
-
-      trait(:no_address) {address ""}
     end
 
     factory :donor do
       sequence(:name) {|n| "Donor #{n}"}
       after(:create) {|user| create :pledge, user: user}
-
-      trait(:send_books) {donor_mode "send_books"}
-      trait(:send_money) {donor_mode "send_money"}
-
-      factory :send_books_donor, traits: [:send_books]
-      factory :send_money_donor, traits: [:send_money]
     end
 
     factory :volunteer do
@@ -68,6 +68,10 @@ FactoryGirl.define do
       association :user, factory: [:student, :no_address]
     end
 
+    factory :request_foreign_student do
+      association :user, factory: [:student, :foreign]
+    end
+
     factory :request_not_amazon do
       association :book, factory: [:book, :no_asin, :no_price]
     end
@@ -89,16 +93,12 @@ FactoryGirl.define do
       association :request, factory: :request_no_address
     end
 
+    factory :donation_for_request_foreign_student do
+      association :request, factory: :request_foreign_student
+    end
+
     factory :donation_for_request_not_amazon do
       association :request, factory: :request_not_amazon
-    end
-
-    factory :donation_with_send_books_donor do
-      association :user, factory: :send_books_donor
-    end
-
-    factory :donation_with_send_money_donor do
-      association :user, factory: :send_money_donor
     end
 
     trait(:paid) {paid true}
@@ -108,7 +108,7 @@ FactoryGirl.define do
 
   factory :fulfillment do
     association :user, factory: :volunteer
-    association :donation, :paid, factory: :donation_with_send_money_donor
+    association :donation, :paid, factory: :donation
   end
 
   factory :review do

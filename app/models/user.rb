@@ -8,7 +8,6 @@ class User < ActiveRecord::Base
   include ActiveModel::Validations
 
   AUTH_TOKEN_EXPIRATION = 24.hours
-  DONOR_MODES = %w{send_books send_money}
 
   attr_reader :password
 
@@ -36,7 +35,6 @@ class User < ActiveRecord::Base
 
   validates_presence_of :name, :location, :email
   validates_uniqueness_of :email, case_sensitive: false, message: "There is already an account with this email."
-  validates_inclusion_of :donor_mode, in: DONOR_MODES
 
   validate :name_must_have_proper_format, on: :create, if: lambda {|user| user.name.present? }
   validates :email, email: {message: "is not a valid email address"}, allow_nil: true
@@ -135,10 +133,6 @@ class User < ActiveRecord::Base
     else
       nil
     end
-  end
-
-  def donor_mode
-    ActiveSupport::StringInquirer.new(self[:donor_mode])
   end
 
   def is_duplicate?

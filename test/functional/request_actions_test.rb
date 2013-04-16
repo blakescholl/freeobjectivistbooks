@@ -330,15 +330,8 @@ class RequestActionsTest < ActionController::TestCase
     verify_link 'cancel this donation', present
   end
 
-  test "cancel donation link for send-books donor" do
+  test "cancel donation link for donor" do
     donation = create :donation
-    get :show, {id: donation.request.id}, session_for(donation.user)
-    assert_response :success
-    verify_cancel_donation_link
-  end
-
-  test "cancel donation link for send-money donor" do
-    donation = create :donation_with_send_money_donor
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     verify_cancel_donation_link
@@ -352,7 +345,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no cancel donation link if paid" do
-    donation = create :donation_with_send_money_donor, paid: true
+    donation = create :donation, :paid
     get :show, {id: donation.request.id}, session_for(donation.user)
     assert_response :success
     verify_cancel_donation_link false
@@ -461,8 +454,8 @@ class RequestActionsTest < ActionController::TestCase
     verify_not_received_link false
   end
 
-  test "no not-received link on send-money request" do
-    donation = create :donation_with_send_money_donor, created_at: 30.days.ago
+  test "no not-received link on paid request" do
+    donation = create :donation, :paid, created_at: 30.days.ago
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link false

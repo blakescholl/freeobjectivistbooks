@@ -45,10 +45,10 @@ class Admin::RequestsControllerTest < ActionController::TestCase
   end
 
   test "show with fulfiller" do
-    donation = create :donation_with_send_money_donor
+    fulfillment = create :fulfillment
 
     admin_auth
-    get :show, id: donation.request.id
+    get :show, id: fulfillment.request.id
     assert_response :success
     assert_select 'h1', /Student \d+ wants\s+Book \d+/
     assert_select 'h2', /donor found/i

@@ -32,7 +32,6 @@ class Donation < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :address, if: :needs_address?, message: "We need your address to send you your book."
   validates_inclusion_of :status, in: %w{not_sent sent received read}
-  validates_inclusion_of :donor_mode, in: User::DONOR_MODES
   validates_uniqueness_of :request_id, scope: :canceled, if: :active?, message: "has already been granted", on: :create
   validate :donor_cannot_be_requester, on: :create
   validate :order_belongs_to_user, if: :order
@@ -74,12 +73,8 @@ class Donation < ActiveRecord::Base
   scope :reading, active.scoped_by_status("received")
   scope :read, active.scoped_by_status("read")
 
-  scope :send_money, scoped_by_donor_mode('send_money')
-  scope :send_books, scoped_by_donor_mode('send_books')
-
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
-  scope :needs_payment, active.send_money.unpaid
   scope :needs_fulfillment, active.needs_sending.paid.unfulfilled
 
   scope :needs_donor_action, active.unpaid.not_flagged.not_sent
@@ -105,7 +100,6 @@ class Donation < ActiveRecord::Base
 
   before_create do |donation|
     donation.price = donation.book.price
-    donation.donor_mode = request.can_send_money? ? user.donor_mode : 'send_books'
   end
 
   #--
@@ -115,10 +109,6 @@ class Donation < ActiveRecord::Base
   delegate :book, :can_send_money?, to: :request
   delegate :address, :address=, to: :student
   delegate :name, :name=, to: :student, prefix: true
-
-  def donor_mode
-    ActiveSupport::StringInquirer.new(self[:donor_mode])
-  end
 
   # Whether the donation is still active, i.e., not canceled.
   def active?
@@ -218,7 +208,7 @@ class Donation < ActiveRecord::Base
 
   # True if the student is allowed to cancel the donation.
   def student_can_cancel?
-    !sent? && !flagged? && donor_mode.send_books? && Time.since(created_at) >= 3.weeks
+    needs_donor_action? && Time.since(created_at) >= 3.weeks
   end
 
   # True if the given user can cancel the donation.

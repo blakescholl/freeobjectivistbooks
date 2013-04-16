@@ -9,9 +9,7 @@ class Reminders::ConfirmReceiptUnsentTest < ActiveSupport::TestCase
       donation = reminder.donation
       assert_not_nil donation
       assert_equal donation.student, reminder.user
-      assert donation.donor_mode.send_books?
-      assert !donation.sent?
-      assert !donation.flagged?
+      assert donation.needs_donor_action?
     end
   end
 

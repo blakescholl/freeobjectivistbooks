@@ -144,5 +144,9 @@ function initializeDonations(donations) {
         form.submit();
     });
 
+    $('.donate-explanation-link').click(function () {
+        $('.donate-explanation').fadeAndSlide();
+    });
+
     updateTotal();
 }

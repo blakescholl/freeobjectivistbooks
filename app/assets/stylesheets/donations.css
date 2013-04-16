@@ -6,12 +6,20 @@
     font-size: 1.4em;
 }
 
-.donation .shipping, .donation .summary .checkmark {
+.donation .shipping, .donation .summary .checkmark, .donate-explanation {
     display: none;
 }
 
 .button.pay-for-selected, .button.pay-for-all {
     background-position-x: right;
+}
+
+.donate-explanation .button {
+    background-position-x: left;
+}
+
+.donate-explanation .button, .donate-explanation .text {
+	margin-bottom: 12px;
 }
 
 #payment-button-row {

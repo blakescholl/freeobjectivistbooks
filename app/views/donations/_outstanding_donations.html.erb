@@ -1,17 +1,4 @@
 <div class="any-donations">
-  <%= render partial: "donations/donation_with_actions", collection: outstanding_donations %>
-
-  <div id="payment-button-row">
-    <div class="grid_7 alpha">&nbsp;</div>
-    <%= form_tag orders_path, id: "payment-form" do %>
-        <div id="payment-button" class="grid_3 button pay-for-all"></div>
-    <% end %>
-    <span class="grid_1 money book_price" id="donations-total"></span>
-    <div class="clear"></div>
-  </div>
-
-  <%= render "requests/spacer" %>
-
   <div id="donate-explanation">
     <p class="donate-explanation-link"><strong><%= link_to "Help – what do I do here?", 'javascript:void(0);' %></strong></p>
     <div class="alpha grid_12 omega donate-explanation">
@@ -58,6 +45,19 @@
       <%= render "requests/spacer" %>
     </div>
   </div>
+
+  <%= render partial: "donations/donation_with_actions", collection: outstanding_donations %>
+
+  <div id="payment-button-row">
+    <div class="grid_7 alpha">&nbsp;</div>
+    <%= form_tag orders_path, id: "payment-form" do %>
+        <div id="payment-button" class="grid_3 button pay-for-all"></div>
+    <% end %>
+    <span class="grid_1 money book_price" id="donations-total"></span>
+    <div class="clear"></div>
+  </div>
+
+  <%= render "requests/spacer" %>
 </div>
 
 <p class="no-donations">None right now.</p>

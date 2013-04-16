@@ -51,19 +51,8 @@ class UsersControllerTest < ActionController::TestCase
   test "donate" do
     get :donate
     assert_response :success
-    assert_select 'ul.overview li', /you will send the books/i
-    assert_select 'ul.overview li', text: /volunteer will send the books/i, count: 0
-    assert_select 'input#user_donor_mode[value="send_books"]'
     assert_select '.error', false
     assert_select '.sidebar h2', "Already signed up?"
-  end
-
-  test "donate in send-money mode" do
-    get :donate, donor_mode: "send_money"
-    assert_response :success
-    assert_select 'ul.overview li', text: /you will send the books/i, count: 0
-    assert_select 'ul.overview li', /volunteer will send the books/i
-    assert_select 'input#user_donor_mode[value="send_money"]'
   end
 
   test "donate when logged in" do

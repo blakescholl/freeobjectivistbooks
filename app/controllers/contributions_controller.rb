@@ -9,9 +9,17 @@ class ContributionsController < ApplicationController
   end
 
   def verify_signature
-    signature_params = params.subhash_without('controller', 'action')
-    @signature = AmazonSignature.new signature_params, request.url
-    raise UnauthorizedException if !Rails.env.test? && !@signature.valid?
+    if !Rails.env.test?
+      @signature = AmazonSignature.new request.query_parameters, request.url
+      if !@signature.valid?
+        logger.error "Signature failed using url: #{request.url}, params: #{request.query_parameters}"
+        raise UnauthorizedException
+      end
+    else
+      # Unfortunately in functional tests all params seems to be passed as path params, not query params.
+      # So we just pass everything in here when in test env. -Jason 16 Apr 2013
+      @signature = AmazonSignature.new params, request.url
+    end
   end
 
   def new_payment(options = {})

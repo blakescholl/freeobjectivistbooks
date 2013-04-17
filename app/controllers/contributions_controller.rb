@@ -9,16 +9,10 @@ class ContributionsController < ApplicationController
   end
 
   def verify_signature
-    if !Rails.env.test?
-      @signature = AmazonSignature.new request.query_parameters, request.url
-      if !@signature.valid?
-        logger.error "Signature failed using url: #{request.url}, params: #{request.query_parameters}"
-        raise UnauthorizedException
-      end
-    else
-      # Unfortunately in functional tests all params seems to be passed as path params, not query params.
-      # So we just pass everything in here when in test env. -Jason 16 Apr 2013
-      @signature = AmazonSignature.new params, request.url
+    @signature = AmazonSignature.new request.request_parameters, request.url
+    if !Rails.env.test? && !@signature.valid?
+      logger.error "Signature failed using url: #{request.url}, params: #{request.request_parameters}"
+      raise "Amazon Payments response signature verification failed"
     end
   end
 

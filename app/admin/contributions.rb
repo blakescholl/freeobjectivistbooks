@@ -22,6 +22,7 @@ ActiveAdmin.register Contribution do
       row :user
       row(:amount) {contribution.amount.format}
       row :order if contribution.order
+      row(:transaction_id) {contribution.transaction_id}
       row :created_at
     end
     active_admin_comments
@@ -31,6 +32,7 @@ ActiveAdmin.register Contribution do
     f.inputs do
       f.input :user, collection: [f.object.user]
       f.input :order, collection: f.object.user.orders
+      f.input :transaction_id, as: :string
       f.input :amount
     end
     f.actions

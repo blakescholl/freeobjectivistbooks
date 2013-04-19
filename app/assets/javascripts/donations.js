@@ -94,7 +94,7 @@ function initializeDonations(donations) {
         }
     }
 
-    $('.donation .button.send').click(function () {
+    $('.donation .button.donation-send').click(function () {
         var card = donationDivForElement(this);
         var donation = donationForDiv(card);
         removeFromPaying(donation);
@@ -109,7 +109,7 @@ function initializeDonations(donations) {
         card.find('.shipping').fadeAndSlideOut();
     });
 
-    $('.donation .button.pay').click(function () {
+    $('.donation .button.donation-pay').click(function () {
         var card = donationDivForElement(this);
         var donation = donationForDiv(card);
         if (donation.paying) {

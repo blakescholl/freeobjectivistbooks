@@ -164,8 +164,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     assert_select '.donation', /#{donation.book} to #{donation.student}/ do
-      assert_select '.button.send'
-      assert_select '.button.pay'
+      assert_select '.button.donation-send'
+      assert_select '.button.donation-pay'
       assert_select '.book_price', "$10"
 
       assert_select '.shipping' do
@@ -177,8 +177,8 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     assert_select '.donation', /#{ineligible_donation.book} to #{ineligible_donation.student}/ do
-      assert_select '.button.send'
-      assert_select '.button.pay', false
+      assert_select '.button.donation-send'
+      assert_select '.button.donation-pay', false
 
       assert_select '.shipping' do
         assert_select '.request .name', ineligible_donation.student.name

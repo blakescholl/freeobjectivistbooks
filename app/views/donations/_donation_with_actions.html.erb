@@ -22,12 +22,12 @@
           <p class="request status">Paid</p>
       <% else %>
           <% if donation.can_send_money? %>
-              <div class="alpha grid_2 button send"></div>
-              <div class="grid_2 button pay"></div>
+              <div class="alpha grid_2 button donation-send"></div>
+              <div class="grid_2 button donation-pay"></div>
               <span class="grid_1 money book_price"><%= humanized_money_with_symbol donation.price %></span>
               <div class="grid_1 omega checkmark"><%= image_tag 'checkmark.png' %></div>
           <% else %>
-              <div class="alpha grid_2 omega button send"></div>
+              <div class="alpha grid_2 omega button donation-send"></div>
           <% end %>
       <% end %>
     </div>

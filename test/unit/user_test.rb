@@ -127,6 +127,10 @@ class UserTest < ActiveSupport::TestCase
     assert_equal [@hugh], User.search("HUGH")
   end
 
+  test "volunteer" do
+    verify_scope(User, :volunteer) {|user| user.is_volunteer?}
+  end
+
   # Callbacks
 
   test "email is normalized on save" do

@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
   default_scope order("created_at desc")
 
   scope :with_email, lambda {|email| where("lower(email) = ?", email.downcase)}
+  scope :volunteer, where('roles like ?', '%"volunteer"%')
 
   def self.find_by_email(email)
     with_email(email).first

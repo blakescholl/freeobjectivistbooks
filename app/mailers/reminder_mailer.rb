@@ -25,6 +25,15 @@ class ReminderMailer < ApplicationMailer
     reminder_mail "Fulfill your pledge of #{@pledge.quantity} Objectivist books"
   end
 
+  def fulfill_donations(reminder)
+    @user = reminder.user
+    @outstanding_count = Donation.needs_fulfillment.count
+    @fulfillment_count = @user.fulfillments.where('created_at > ?', 1.week.ago).count
+    @single = @outstanding_count == 1
+    subject = @single ? "1 book is" : "#{@outstanding_count} books are"
+    reminder_mail "#{subject} waiting to be fulfilled on Free Objectivist Books"
+  end
+
   def renew_request(reminder)
     @user = reminder.user
     @request = reminder.request

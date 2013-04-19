@@ -253,4 +253,9 @@ class Donation
   def thank!(message = "Thanks!")
     message! student, message: message, is_thanks: true, public: false
   end
+
+  def fulfill!(user = nil)
+    user ||= FactoryGirl.create :volunteer
+    fulfill user
+  end
 end

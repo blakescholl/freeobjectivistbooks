@@ -44,6 +44,49 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "fulfill donations" do
+    user = create :volunteer
+    reminder = Reminders::FulfillDonations.new_for_entity user
+    count = Donation.needs_fulfillment.count
+
+    verify_reminder reminder, "1 book is waiting to be fulfilled on Free Objectivist Books" do
+      assert_select 'p', /Hi Volunteer \d+,/
+      assert_select 'p', /there is currently 1 donation waiting/i
+      assert_select 'p', /see and send it/i
+      assert_select 'a', /help out/i
+      assert_select 'p', /haven't sent any/
+    end
+  end
+
+  test "fulfill donations multiple outstanding" do
+    user = create :volunteer
+    reminder = Reminders::FulfillDonations.new_for_entity user
+    create :donation, :paid
+    count = Donation.needs_fulfillment.count
+
+    verify_reminder reminder, "#{count} books are waiting to be fulfilled on Free Objectivist Books" do
+      assert_select 'p', /Hi Volunteer \d+,/
+      assert_select 'p', /there are currently #{count} donations waiting/i
+      assert_select 'p', /see and send them/i
+      assert_select 'a', /help out/i
+      assert_select 'p', /haven't sent any/
+    end
+  end
+
+  test "fulfill donations for volunteer with recent fulfillments" do
+    user = create :volunteer
+    create_list :fulfillment, 2, user: user
+    Timecop.travel 4.days
+
+    reminder = Reminders::FulfillDonations.new_for_entity user
+    count = Donation.needs_fulfillment.count
+
+    verify_reminder reminder do
+      assert_select 'p', /sent 2 books/
+      assert_select 'p', text: /haven't sent any/, count: 0
+    end
+  end
+
   test "renew request" do
     request = create :request, :renewable
     reminder = Reminders::RenewRequest.new_for_entity request

@@ -8,6 +8,7 @@ class ReminderJob
   # All the Reminder types we send.
   TYPES = [
     Reminders::FulfillPledge,
+    Reminders::FulfillDonations,
     Reminders::RenewRequest,
     Reminders::SendBooks,
     Reminders::ConfirmReceiptUnsent,

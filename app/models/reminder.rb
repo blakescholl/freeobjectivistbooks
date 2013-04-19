@@ -66,7 +66,8 @@ class Reminder < ActiveRecord::Base
     1.week
   end
 
-  # The maximum amount of this type of reminder to send for a given entity. May be overridden by subclasses.
+  # The maximum amount of this type of reminder to send for a given entity, if any. May be overridden by subclasses.
+  # A value of nil means there is no maximum and reminders can continue indefinitely (generally not recommended).
   def max_reminders
     3
   end
@@ -132,10 +133,12 @@ class Reminder < ActiveRecord::Base
       return false
     end
 
-    count = past_reminder_count
-    if count >= max_reminders
-      Rails.logger.info "Already sent #{count} of #{self}"
-      return false
+    if max_reminders
+      count = past_reminder_count
+      if count >= max_reminders
+        Rails.logger.info "Already sent #{count} of #{self}"
+        return false
+      end
     end
 
     true

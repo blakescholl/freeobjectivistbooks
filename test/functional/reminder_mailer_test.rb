@@ -54,7 +54,6 @@ class ReminderMailerTest < ActionMailer::TestCase
       assert_select 'p', /there is currently 1 donation waiting/i
       assert_select 'p', /see and send it/i
       assert_select 'a', /help out/i
-      assert_select 'p', /haven't sent any/
     end
   end
 
@@ -69,7 +68,6 @@ class ReminderMailerTest < ActionMailer::TestCase
       assert_select 'p', /there are currently #{count} donations waiting/i
       assert_select 'p', /see and send them/i
       assert_select 'a', /help out/i
-      assert_select 'p', /haven't sent any/
     end
   end
 
@@ -83,7 +81,6 @@ class ReminderMailerTest < ActionMailer::TestCase
 
     verify_reminder reminder do
       assert_select 'p', /sent 2 books/
-      assert_select 'p', text: /haven't sent any/, count: 0
     end
   end
 

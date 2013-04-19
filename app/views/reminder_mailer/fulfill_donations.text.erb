@@ -5,7 +5,3 @@ You've sent <%= @fulfillment_count %> books in the last week--thanks!
 There <%= @single ? "is" : "are" %> currently <%= pluralize @outstanding_count, 'donation' %> waiting to be fulfilled on Free Objectivist Books. See and send <%= @single ? "it" : "them" %> using this link:
 
 <%= volunteer_url %>
-
-<% if @fulfillment_count <= 0 %>
-(You haven't sent any books in the last week, by the way.)
-<% end %>

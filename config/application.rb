@@ -53,6 +53,10 @@ module FreeBooks
 
     config.email_recipient_override = nil
 
+    # A default value is needed here in all environments; the real value only really matters in prod,
+    # where it is overridden from an environment variable.
+    config.mailgun_domain = "freeobjectivistbooks.mailgun.org"
+
     config.aws_access_key = ENV['AWS_ACCESS_KEY'] || "test-access-key"
     config.aws_secret_key = ENV['AWS_SECRET_KEY'] || "test-secret-key"
     config.aws_payments_live = false

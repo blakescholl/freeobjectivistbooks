@@ -1,6 +1,10 @@
 class ApplicationMailer < ActionMailer::Base
   default from: "Ayn Rand and Objectivist Books For Students <jason@rationalegoist.com>"
 
+  # Important for avoiding Gmail spam filters, as per
+  # http://blog.mailgun.net/post/tips-tricks-avoiding-gmail-spam-filtering-when-using-ruby-on-rails-action-mailer/
+  default "Message-ID" => lambda {"#{SecureRandom.uuid}@#{Rails.application.config.mailgun_domain}"}
+
   def mail_to_user(user, options)
     options = if Rails.application.config.email_recipient_override
       options.merge(

@@ -382,8 +382,8 @@ class RequestTest < ActiveSupport::TestCase
   end
 
   test "renew for a recently-canceled request" do
-    open_at = 1.day.ago
-    request = create :request, :canceled, open_at: open_at
+    request = create :request, :canceled, open_at: 1.day.ago
+    open_at = request.open_at
     event = request.renew
 
     assert request.active?
@@ -393,8 +393,8 @@ class RequestTest < ActiveSupport::TestCase
   end
 
   test "renew for a recently opened request is a no-op" do
-    open_at = 1.day.ago
-    request = create :request, open_at: open_at
+    request = create :request, open_at: 1.day.ago
+    open_at = request.open_at
     event = request.renew
 
     assert request.active?

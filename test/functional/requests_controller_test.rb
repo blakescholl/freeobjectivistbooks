@@ -619,8 +619,8 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew of recent canceled request is an uncancel" do
-    open_at = 1.day.ago
-    request = create :request, :canceled, open_at: open_at
+    request = create :request, :canceled, open_at: 1.day.ago
+    open_at = request.open_at
 
     put :renew, {id: request.id}, session_for(request.user)
     assert_redirected_to request
@@ -633,8 +633,8 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "renew is idempotent" do
-    open_at = 1.minute.ago
-    request = create :request, open_at: open_at
+    request = create :request, open_at: 1.minute.ago
+    open_at = request.open_at
 
     put :renew, {id: request.id, request: renew_params}, session_for(request.user)
     assert_redirected_to request

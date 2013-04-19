@@ -5,7 +5,8 @@ class ProfileControllerTest < ActionController::TestCase
     verify_link 'request another', present
   end
 
-  def verify_all_donations_link(present = true)
+  def verify_donor_links(present = true)
+    verify_link 'change this pledge', present
     verify_link 'see all your donations', present
   end
 
@@ -36,7 +37,7 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request false
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
@@ -72,7 +73,7 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request false
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
@@ -93,7 +94,7 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
@@ -123,7 +124,7 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     verify_can_request
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links false
 
     assert_select 'h2', text: /donation/i, count: 0
@@ -190,7 +191,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     assert_select '#payment-button-row'
 
-    verify_all_donations_link
+    verify_donor_links
     verify_new_request_link false
     verify_one_request_text false
     verify_volunteer_links false
@@ -208,7 +209,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_new_request_link false
     verify_one_request_text false
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links
   end
 
@@ -230,7 +231,7 @@ class ProfileControllerTest < ActionController::TestCase
 
     verify_new_request_link false
     verify_one_request_text false
-    verify_all_donations_link false
+    verify_donor_links false
     verify_volunteer_links
   end
 

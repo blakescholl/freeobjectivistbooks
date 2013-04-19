@@ -104,6 +104,7 @@
     <% @current_user.pledges.each do |pledge| %>
     <div class="pledge">
         <p class="headline">You pledged to donate <%= pledge.quantity %> books</p>
+        <p><%= link_to "Change this pledge", edit_pledge_path(pledge) %></p>
     </div>
     <% end %>
     <% end %>

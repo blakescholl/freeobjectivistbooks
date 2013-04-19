@@ -1,0 +1,25 @@
+<% content_for :title do %>Your Pledge<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.pledge-explanation {
+    padding-top: 10px;
+}
+
+.button {
+    margin-top: 24px;
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Your pledge</h1>
+
+<div class="grid_12">
+<%= form_for @pledge do |f| %>
+    <p class="field_with_errors"><%= @pledge.errors[:quantity].join(", ") %></p>
+    <label>I pledge to donate <%= f.text_field :quantity, size: 1 %> books to students.</label>
+    <p class="pledge-explanation">Most books are $10 a copy or less.</p>
+
+    <%= f.submit "", class: "grid_4 alpha button update" %><div class="clear"></div>
+<% end %>
+</div>

@@ -39,6 +39,8 @@ class PledgesControllerTest < ActionController::TestCase
 
     pledge.reload
     assert_equal 10, pledge.quantity
+
+    verify_event pledge, "update"
   end
 
   test "update quantity must be a number" do

@@ -1,5 +1,10 @@
 <% if event.user %><%= admin_user_link event.user %><% elsif event.user_id %>Someone<% end %>
-<% if event.request %>
+<% if event.pledge %>
+    <% case event.type %>
+    <% when "update" %>
+        updated their pledge <%= event.detail %>
+    <% end %>
+<% elsif event.request %>
     <% case event.type %>
     <% when "grant" %>
         granted <%= admin_user_link event.student %>'s request for
@@ -44,6 +49,10 @@
             <% if event.fulfiller %>(fulfiller: <%= admin_user_link event.fulfiller %>)<% end %>
         <% end %>
     <% end %>
-<% else %>
+<% elsif event.request_id %>
     did a "<%= event.type %>" event on deleted request <%= event.request_id %>
+<% elsif event.pledge_id %>
+    did a "<%= event.type %>" event on deleted pledge <%= event.pledge_id %>
+<% else %>
+    did a "<%= event.type %>" event on an unknown entity
 <% end %>

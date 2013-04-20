@@ -5,7 +5,8 @@ class PledgesController < ApplicationController
 
   def update
     @pledge.attributes = params[:pledge]
-    if save @pledge
+    @event = @pledge.build_update_event
+    if save @pledge, @event
       redirect_to profile_url
     else
       render :edit

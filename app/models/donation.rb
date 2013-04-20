@@ -18,11 +18,7 @@ class Donation < ActiveRecord::Base
   has_many :reminder_entities, as: :entity
   has_many :reminders, through: :reminder_entities
 
-  Event::TYPES.each do |type|
-    define_method "#{type}_events" do
-      events.scoped_by_type type
-    end
-  end
+  Event.create_associations self
 
   #--
   # Validations

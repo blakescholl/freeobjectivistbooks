@@ -7,6 +7,8 @@ class Pledge < ActiveRecord::Base
   has_many :reminders, through: :reminder_entities
   has_one :testimonial, as: :source
 
+  Event.create_associations self
+
   validates_numericality_of :quantity, only_integer: true, greater_than: 0,
     message: "Please enter a number of books to pledge."
 
@@ -20,6 +22,14 @@ class Pledge < ActiveRecord::Base
   # Determines if the donor has donated at least as many books as pledged.
   def fulfilled?
     user.donations.active.count >= quantity
+  end
+
+  def update_detail
+    "quantity from #{quantity_was} to #{quantity}"
+  end
+
+  def build_update_event
+    update_events.build detail: update_detail if changed?
   end
 
   # Creates a Testimonial based on this pledge and its "reason" text.

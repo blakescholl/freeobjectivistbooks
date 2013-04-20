@@ -43,6 +43,19 @@ class PledgeTest < ActiveSupport::TestCase
     assert pledge.invalid?
   end
 
+  # Update event
+
+  test "build update event" do
+    pledge = create :pledge
+    pledge.quantity = 10
+    event = pledge.build_update_event
+
+    assert_not_nil event
+    assert_equal pledge, event.pledge
+    assert_equal pledge.user, event.user
+    assert_equal "update", event.type
+  end
+
   # Derived attributes
 
   test "fulfilled?" do

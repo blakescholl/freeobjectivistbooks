@@ -21,11 +21,7 @@ class Request < ActiveRecord::Base
   has_many :reminders, through: :reminder_entities
   belongs_to :referral
 
-  Event::TYPES.each do |type|
-    define_method "#{type}_events" do
-      events.scoped_by_type type
-    end
-  end
+  Event.create_associations self
 
   #--
   # Validations

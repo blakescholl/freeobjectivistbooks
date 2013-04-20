@@ -4,6 +4,14 @@ class Event < ActiveRecord::Base
 
   TYPES = %w{grant update flag fix message update_status cancel_donation cancel_request renew autocancel}
 
+  def self.create_associations(target_class)
+    TYPES.each do |type|
+      target_class.send :define_method, "#{type}_events" do
+        events.scoped_by_type type
+      end
+    end
+  end
+
   #--
   # Associations
   #++
@@ -20,7 +28,8 @@ class Event < ActiveRecord::Base
   # Validations
   #++
 
-  validates_presence_of :request, :type
+  validates_presence_of :type
+  validates_presence_of :request, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation cancel_request renew autocancel}}
   validates_presence_of :donation, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation}}
   validates_inclusion_of :type, in: TYPES
 
@@ -81,6 +90,8 @@ class Event < ActiveRecord::Base
   end
 
   def default_user
+    return pledge.user if pledge
+
     case type
     when "grant", "flag" then donor
     when "update", "fix", "cancel_request", "renew" then student
@@ -99,8 +110,13 @@ class Event < ActiveRecord::Base
   # Derived attributes
   #++
 
-  delegate :book, :student, to: :request
-  delegate :donor, :fulfiller, :sender, to: :donation, allow_nil: true
+  delegate :book, :student, to: :request, allow_nil: true
+  delegate :fulfiller, :sender, to: :donation, allow_nil: true
+
+  def donor
+    entity = donation || pledge
+    entity && entity.user
+  end
 
   def role_for(user)
     case user

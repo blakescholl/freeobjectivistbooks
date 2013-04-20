@@ -2,6 +2,7 @@
 class Pledge < ActiveRecord::Base
   belongs_to :user
   belongs_to :referral
+  has_many :events
   has_many :reminder_entities, as: :entity
   has_many :reminders, through: :reminder_entities
   has_one :testimonial, as: :source

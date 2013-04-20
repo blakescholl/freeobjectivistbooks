@@ -8,9 +8,10 @@ class Event < ActiveRecord::Base
   # Associations
   #++
 
-  belongs_to :request
   belongs_to :user
+  belongs_to :request
   belongs_to :donation
+  belongs_to :pledge
   belongs_to :recipient, class_name: "User"
   belongs_to :reply_to_event, class_name: "Event"
   has_one :testimonial, as: :source

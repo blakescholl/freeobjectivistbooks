@@ -5,4 +5,11 @@ namespace :backfill do
       user.save!(validate: false)
     end
   end
+
+  task :donation_pledges => :environment do
+    Donation.find_each do |donation|
+      donation.pledge = donation.user.current_pledge
+      donation.save!
+    end
+  end
 end

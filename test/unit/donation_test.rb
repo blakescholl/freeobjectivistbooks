@@ -285,6 +285,14 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal @atlas.price, @howard_request.donation.price
   end
 
+  test "pledge recorded on create" do
+    pledge = create :pledge
+    request = create :request
+
+    request.grant! pledge.user
+    assert_equal pledge, request.donation.pledge
+  end
+
   # Cancel
 
   test "cancel by donor" do

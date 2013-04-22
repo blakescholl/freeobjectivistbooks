@@ -1,11 +1,12 @@
 # Represents a pledge by a donor to donate a specific number of books.
 class Pledge < ActiveRecord::Base
   belongs_to :user
-  belongs_to :referral
+  has_many :donations
   has_many :events
   has_many :reminder_entities, as: :entity
   has_many :reminders, through: :reminder_entities
   has_one :testimonial, as: :source
+  belongs_to :referral
 
   Event.create_associations self
 
@@ -27,7 +28,7 @@ class Pledge < ActiveRecord::Base
 
   # Determines if the donor has donated at least as many books as pledged.
   def fulfilled?
-    user.donations.active.count >= quantity
+    donations.active.size >= quantity
   end
 
   def update_detail

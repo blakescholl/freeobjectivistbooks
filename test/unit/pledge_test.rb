@@ -59,8 +59,17 @@ class PledgeTest < ActiveSupport::TestCase
   # Derived attributes
 
   test "fulfilled?" do
-    assert @cameron_pledge.fulfilled?
-    assert !@hugh_pledge.fulfilled?
+    pledge = create :pledge, quantity: 1
+    assert !pledge.fulfilled?, "pledge is fulfilled"
+
+    create :donation, user: pledge.user
+    assert pledge.fulfilled?, "pledge not fulfilled"
+
+    pledge.cancel!
+    assert pledge.fulfilled?, "pledge not fulfilled after cancel"
+
+    new_pledge = create :pledge, quantity: 1
+    assert !new_pledge.fulfilled?, "new pledge is fulfilled"
   end
 
   test "fulfilled" do

@@ -11,6 +11,7 @@ class Donation < ActiveRecord::Base
 
   belongs_to :request, autosave: true
   belongs_to :user
+  belongs_to :pledge
   has_many :events, dependent: :destroy
   belongs_to :order
   has_one :fulfillment
@@ -31,6 +32,7 @@ class Donation < ActiveRecord::Base
   validates_uniqueness_of :request_id, scope: :canceled, if: :active?, message: "has already been granted", on: :create
   validate :donor_cannot_be_requester, on: :create
   validate :order_belongs_to_user, if: :order
+  validate :pledge_belongs_to_user, if: :pledge
 
   def donor_cannot_be_requester
     errors.add :base, "You can't donate to yourself!" if donor == student
@@ -38,6 +40,10 @@ class Donation < ActiveRecord::Base
 
   def order_belongs_to_user
     errors.add :order, "doesn't belong to this user" if order.user != user
+  end
+
+  def pledge_belongs_to_user
+    errors.add :pledge, "doesn't belong to this user" if pledge.user != user
   end
 
   #--
@@ -96,6 +102,7 @@ class Donation < ActiveRecord::Base
 
   before_create do |donation|
     donation.price = donation.book.price
+    donation.pledge = donation.user.current_pledge
   end
 
   #--

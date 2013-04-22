@@ -21,7 +21,9 @@ FreeBooks::Application.routes.draw do
     resource :donation, only: [:create]
   end
 
-  resources :pledges, only: [:edit, :update]
+  resources :pledges, only: [:edit, :update, :destroy] do
+    get "cancel", on: :member
+  end
 
   resources :donations, only: [:index, :destroy] do
     get "send" => "donations#outstanding", on: :collection

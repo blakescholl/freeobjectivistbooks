@@ -9,6 +9,10 @@
 .button {
     margin-top: 24px;
 }
+
+.cancel-link {
+    margin-top: 24px;
+}
 </style>
 <% end %>
 
@@ -21,5 +25,7 @@
     <p class="pledge-explanation">Most books are $10 a copy or less.</p>
 
     <%= f.submit "", class: "grid_4 alpha button update" %><div class="clear"></div>
+
+    <p class="cancel-link">Or, <%= link_to "cancel this pledge", cancel_pledge_path(@pledge) %></p>
 <% end %>
 </div>

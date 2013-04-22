@@ -5,6 +5,8 @@ class ProfileController < ApplicationController
   def show
     @requests = @current_user.requests
 
+    @pledge = @current_user.current_pledge
+
     donations = @current_user.donations.active
     @show_donations = donations.any? || @current_user.pledges.any?
 

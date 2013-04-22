@@ -3,6 +3,8 @@
     <% case event.type %>
     <% when "update" %>
         updated their pledge <%= event.detail %>
+    <% when "cancel_pledge" %>
+        canceled their pledge for <%= pluralize event.pledge.quantity, "book" %>
     <% end %>
 <% elsif event.request %>
     <% case event.type %>

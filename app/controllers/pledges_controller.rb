@@ -12,4 +12,19 @@ class PledgesController < ApplicationController
       render :edit
     end
   end
+
+  def cancel
+    @event = @pledge.cancel_pledge_events.build
+  end
+
+
+  def destroy
+    @event = @pledge.cancel params[:pledge]
+    if save @pledge, @event
+      flash[:notice] = "Your pledge has been canceled."
+      redirect_to profile_url
+    else
+      render :cancel
+    end
+  end
 end

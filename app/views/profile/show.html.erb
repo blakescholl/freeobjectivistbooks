@@ -100,13 +100,11 @@
     </p>
     <% end %>
 
-    <% if @current_user.pledges.any? %>
-    <% @current_user.pledges.each do |pledge| %>
+    <% if @pledge %>
     <div class="pledge">
-        <p class="headline">You pledged to donate <%= pledge.quantity %> books</p>
-        <p><%= link_to "Change this pledge", edit_pledge_path(pledge) %></p>
+        <p class="headline">You pledged to donate <%= @pledge.quantity %> books</p>
+        <p><%= link_to "Change this pledge", edit_pledge_path(@pledge) %></p>
     </div>
-    <% end %>
     <% end %>
 
     <% if @show_donations %>

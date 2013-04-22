@@ -86,7 +86,7 @@ class RequestsController < ApplicationController
     @donations = all_donations.needs_donor_action.reorder(:created_at)
     @previous_count = all_donations.count - @donations.count
     @flag_count = all_donations.unpaid.not_sent.flagged.count
-    @pledge = @current_user.pledges.first
+    @pledge = @current_user.current_pledge
   end
 
   def new

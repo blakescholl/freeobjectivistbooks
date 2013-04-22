@@ -1,0 +1,48 @@
+<% content_for :title do %>Cancel Pledge<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.pledge {
+    margin-top: 24px;
+}
+
+.headline {
+    font-size: 1.2em;
+}
+
+h2 {
+    margin-bottom: 6px;
+}
+
+.button {
+    margin-top: 24px;
+}
+
+.dont-cancel {
+    height: 46px;
+    margin-top: 36px;
+}
+ </style>
+<% end %>
+
+<h1 class="grid_16">Cancel your pledge</h1>
+
+<div class="grid_12">
+    <div class="pledge">
+        <p class="headline">You pledged to donate <%= pluralize @pledge.quantity, "book" %></p>
+    </div>
+
+    <%= form_for @pledge, method: :delete do |f| %>
+        <%= f.fields_for @event do |e| %>
+            <h2>Why you are canceling your plege? (optional)</h2>
+
+            <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>
+            <%= e.text_area :message, rows: 6, cols: 60 %>
+            <div class="clear"></div>
+        <% end %>
+
+        <%= f.submit "", class: "grid_3 alpha button cancel" %>
+        <%= link_to "Don't cancel", profile_path, class: "grid_2 omega dont-cancel" %>
+        <div class="clear"></div>
+    <% end %>
+</div>

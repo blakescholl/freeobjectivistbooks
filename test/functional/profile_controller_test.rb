@@ -6,7 +6,7 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   def verify_donor_links(present = true)
-    verify_link 'change this pledge', present
+    verify_link 'pledge', present
     verify_link 'see all your donations', present
   end
 
@@ -159,6 +159,11 @@ class ProfileControllerTest < ActionController::TestCase
     get :show, params, session_for(user)
     assert_response :success
 
+    assert_select '.pledge' do
+      assert_select '.headline', /donate 5 books/
+      assert_select 'a', /change/i
+    end
+
     assert_select '.donation', 2 do
       assert_select '.headline a'
       assert_select '.shipping'
@@ -190,6 +195,24 @@ class ProfileControllerTest < ActionController::TestCase
     end
 
     assert_select '#payment-button-row'
+
+    verify_donor_links
+    verify_new_request_link false
+    verify_one_request_text false
+    verify_volunteer_links false
+  end
+
+  test "show for donor with canceled pledge" do
+    user = create :donor
+    user.cancel_pledge!
+
+    get :show, params, session_for(user)
+    assert_response :success
+
+    assert_select '.pledge' do
+      assert_select '.headline', false
+      assert_select 'a', /new/i
+    end
 
     verify_donor_links
     verify_new_request_link false

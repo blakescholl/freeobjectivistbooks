@@ -1,6 +1,21 @@
 class PledgesController < ApplicationController
+  before_filter :require_login
+
   def allowed_users
-    @pledge.user
+    @pledge.user if @pledge
+  end
+
+  def new
+    @pledge = @current_user.pledges.build quantity: 5
+  end
+
+  def create
+    @pledge = @current_user.pledges.build params[:pledge]
+    if save @pledge
+      redirect_to profile_url
+    else
+      render :new
+    end
   end
 
   def update
@@ -16,7 +31,6 @@ class PledgesController < ApplicationController
   def cancel
     @event = @pledge.cancel_pledge_events.build
   end
-
 
   def destroy
     @event = @pledge.cancel params[:pledge]

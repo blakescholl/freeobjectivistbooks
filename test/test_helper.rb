@@ -172,6 +172,10 @@ class User
   def expired_auth_token
     auth_token (AUTH_TOKEN_EXPIRATION + 1.hour).ago
   end
+
+  def cancel_pledge!
+    current_pledge.cancel! if current_pledge
+  end
 end
 
 class Request
@@ -189,6 +193,16 @@ class Request
     event = cancel params
     save!
     donation.save! if donation
+    event.save! if event
+    event
+  end
+end
+
+class Pledge
+  def cancel!
+    params = {event: {message: ""}}
+    event = cancel params
+    save!
     event.save! if event
     event
   end

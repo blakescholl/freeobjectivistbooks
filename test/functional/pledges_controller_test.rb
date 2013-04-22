@@ -1,6 +1,57 @@
 require 'test_helper'
 
 class PledgesControllerTest < ActionController::TestCase
+  # New
+
+  test "new" do
+    user = create :donor
+
+    get :new, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h1', "Make a pledge"
+    assert_select 'input[value=5]'
+    assert_select 'input[type=submit]'
+    assert_select 'a', /cancel/i
+  end
+
+  test "new requires login" do
+    get :new
+    verify_login_page
+  end
+
+  # Create
+
+  test "create" do
+    user = create :donor
+
+    assert_difference "user.pledges.count" do
+      post :create, {pledge: {quantity: 5}}, session_for(user)
+      assert_redirected_to profile_url
+      user.reload
+    end
+
+    pledge = user.pledges.reorder(:created_at).last
+    assert_equal 5, pledge.quantity
+  end
+
+  test "create requires valid quantity" do
+    user = create :donor
+
+    assert_no_difference "user.pledges.count" do
+      post :create, {pledge: {quantity: 0}}, session_for(user)
+      assert_response :success
+    end
+
+    assert_select 'h1', "Make a pledge"
+    assert_select '.field_with_errors', /[a-z]/
+  end
+
+  test "create requires login" do
+    post :create, {pledge: {quantity: 5}}
+    verify_login_page
+  end
+
   # Edit
 
   test "edit" do

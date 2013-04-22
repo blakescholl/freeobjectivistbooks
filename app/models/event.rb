@@ -29,6 +29,7 @@ class Event < ActiveRecord::Base
   #++
 
   validates_presence_of :type
+  validates_presence_of :pledge, if: lambda {|e| e.type.in? %w{cancel_pledge}}
   validates_presence_of :request, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation cancel_request renew autocancel}}
   validates_presence_of :donation, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation}}
   validates_inclusion_of :type, in: TYPES

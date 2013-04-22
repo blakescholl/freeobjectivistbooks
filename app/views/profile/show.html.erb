@@ -100,14 +100,16 @@
     </p>
     <% end %>
 
-    <% if @pledge %>
-    <div class="pledge">
-        <p class="headline">You pledged to donate <%= @pledge.quantity %> books</p>
-        <p><%= link_to "Change this pledge", edit_pledge_path(@pledge) %></p>
-    </div>
-    <% end %>
-
     <% if @show_donations %>
+    <div class="pledge">
+        <% if @pledge %>
+            <p class="headline">You pledged to donate <%= @pledge.quantity %> books</p>
+            <p><%= link_to "Change this pledge", edit_pledge_path(@pledge) %></p>
+        <% else %>
+            <p><%= link_to "Make a new pledge", new_pledge_path %></p>
+        <% end %>
+    </div>
+
     <h2>Outstanding donations</h2>
     <%= render partial: "donations/outstanding_donations", object: @outstanding_donations, locals: {flag_count: @flag_count} %>
     <% end %>

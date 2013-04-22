@@ -280,13 +280,17 @@ class ReminderMailerTest < ActionMailer::TestCase
   end
 
   test "read books" do
-    reminder = Reminders::ReadBooks.new_for_entity @hank_donation_received
+    donation = create :donation
+    donation.update_status! 'received'
+    Timecop.travel 5.weeks
 
-    verify_reminder reminder, "Have you finished reading The Fountainhead?" do
-      assert_select 'p', /Hi Hank/
-      assert_select 'p', /You received The Fountainhead on Jan 19\s+\((about )?\d+ \w+ ago\)/
-      assert_select 'a', /Yes, I have finished reading The Fountainhead/
-      assert_select 'p', /your donor, Henry Cameron/
+    reminder = Reminders::ReadBooks.new_for_entity donation
+
+    verify_reminder reminder, /Have you finished reading Book \d+\?/ do
+      assert_select 'p', /Hi Student \d+/
+      assert_select 'p', /You received Book \d+ on [A-Z][a-z]{2} \d+ \(about 1 month ago\)/
+      assert_select 'a', /Yes, I have finished reading Book \d+/
+      assert_select 'p', /your donor, Donor \d+/
     end
   end
 

@@ -71,16 +71,21 @@ class AnnouncementMailerTest < ActionMailer::TestCase
   end
 
   test "mark read books" do
-    mail = AnnouncementMailer.mark_read_books @hank_donation_received
-    assert_equal "Let us know when you finish reading The Fountainhead", mail.subject
-    assert_equal ["hank@rearden.com"], mail.to
+    donation = create :donation
+    donation.update_status! 'received'
+    Timecop.travel 5.weeks
+
+    ActionMailer::Base.deliveries = []
+    mail = AnnouncementMailer.mark_read_books donation
+    assert_match /Let us know when you finish reading Book \d+/, mail.subject
+    assert_equal [donation.student.email], mail.to
 
     mail.deliver
     assert_select_email do
-      assert_select 'p', /Hi Hank/
-      assert_select 'p', /You received The Fountainhead on Jan 19\s+\((about )?\d+ \w+ ago\)/
-      assert_select 'a', /Yes, I have finished reading The Fountainhead/
-      assert_select 'p', /your donor, Henry Cameron/
+      assert_select 'p', /Hi Student \d+/
+      assert_select 'p', /You received Book \d+ on [A-Z][a-z]{2} \d+ \(about 1 month ago\)/
+      assert_select 'a', /Yes, I have finished reading Book \d+/
+      assert_select 'p', /your donor, Donor \d+/
     end
   end
 end

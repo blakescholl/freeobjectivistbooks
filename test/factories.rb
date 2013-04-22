@@ -80,6 +80,8 @@ FactoryGirl.define do
   factory :pledge do
     association :user, factory: :donor
     quantity 5
+
+    trait(:canceled) {canceled true}
   end
 
   factory :donation do

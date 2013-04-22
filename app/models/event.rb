@@ -2,7 +2,7 @@
 class Event < ActiveRecord::Base
   self.inheritance_column = 'class'  # anything other than "type", to let us use "type" for something else
 
-  TYPES = %w{grant update flag fix message update_status cancel_donation cancel_request renew autocancel}
+  TYPES = %w{grant update flag fix message update_status cancel_donation cancel_request cancel_pledge renew autocancel}
 
   def self.create_associations(target_class)
     TYPES.each do |type|

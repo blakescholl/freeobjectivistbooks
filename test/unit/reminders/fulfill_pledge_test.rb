@@ -2,12 +2,16 @@ require 'test_helper'
 
 class Reminders::FulfillPledgeTest < ActiveSupport::TestCase
   test "all reminders" do
+    create :pledge
+    create :pledge, :canceled
+
     reminders = Reminders::FulfillPledge.all_reminders
     assert reminders.any?
 
     reminders.each do |reminder|
       assert_not_nil reminder.pledge
       assert_equal reminder.pledge.user, reminder.user
+      assert reminder.pledge.active?
       assert !reminder.pledge.fulfilled?
     end
   end

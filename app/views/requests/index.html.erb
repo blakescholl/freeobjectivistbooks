@@ -71,10 +71,12 @@
           <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
       <% end %>
       <p class="no-donations">
-        <% if @previous_count > 0 %>
-            You previously donated <%= pluralize @previous_count, 'book' %>.
-        <% else %>
-            You haven't donated any books yet.
+        <% if @pledge %>
+            <% if @pledge.donations.size > 0 %>
+                You have donated <%= pluralize @pledge.donations.size, 'book' %> towards this pledge.
+            <% else %>
+                You haven't donated any books towards this pledge yet.
+            <% end %>
         <% end %>
       </p>
       <% if @flag_count > 0 %>

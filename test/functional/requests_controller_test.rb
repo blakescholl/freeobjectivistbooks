@@ -24,7 +24,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
       assert_select 'p', "You have pledged to donate 5 books."
-      assert_select 'p', "You haven't donated any books yet."
+      assert_select 'p', /haven't donated any books/
       assert_select 'ul'
     end
 
@@ -37,7 +37,7 @@ class RequestsControllerTest < ActionController::TestCase
     get :index, params, session_for(donation.user)
     assert_response :success
 
-    assert_select '.sidebar p', /previously donated 1 book/
+    assert_select '.sidebar p', /donated 1 book/
   end
 
   test "index for user with flagged donations" do

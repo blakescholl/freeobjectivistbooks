@@ -103,7 +103,11 @@
     <% if @show_donations %>
     <div class="pledge">
         <% if @pledge %>
-            <p class="headline">You pledged to donate <%= @pledge.quantity %> books</p>
+            <p class="headline">You pledged to donate <%= @pledge.quantity %> books on <%= short_date @pledge.created_at %></p>
+            <p><%= feedback_for @pledge %></p>
+        <% end %>
+        <% if @pledge && @pledge.active? %>
+            <p><%= link_to 'Find students to donate books to', donate_path %></p>
             <p><%= link_to "Change this pledge", edit_pledge_path(@pledge) %></p>
         <% else %>
             <p><%= link_to "Make a new pledge", new_pledge_path %></p>

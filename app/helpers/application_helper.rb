@@ -44,8 +44,12 @@ module ApplicationHelper
     count == 1 ? noun : "#{count} #{noun.pluralize}"
   end
 
+  def short_date(date)
+    I18n.l date.to_date, format: :short
+  end
+
   def short_date_with_time_ago(date)
-    short_date = I18n.l date.to_date, format: :short
+    short_date = short_date date
     time_ago = distance_of_time_in_words_to_now date
     "#{short_date} (#{time_ago} ago)"
   end

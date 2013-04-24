@@ -81,6 +81,7 @@ FactoryGirl.define do
     association :user, factory: :donor
     quantity 5
 
+    trait(:ended) {ended true}
     trait(:canceled) {canceled true}
   end
 

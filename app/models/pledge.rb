@@ -15,10 +15,11 @@ class Pledge < ActiveRecord::Base
 
   default_scope order("created_at desc")
 
-  scope :active, where(canceled: false)
+  scope :not_canceled, where(canceled: false)
+  scope :active, not_canceled.where(ended: false)
 
   def active?
-    !canceled?
+    !canceled? && !ended?
   end
 
   # Returns all unfulfilled pledges.
@@ -26,9 +27,33 @@ class Pledge < ActiveRecord::Base
     active.includes(:user).select {|pledge| !pledge.fulfilled? }
   end
 
+  def donations_count
+    donations.active.size
+  end
+
   # Determines if the donor has donated at least as many books as pledged.
   def fulfilled?
-    donations.active.size >= quantity
+    donations_count >= quantity
+  end
+
+  def exceeded?
+    donations_count > quantity
+  end
+
+  def any_donations?
+    donations_count > 0
+  end
+
+  def status
+    if exceeded?
+      :exceeded
+    elsif fulfilled?
+      :fulfilled
+    elsif any_donations?
+      :partial
+    else
+      :empty
+    end
   end
 
   def update_detail
@@ -40,7 +65,7 @@ class Pledge < ActiveRecord::Base
   end
 
   def cancel(params = {})
-    return if canceled?
+    return if !active?
     self.canceled = true
     cancel_pledge_events.build params[:event]
   end

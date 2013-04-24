@@ -156,6 +156,10 @@ class User < ActiveRecord::Base
     pledges.active.reorder(:created_at).last
   end
 
+  def latest_pledge
+    pledges.not_canceled.reorder(:created_at).last
+  end
+
   def can_request?
     requests.not_granted.empty?
   end

@@ -45,6 +45,7 @@
 
 <div class="grid_12">
   <%= render partial: "donations/outstanding_donations", object: @outstanding_donations, locals: {flag_count: @flag_count} %>
+  <p class="no-donations"><%= link_to 'Find students to donate books to', donate_path %></p>
 </div>
 <div class="clear"></div>
 

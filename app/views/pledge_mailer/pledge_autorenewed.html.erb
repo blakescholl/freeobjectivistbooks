@@ -1,0 +1,15 @@
+<p>You have <%= pledge_summary @pledge %> on Free Objectivist Books. <%= @feedback %></p>
+
+<p>
+  <% if @pledge.fulfilled? %>
+    You're going strong, and your pledge has been renewed for the coming month.
+  <% else %>
+    It's a new month, and a new chance to spread Objectivism. Your pledge has automatically been renewed
+    for the coming month.
+  <% end %>
+  There are <%= @request_count %> students waiting to read Ayn Rand!
+</p>
+
+<p><strong><%= link_to "Make a donation today", donate_url %></strong></p>
+
+<p>You can also <%= link_to "update or cancel your pledge", edit_pledge_url(@new_pledge) %>.</p>

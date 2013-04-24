@@ -84,6 +84,7 @@ FactoryGirl.define do
     association :user, factory: :donor
     quantity 5
 
+    trait(:recurring) {recurring true}
     trait(:ended) {ended true}
     trait(:canceled) {canceled true}
     trait(:endable) {created_at {5.weeks.ago}}

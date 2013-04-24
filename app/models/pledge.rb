@@ -72,12 +72,22 @@ class Pledge < ActiveRecord::Base
   end
 
   def end_if_needed!
-    if needs_ending?
-      self.ended = true
-      mail = PledgeMailer.pledge_rotation self
-      mail.deliver
-      save!
+    return unless needs_ending?
+
+    self.ended = true
+    save!
+
+    if recurring?
+      new_pledge = Pledge.create! user: user, quantity: quantity, recurring: true
+      mail = PledgeMailer.pledge_autorenewed self, new_pledge
+    else
+      mail = PledgeMailer.pledge_ended self
+      new_pledge = nil
     end
+
+    mail.deliver
+
+    new_pledge
   end
 
   def cancel(params = {})

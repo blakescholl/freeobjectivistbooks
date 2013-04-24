@@ -59,12 +59,40 @@ class PledgeTest < ActiveSupport::TestCase
   # End if needed
 
   test "end if needed" do
-    pledge = create :pledge, created_at: 5.weeks.ago
+    pledge = create :pledge, :endable
+    user = pledge.user
 
     assert_difference "ActionMailer::Base.deliveries.count" do
-      pledge.end_if_needed!
-      assert pledge.ended?
+      new_pledge = pledge.end_if_needed!
+      assert pledge.ended?, "pledge is not ended"
+      assert_nil new_pledge, "got new pledge"
     end
+
+    user.reload
+    assert_nil user.current_pledge, "user has current pledge"
+    assert_equal pledge, user.latest_pledge
+  end
+
+  test "end if needed for recurring pledge" do
+    pledge = create :pledge, :recurring, :endable
+    user = pledge.user
+
+    new_pledge = nil
+    assert_difference "ActionMailer::Base.deliveries.count" do
+      new_pledge = pledge.end_if_needed!
+      assert pledge.ended?, "pledge is not ended"
+    end
+
+    user.reload
+
+    assert_equal user, new_pledge.user
+    assert_equal pledge.quantity, new_pledge.quantity
+    assert new_pledge.active?, "new pledge is not active"
+    assert new_pledge.recurring?, "new pledge is not recurring"
+    assert_equal 0, new_pledge.donations_count
+
+    assert_equal new_pledge, user.current_pledge
+    assert_equal new_pledge, user.latest_pledge
   end
 
   test "end if needed is idempotent" do

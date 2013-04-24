@@ -1,6 +1,6 @@
 <p>
-  On <%= short_date @pledge.created_at %> you pledged to donate <%= pluralize @pledge.quantity, "book" %> to students
-  on Free Objectivist Books. <%= @feedback %>
+  On <%= short_date @pledge.created_at %> you <%= pledge_summary @pledge %> to students on Free Objectivist Books.
+  <%= @feedback %>
 </p>
 
 <p>

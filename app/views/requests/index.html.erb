@@ -68,17 +68,9 @@
     <div class="content_5">
       <h2>Your donations</h2>
       <% if @pledge %>
-          <p>You have pledged to donate <%= pluralize @pledge.quantity, 'book' %>.</p>
+          <p>You have <%= pledge_summary @pledge %>.</p>
+          <p class="no-donations"><%= feedback_for @pledge %></p>
       <% end %>
-      <p class="no-donations">
-        <% if @pledge %>
-            <% if @pledge.donations.size > 0 %>
-                You have donated <%= pluralize @pledge.donations.size, 'book' %> towards this pledge.
-            <% else %>
-                You haven't donated any books towards this pledge yet.
-            <% end %>
-        <% end %>
-      </p>
       <% if @flag_count > 0 %>
           <p class="no-donations"><%= pluralize @flag_count, "book" %> flagged and waiting on student response.</p>
       <% end %>

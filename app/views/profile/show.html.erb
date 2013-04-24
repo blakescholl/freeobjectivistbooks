@@ -103,7 +103,7 @@
     <% if @show_donations %>
     <div class="pledge">
         <% if @pledge %>
-            <p class="headline">You pledged to donate <%= @pledge.quantity %> books on <%= short_date @pledge.created_at %></p>
+            <p class="headline">You have <%= pledge_summary @pledge %></p>
             <p><%= feedback_for @pledge %></p>
         <% end %>
         <% if @pledge && @pledge.active? %>

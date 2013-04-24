@@ -29,7 +29,7 @@ h2 {
 
 <div class="grid_12">
     <div class="pledge">
-        <p class="headline">You pledged to donate <%= pluralize @pledge.quantity, "book" %></p>
+        <p class="headline">You <%= pledge_summary @pledge %></p>
     </div>
 
     <%= form_for @pledge, method: :delete do |f| %>

@@ -24,7 +24,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select '.sidebar' do
       assert_select 'h2', "Your donations"
       assert_select 'p', "You have pledged to donate 5 books."
-      assert_select 'p', /haven't donated any books/
+      assert_select 'p', /haven.+t donated any books towards this pledge yet/
       assert_select 'ul'
     end
 

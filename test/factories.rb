@@ -28,7 +28,10 @@ FactoryGirl.define do
 
     factory :donor do
       sequence(:name) {|n| "Donor #{n}"}
-      after(:create) {|user| create :pledge, user: user}
+
+      trait :with_pledge do
+        after(:create) {|user| create :pledge, user: user}
+      end
     end
 
     factory :volunteer do

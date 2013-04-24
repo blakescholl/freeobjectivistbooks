@@ -68,7 +68,7 @@ class PledgeTest < ActiveSupport::TestCase
   end
 
   test "end if needed is idempotent" do
-    pledge = create :pledge, :ended, created_at: 5.weeks.ago
+    pledge = create :pledge, :ended, :endable
 
     assert_no_difference "ActionMailer::Base.deliveries.count" do
       pledge.end_if_needed!
@@ -77,7 +77,7 @@ class PledgeTest < ActiveSupport::TestCase
   end
 
   test "end if needed does nothing if pledge canceled" do
-    pledge = create :pledge, :canceled, created_at: 5.weeks.ago
+    pledge = create :pledge, :canceled, :endable
 
     assert_no_difference "ActionMailer::Base.deliveries.count" do
       pledge.end_if_needed!

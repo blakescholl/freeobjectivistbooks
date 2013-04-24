@@ -149,7 +149,7 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   test "show for donor" do
-    user = create :donor
+    user = create :donor, :with_pledge
     donation = create :donation, user: user
     ineligible_donation = create :donation_for_request_not_amazon, user: user
     create :donation_for_request_no_address, user: user
@@ -203,7 +203,7 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   test "show for donor with canceled pledge" do
-    user = create :donor
+    user = create :donor, :with_pledge
     user.cancel_pledge!
 
     get :show, params, session_for(user)

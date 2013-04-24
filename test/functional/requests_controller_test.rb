@@ -4,7 +4,7 @@ class RequestsControllerTest < ActionController::TestCase
   # Index
 
   test "index" do
-    user = create :donor
+    user = create :donor, :with_pledge
 
     get :index, params, session_for(user)
     assert_response :success
@@ -32,18 +32,20 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "index for user with previous donations" do
-    donation = create :donation, :sent
+    user = create :donor, :with_pledge
+    donation = create :donation, :sent, user: user
 
-    get :index, params, session_for(donation.user)
+    get :index, params, session_for(user)
     assert_response :success
 
     assert_select '.sidebar p', /donated 1 book/
   end
 
   test "index for user with flagged donations" do
-    donation = create :donation_for_request_no_address
+    user = create :donor, :with_pledge
+    donation = create :donation_for_request_no_address, user: user
 
-    get :index, params, session_for(donation.user)
+    get :index, params, session_for(user)
     assert_response :success
 
     assert_select '.sidebar p', /1 book flagged/

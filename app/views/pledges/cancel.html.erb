@@ -34,7 +34,7 @@ h2 {
 
     <%= form_for @pledge, method: :delete do |f| %>
         <%= f.fields_for @event do |e| %>
-            <h2>Why you are canceling your plege? (optional)</h2>
+            <h2>Why you are canceling your pledge? (optional)</h2>
 
             <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>
             <%= e.text_area :message, rows: 6, cols: 60 %>

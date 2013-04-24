@@ -83,6 +83,7 @@ FactoryGirl.define do
 
     trait(:ended) {ended true}
     trait(:canceled) {canceled true}
+    trait(:endable) {created_at {5.weeks.ago}}
   end
 
   factory :donation do

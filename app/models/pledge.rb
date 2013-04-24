@@ -1,5 +1,7 @@
 # Represents a pledge by a donor to donate a specific number of books.
 class Pledge < ActiveRecord::Base
+  PLEDGE_PERIOD = 1.month
+
   belongs_to :user
   has_many :donations
   has_many :events
@@ -17,6 +19,7 @@ class Pledge < ActiveRecord::Base
 
   scope :not_canceled, where(canceled: false)
   scope :active, not_canceled.where(ended: false)
+  scope :needs_ending, lambda {active.where('created_at < ?', PLEDGE_PERIOD.ago)}
 
   def active?
     !canceled? && !ended?
@@ -62,6 +65,19 @@ class Pledge < ActiveRecord::Base
 
   def build_update_event
     update_events.build detail: update_detail if changed?
+  end
+
+  def needs_ending?
+    active? && created_at < PLEDGE_PERIOD.ago
+  end
+
+  def end_if_needed!
+    if needs_ending?
+      self.ended = true
+      mail = PledgeMailer.pledge_rotation self
+      mail.deliver
+      save!
+    end
   end
 
   def cancel(params = {})

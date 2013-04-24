@@ -1,0 +1,17 @@
+<p>
+  On <%= short_date @pledge.created_at %> you pledged to donate <%= pluralize @pledge.quantity, "book" %> to students
+  on Free Objectivist Books. <%= @feedback %>
+</p>
+
+<p>
+  <% if @pledge.fulfilled? %>
+    Since you're going strong, how about making a new pledge?
+  <% else %>
+    Your pledge is up, but you can always make a new one!
+  <% end %>
+  There are <%= @request_count %> students still waiting to read Ayn Rand.
+</p>
+
+<p>Make a new pledge using this link:</p>
+
+<p><strong><%= link_to "Make a new pledge", new_pledge_url %></strong></p>

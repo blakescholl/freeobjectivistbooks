@@ -56,6 +56,44 @@ class PledgeTest < ActiveSupport::TestCase
     assert_equal "update", event.type
   end
 
+  # End if needed
+
+  test "end if needed" do
+    pledge = create :pledge, created_at: 5.weeks.ago
+
+    assert_difference "ActionMailer::Base.deliveries.count" do
+      pledge.end_if_needed!
+      assert pledge.ended?
+    end
+  end
+
+  test "end if needed is idempotent" do
+    pledge = create :pledge, :ended, created_at: 5.weeks.ago
+
+    assert_no_difference "ActionMailer::Base.deliveries.count" do
+      pledge.end_if_needed!
+      assert pledge.ended?
+    end
+  end
+
+  test "end if needed does nothing if pledge canceled" do
+    pledge = create :pledge, :canceled, created_at: 5.weeks.ago
+
+    assert_no_difference "ActionMailer::Base.deliveries.count" do
+      pledge.end_if_needed!
+      assert !pledge.ended?
+    end
+  end
+
+  test "end if needed doesn't end new pledges" do
+    pledge = create :pledge
+
+    assert_no_difference "ActionMailer::Base.deliveries.count" do
+      pledge.end_if_needed!
+      assert !pledge.ended?
+    end
+  end
+
   # Derived attributes
 
   test "fulfilled?" do

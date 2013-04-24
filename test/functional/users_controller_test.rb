@@ -24,7 +24,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def pledge_attributes
-    { quantity: 5, reason: pledge_reason }
+    { quantity: 5, recurring: false, reason: pledge_reason }
   end
 
   # Read

@@ -10,7 +10,8 @@ class PledgesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'h1', "Make a pledge"
-    assert_select 'input[value=5]'
+    assert_select 'input[type=text][value=5]'
+    assert_select 'input[type=radio]', 2
     assert_select 'input[type=submit]'
     assert_select 'a', /cancel/i
   end
@@ -26,20 +27,35 @@ class PledgesControllerTest < ActionController::TestCase
     user = create :donor
 
     assert_difference "user.pledges.count" do
-      post :create, {pledge: {quantity: 5}}, session_for(user)
+      post :create, {pledge: {quantity: 5, recurring: false}}, session_for(user)
       assert_redirected_to donate_url
       user.reload
     end
 
     pledge = user.pledges.reorder(:created_at).last
     assert_equal 5, pledge.quantity
+    assert !pledge.recurring?
+  end
+
+  test "create recurring" do
+    user = create :donor
+
+    assert_difference "user.pledges.count" do
+      post :create, {pledge: {quantity: 3, recurring: true}}, session_for(user)
+      assert_redirected_to donate_url
+      user.reload
+    end
+
+    pledge = user.pledges.reorder(:created_at).last
+    assert_equal 3, pledge.quantity
+    assert pledge.recurring?
   end
 
   test "create requires valid quantity" do
     user = create :donor
 
     assert_no_difference "user.pledges.count" do
-      post :create, {pledge: {quantity: 0}}, session_for(user)
+      post :create, {pledge: {quantity: 0, recurring: false}}, session_for(user)
       assert_response :success
     end
 
@@ -48,7 +64,7 @@ class PledgesControllerTest < ActionController::TestCase
   end
 
   test "create requires login" do
-    post :create, {pledge: {quantity: 5}}
+    post :create, {pledge: {quantity: 5, recurring: false}}
     verify_login_page
   end
 
@@ -62,6 +78,7 @@ class PledgesControllerTest < ActionController::TestCase
 
     assert_select 'h1', "Your pledge"
     assert_select 'input[value=5]'
+    assert_select 'input[type=radio]', 2
     assert_select 'input[type=submit]'
     assert_select 'a', /cancel/i
   end
@@ -86,11 +103,12 @@ class PledgesControllerTest < ActionController::TestCase
   test "update" do
     pledge = create :pledge
 
-    put :update, {id: pledge.id, pledge: {quantity: 10}}, session_for(pledge.user)
+    put :update, {id: pledge.id, pledge: {quantity: 3, recurring: true}}, session_for(pledge.user)
     assert_redirected_to profile_url
 
     pledge.reload
-    assert_equal 10, pledge.quantity
+    assert_equal 3, pledge.quantity
+    assert pledge.recurring?
 
     verify_event pledge, "update"
   end
@@ -98,7 +116,7 @@ class PledgesControllerTest < ActionController::TestCase
   test "update quantity must be a number" do
     pledge = create :pledge
 
-    put :update, {id: pledge.id, pledge: {quantity: "x"}}, session_for(pledge.user)
+    put :update, {id: pledge.id, pledge: {quantity: "x", recurring: true}}, session_for(pledge.user)
     assert_response :success
 
     assert_select 'h1', "Your pledge"
@@ -106,12 +124,13 @@ class PledgesControllerTest < ActionController::TestCase
 
     pledge.reload
     assert_equal 5, pledge.quantity
+    assert !pledge.recurring?
   end
 
   test "update requires login" do
     pledge = create :pledge
 
-    put :update, {id: pledge.id, pledge: {quantity: 10}}
+    put :update, {id: pledge.id, pledge: {quantity: 10, recurring: false}}
     verify_login_page
   end
 
@@ -119,7 +138,7 @@ class PledgesControllerTest < ActionController::TestCase
     pledge = create :pledge
     user = create :user
 
-    put :update, {id: pledge.id, pledge: {quantity: 10}}, session_for(user)
+    put :update, {id: pledge.id, pledge: {quantity: 10, recurring: false}}, session_for(user)
     verify_wrong_login_page
   end
 

@@ -87,9 +87,7 @@
 
     <h2>Your pledge</h2>
     <%= fields_for @pledge do |p| %>
-    <p class="field_with_errors"><%= @pledge.errors[:quantity].join(", ") %></p>
-    <label>I pledge to donate <%= p.text_field :quantity, size: 1 %> books to students.</label>
-    <p class="pledge-explanation">Most books are $10 a copy or less.</p>
+    <%= render partial: "pledges/pledge_fields", locals: {pledge: @pledge, form: p} %>
 
     <h2>Why do you want to donate Objectivist books? (optional)</h2>
 

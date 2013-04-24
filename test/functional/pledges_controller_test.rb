@@ -27,7 +27,7 @@ class PledgesControllerTest < ActionController::TestCase
 
     assert_difference "user.pledges.count" do
       post :create, {pledge: {quantity: 5}}, session_for(user)
-      assert_redirected_to profile_url
+      assert_redirected_to donate_url
       user.reload
     end
 

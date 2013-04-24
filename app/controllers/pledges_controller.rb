@@ -12,7 +12,7 @@ class PledgesController < ApplicationController
   def create
     @pledge = @current_user.pledges.build params[:pledge]
     if save @pledge
-      redirect_to profile_url
+      redirect_to donate_url
     else
       render :new
     end

@@ -97,7 +97,7 @@ ActiveAdmin.register User do
       f.input :email
       f.input :studying
       f.input :school
-      f.input :location
+      f.input :location_name
       f.input :address
       f.input :is_volunteer, as: :boolean
       f.input :is_admin, as: :boolean

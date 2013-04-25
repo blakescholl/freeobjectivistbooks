@@ -387,7 +387,7 @@ class RequestTest < ActiveSupport::TestCase
     event = request.renew
 
     assert request.active?
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
     assert_equal "renew", event.type
     assert_equal "uncanceled", event.detail
   end
@@ -398,7 +398,7 @@ class RequestTest < ActiveSupport::TestCase
     event = request.renew
 
     assert request.active?
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
     assert_nil event
   end
 end

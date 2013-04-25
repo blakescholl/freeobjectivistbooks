@@ -629,7 +629,7 @@ class RequestsControllerTest < ActionController::TestCase
 
     request.reload
     assert request.active?
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
 
     verify_event request, "renew", detail: "uncanceled"
   end
@@ -642,7 +642,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_redirected_to request
 
     request.reload
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
   end
 
   test "renew for canceled request requires can_request?" do
@@ -667,7 +667,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
 
     request.reload
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
   end
 
   test "renew requires valid shipping info" do
@@ -683,7 +683,7 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select 'input.confirm[type="submit"]'
 
     request.reload
-    assert_equal open_at, request.open_at
+    assert_equal open_at.to_i, request.open_at.to_i
     assert_equal name, request.user.name
   end
 

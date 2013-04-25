@@ -15,6 +15,33 @@ class User < ActiveRecord::Base
   serialize :roles, JSON
 
   #--
+  # Roles
+  #++
+
+  def self.role(role_name)
+    role_name = role_name.to_s
+
+    define_method "is_#{role_name}" do
+      roles.include? role_name
+    end
+
+    define_method "is_#{role_name}?" do
+      send role_name
+    end
+
+    define_method "is_#{role_name}=" do |value|
+      if value.to_bool
+        self.roles << role_name if !roles.include?(role_name)
+      else
+        self.roles -= [role_name]
+      end
+    end
+  end
+
+  role :volunteer
+  role :admin
+
+  #--
   # Associations
   #++
 
@@ -166,22 +193,6 @@ class User < ActiveRecord::Base
 
   def new_request
     requests.build book: Book.default_book
-  end
-
-  def is_volunteer?
-    is_volunteer
-  end
-
-  def is_volunteer
-    roles.include? "volunteer"
-  end
-
-  def is_volunteer=(is_volunteer)
-    if is_volunteer.to_bool
-      self.roles << "volunteer" unless self.is_volunteer?
-    else
-      self.roles -= ["volunteer"]
-    end
   end
 
   def increment_balance!(amount)

@@ -100,6 +100,7 @@ ActiveAdmin.register User do
       f.input :location
       f.input :address
       f.input :is_volunteer, as: :boolean
+      f.input :is_admin, as: :boolean
       f.input :blocked
     end
     f.actions

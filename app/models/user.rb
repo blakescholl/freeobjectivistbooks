@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
     end
 
     define_method "is_#{role_name}?" do
-      send role_name
+      roles.include? role_name
     end
 
     define_method "is_#{role_name}=" do |value|

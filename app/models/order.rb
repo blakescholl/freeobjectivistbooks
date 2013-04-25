@@ -58,6 +58,7 @@ class Order < ActiveRecord::Base
 
   # Summary of the Donations in this order.
   def description
+    return "(empty)" if donations.empty?
     donation = donations.first
     description = "#{donation.book} to #{donation.student} in #{donation.student.location}"
     rest = donations.size - 1

@@ -18,7 +18,7 @@ ActiveAdmin.register Order do
     attributes_table do
       row :user
       row :description
-      row(:total) {order.total.format}
+      row(:total) {order.total.to_money.format}
       row :paid?
       row :created_at
     end

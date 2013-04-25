@@ -35,6 +35,4 @@ FreeBooks::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
-
-  config.admin_password_hash = Digest::MD5.hexdigest "admin:Admin:password"
 end

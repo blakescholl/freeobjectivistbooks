@@ -4,8 +4,7 @@ class Admin::RequestsControllerTest < ActionController::TestCase
   # Index
 
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'h1', "Requests"
     assert_select '.overview table'
@@ -21,24 +20,21 @@ class Admin::RequestsControllerTest < ActionController::TestCase
   # Show
 
   test "show no donor" do
-    admin_auth
-    get :show, id: @howard_request.id
+    get :show, {id: @howard_request.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /Howard Roark wants\s+Atlas Shrugged/
     assert_select 'h2', /looking for donor/i
   end
 
   test "show with donor" do
-    admin_auth
-    get :show, id: @hank_request.id
+    get :show, {id: @hank_request.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /Hank Rearden wants\s+Atlas Shrugged/
     assert_select 'h2', /donor found/i
   end
 
   test "show with book sent" do
-    admin_auth
-    get :show, id: @quentin_request.id
+    get :show, {id: @quentin_request.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /Quentin Daniels wants\s+The Virtue of Selfishness/
     assert_select 'h2', /book sent/i
@@ -47,15 +43,14 @@ class Admin::RequestsControllerTest < ActionController::TestCase
   test "show with fulfiller" do
     fulfillment = create :fulfillment
 
-    admin_auth
-    get :show, id: fulfillment.request.id
+    get :show, {id: fulfillment.request.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /Student \d+ wants\s+Book \d+/
     assert_select 'h2', /donor found/i
   end
 
   test "show requires login" do
-    get :show, id: @howard_request.id
+    get :show, {id: @howard_request.id}
     assert_response :unauthorized
   end
 end

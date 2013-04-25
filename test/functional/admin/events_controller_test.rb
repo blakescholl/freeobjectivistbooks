@@ -2,16 +2,14 @@ require 'test_helper'
 
 class Admin::EventsControllerTest < ActionController::TestCase
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /#{Event.count} event/
     assert_select '.event', Event.count
   end
 
   test "public thanks" do
-    admin_auth
-    get :index, public_thanks: 'true'
+    get :index, {public_thanks: 'true'}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', /public thank-yous/
     assert_select '.event', Event.public_thanks.count

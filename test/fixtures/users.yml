@@ -81,3 +81,12 @@ irina:
   password_digest: <%= BCrypt::Password.create "irina" %>
   location: leningrad
   roles: '["volunteer"]'
+
+# Admin
+
+admin:
+  name: Jason Crawford
+  email: jason@freeobjectivistbooks.org
+  password_digest: <%= BCrypt::Password.create "jason" %>
+  location: san_francisco
+  roles: '["admin"]'

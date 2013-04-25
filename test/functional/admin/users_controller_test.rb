@@ -2,30 +2,26 @@ require 'test_helper'
 
 class Admin::UsersControllerTest < ActionController::TestCase
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'h1', "#{User.count} users"
     assert_select '.user', User.count
   end
 
   test "search" do
-    admin_auth
-    get :index, q: "h"
+    get :index, {q: "h"}, session_for(users :admin)
     assert_response :success
     assert_select '.overview', /matching/
     assert_select '.user'
   end
 
   test "search with one result" do
-    admin_auth
-    get :index, q: "roark"
+    get :index, {q: "roark"}, session_for(users :admin)
     assert_redirected_to [:admin, @howard]
   end
 
   test "show student" do
-    admin_auth
-    get :show, id: @howard.id
+    get :show, {id: @howard.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', "Howard Roark"
     assert_select '.email', "roark@stanton.edu"
@@ -36,8 +32,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
   end
 
   test "show donor" do
-    admin_auth
-    get :show, id: @hugh.id
+    get :show, {id: @hugh.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', "Hugh Akston"
     assert_select '.email', "akston@patrickhenry.edu"
@@ -50,8 +45,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
   end
 
   test "edit" do
-    admin_auth
-    get :edit, id: @howard.id
+    get :edit, {id: @howard.id}, session_for(users :admin)
     assert_response :success
     assert_select 'h1', 'Edit user'
     assert_select 'input[id="user_name"][value="Howard Roark"]'
@@ -59,8 +53,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
   end
 
   test "update" do
-    admin_auth
-    put :update, id: @howard.id, user: {name: "Howard Q. Roark", address: "123 Independence St"}
+    put :update, {id: @howard.id, user: {name: "Howard Q. Roark", address: "123 Independence St"}}, session_for(users :admin)
     assert_redirected_to [:admin, @howard]
 
     @howard.reload
@@ -69,15 +62,13 @@ class Admin::UsersControllerTest < ActionController::TestCase
   end
 
   test "spoof" do
-    admin_auth
-    post :spoof, id: @howard.id
+    post :spoof, {id: @howard.id}, session_for(users :admin)
     assert_redirected_to profile_url
     assert_equal @howard.id, session[:user_id]
   end
 
   test "destroy" do
-    admin_auth
-    delete :destroy, id: @howard.id
+    delete :destroy, {id: @howard.id}, session_for(users :admin)
     assert_redirected_to action: :index
     assert !User.exists?(@howard)
   end

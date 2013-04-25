@@ -44,6 +44,4 @@ FreeBooks::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
-
-  config.admin_password_hash = Digest::MD5.hexdigest "admin:Admin:password"
 end

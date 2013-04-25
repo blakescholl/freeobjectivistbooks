@@ -91,18 +91,22 @@ class ApplicationController < ActionController::Base
     raise UnauthorizedException if !@current_user
   end
 
-  # Uses HTTP digest authentication to validate admin credentials.
+  # Invokes render_forbidden if the current_user doesn't have the given role. Used in before_filters.
+  def require_role(role)
+    require_login
+    raise ForbiddenException if !@current_user.roles.include?(role.to_s)
+  end
+
+  # Invokes render_forbidden if the current_user is not an admin.
+  # Optional before_filter that subclasses can use.
   def require_admin
-    authenticate_or_request_with_http_digest("Admin") do |username|
-      Rails.application.config.admin_password_hash
-    end
+    require_role :admin
   end
 
   # Invokes render_forbidden if the current_user is not a volunteer.
   # Optional before_filter that subclasses can use.
   def require_volunteer
-    require_login
-    raise ForbiddenException if !@current_user.is_volunteer?
+    require_role :volunteer
   end
 
   # Specifies who can access this page. Subclasses can override this to return a user or a list of

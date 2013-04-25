@@ -2,8 +2,7 @@ require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'a', /user/
     assert_select 'a', /request/

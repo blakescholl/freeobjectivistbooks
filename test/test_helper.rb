@@ -89,10 +89,6 @@ class ActiveSupport::TestCase
     Timecop.return
   end
 
-  def admin_auth
-    authenticate_with_http_digest "admin", "password", "Admin"
-  end
-
   def decode_json_response
     ActiveSupport::JSON.decode @response.body
   end
@@ -135,32 +131,6 @@ class ActiveSupport::TestCase
     assert_not_nil request.open_at
     time_since_open_at = Time.since(request.open_at)
     assert time_since_open_at < 2, "time since open_at: #{time_since_open_at}"
-  end
-end
-
-# from https://gist.github.com/1282275
-class ActionController::TestCase
-  require 'digest/md5'
-
-  def authenticate_with_http_digest(user, password, realm)
-    ActionController::Base.class_eval { include ActionController::Testing }
-
-    @controller.instance_eval %Q(
-      alias real_process_with_new_base_test process_with_new_base_test
-
-      def process_with_new_base_test(request, response)
-        credentials = {
-      	  :uri => request.url,
-      	  :realm => "#{realm}",
-      	  :username => "#{user}",
-      	  :nonce => ActionController::HttpAuthentication::Digest.nonce(request.env['action_dispatch.secret_token']),
-      	  :opaque => ActionController::HttpAuthentication::Digest.opaque(request.env['action_dispatch.secret_token'])
-        }
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Digest.encode_credentials(request.request_method, credentials, "#{password}", false)
-
-        real_process_with_new_base_test(request, response)
-      end
-    )
   end
 end
 

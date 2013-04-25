@@ -2,8 +2,7 @@ require 'test_helper'
 
 class Admin::PledgesControllerTest < ActionController::TestCase
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'h1', 'Pledges'
     assert_select '.overview table'

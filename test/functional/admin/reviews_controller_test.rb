@@ -4,8 +4,7 @@ class Admin::ReviewsControllerTest < ActionController::TestCase
   # Index
 
   test "index" do
-    admin_auth
-    get :index
+    get :index, params, session_for(users :admin)
     assert_response :success
     assert_select 'h1', "Reviews"
     assert_select '.review', Review.count

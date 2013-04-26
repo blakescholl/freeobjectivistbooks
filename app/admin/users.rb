@@ -53,6 +53,18 @@ ActiveAdmin.register User do
       end
     end
 
+    if user.pledges.any?
+      panel "Pledges" do
+        table_for user.pledges do
+          column :quantity
+          column(:recurring?) {|pledge| pledge.recurring? ? "every month" : "this month"}
+          column(:active?) {|pledge| pledge.ended? ? "ended" : pledge.canceled? ? "canceled" : "active"}
+          column(:status) {|pledge| pledge.status}
+          column(:view) {|pledge| link_to "View", admin2_pledge_path(pledge)}
+        end
+      end
+    end
+
     if user.donations.any?
       panel "Donations" do
         table_for user.donations do

@@ -8,7 +8,7 @@ ActiveAdmin.register Order do
     selectable_column
     column :user
     column :description
-    column(:total) {|order| order.total.format}
+    column(:total) {|order| order.total.to_money.format}
     column :paid?
     column :created_at
     default_actions

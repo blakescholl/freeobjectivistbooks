@@ -17,9 +17,20 @@ class Pledge < ActiveRecord::Base
 
   default_scope order("created_at desc")
 
+  scope :recurring, where(recurring: true)
+  scope :ended, where(ended: true)
+  scope :not_ended, where(ended: false)
+  scope :canceled, where(canceled: true)
   scope :not_canceled, where(canceled: false)
-  scope :active, not_canceled.where(ended: false)
+  scope :active, not_canceled.not_ended
   scope :needs_ending, lambda {active.where('created_at < ?', PLEDGE_PERIOD.ago)}
+
+  def self.not_active
+    t = arel_table
+    ended = t[:ended].eq true
+    canceled = t[:canceled].eq true
+    where(ended.or canceled)
+  end
 
   def active?
     !canceled? && !ended?

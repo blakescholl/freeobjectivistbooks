@@ -7,7 +7,7 @@ class MetricsTest < ActiveSupport::TestCase
 
   def values_for(metrics)
     metrics.inject({}) do |hash,metric|
-      value = metric[:value] || metric[:values]["Total"]
+      value = metric[:value] || (metric[:values] && metric[:values]["Total"])
       hash.merge(metric[:name] => value)
     end
   end
@@ -62,7 +62,18 @@ class MetricsTest < ActiveSupport::TestCase
   test "pledge metrics" do
     metrics = @metrics.pledge_metrics
     values = values_for metrics
-    assert_equal values['Average pledge size'], values['Books pledged'].to_f / values['Donors pledging'], metrics.inspect
+    assert_equal values['Average pledge size'], values['Books pledged'].to_f / values['Active pledges'], metrics.inspect
+    assert_equal Pledge.active.map {|p| p.donations_count}.sum, values['Donations so far'], metrics.inspect
+    assert values['Recurring pledges'] < values['Active pledges'], metrics.inspect
+    assert values['Books pledged monthly'] < values['Books pledged'], metrics.inspect
+  end
+
+  test "past pledge metrics" do
+    metrics = @metrics.past_pledge_metrics
+    values = values_for metrics
+    assert_equal values['Past pledges'], values['Ended pledges'] + values['Canceled pledges'], metrics.inspect
+    assert_equal values['Average past pledge size'], values['Past books pledged'].to_f / values['Past pledges'], metrics.inspect if values['Past pledges'] != 0
+    assert_equal Pledge.not_active.map {|p| p.donations_count}.sum, values['Past pledge donations'], metrics.inspect
   end
 
   test "book leaderboard" do

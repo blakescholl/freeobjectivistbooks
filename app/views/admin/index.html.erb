@@ -59,6 +59,12 @@ td, th {
     <h2>Request pipeline</h2>
     <%= render partial: "admin/metrics", object: @metrics.request_pipeline %>
 
+    <h2>Active pledges</h2>
+    <%= render partial: "admin/metrics", object: @metrics.pledge_metrics %>
+
+    <h2>Past pledges</h2>
+    <%= render partial: "admin/metrics", object: @metrics.past_pledge_metrics %>
+
     <h2>Send-money sub-pipeline</h2>
     <%= render partial: "admin/metrics", object: @metrics.send_money_pipeline %>
 
@@ -81,9 +87,6 @@ td, th {
 
     <h2>Donation metrics</h2>
     <%= render partial: "admin/metrics", object: @metrics.donation_metrics %>
-
-    <h2>Pledge metrics</h2>
-    <%= render partial: "admin/metrics", object: @metrics.pledge_metrics %>
 
     <h2>Latest events</h2>
     <% @latest_events.each do |event| %>

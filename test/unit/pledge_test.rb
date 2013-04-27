@@ -43,6 +43,52 @@ class PledgeTest < ActiveSupport::TestCase
     assert pledge.invalid?
   end
 
+  # Scopes
+
+  def verify_scope(scope)
+    super Pledge, scope
+  end
+
+  test "recurring" do
+    create :pledge, :recurring
+    verify_scope(:recurring) {|p| p.recurring?}
+  end
+
+  test "active" do
+    verify_scope(:active) {|p| p.active?}
+  end
+
+  test "ended" do
+    create :pledge, :ended
+    verify_scope(:ended) {|p| p.ended?}
+  end
+
+  test "canceled" do
+    create :pledge, :canceled
+    verify_scope(:canceled) {|p| p.canceled?}
+  end
+
+  test "not active" do
+    create :pledge, :ended
+    verify_scope(:not_active) {|p| !p.active?}
+  end
+
+  test "not ended" do
+    verify_scope(:not_ended) {|p| !p.ended?}
+  end
+
+  test "not canceled" do
+    verify_scope(:not_canceled) {|p| !p.canceled?}
+  end
+
+  test "needs ending" do
+    verify_scope(:needs_ending) {|p| p.needs_ending?}
+  end
+
+  test "unfulfilled" do
+    verify_scope(:unfulfilled) {|pledge| !pledge.fulfilled?}
+  end
+
   # Update event
 
   test "build update event" do
@@ -136,10 +182,6 @@ class PledgeTest < ActiveSupport::TestCase
 
     new_pledge = create :pledge, quantity: 1
     assert !new_pledge.fulfilled?, "new pledge is fulfilled"
-  end
-
-  test "fulfilled" do
-    verify_scope(Pledge, :unfulfilled) {|pledge| !pledge.fulfilled?}
   end
 
   test "to testimonial" do

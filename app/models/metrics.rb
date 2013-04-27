@@ -85,10 +85,29 @@ class Metrics
   end
 
   def pledge_metrics
-    [
-      {name: 'Donors pledging',     value: Pledge.count},
-      {name: 'Books pledged',       value: Pledge.sum(:quantity)},
-      {name: 'Average pledge size', value: Pledge.average(:quantity)},
+    pledges = Pledge.active
+    recurring = pledges.recurring
+
+    calculate_metrics [
+      {name: 'Active pledges',        value: pledges.count},
+      {name: 'Books pledged',         value: pledges.sum(:quantity)},
+      {name: 'Average pledge size',   value: pledges.average(:quantity)},
+      {name: 'Donations so far',      value: Donation.active.joins(:pledge).merge(pledges).count, denominator_name: 'Books pledged'},
+      {name: 'Recurring pledges',     value: recurring.count,                                     denominator_name: 'Active pledges'},
+      {name: 'Books pledged monthly', value: recurring.sum(:quantity)},
+    ]
+  end
+
+  def past_pledge_metrics
+    pledges = Pledge.not_active
+
+    calculate_metrics [
+      {name: 'Past pledges',             value: pledges.count},
+      {name: 'Ended pledges',            value: Pledge.ended.count,                                  denominator_name: 'Past pledges'},
+      {name: 'Canceled pledges',         value: Pledge.canceled.count,                               denominator_name: 'Past pledges'},
+      {name: 'Past books pledged',       value: pledges.sum(:quantity)},
+      {name: 'Average past pledge size', value: pledges.average(:quantity)},
+      {name: 'Past pledge donations',    value: Donation.active.joins(:pledge).merge(pledges).count, denominator_name: 'Past books pledged'},
     ]
   end
 

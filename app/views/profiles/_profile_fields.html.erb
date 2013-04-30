@@ -1,0 +1,25 @@
+<%= form.label :name, class: "grid_5 alpha" %><div class="clear"></div>
+<% if type == :donor %>
+    <%= form.text_field :name, class: "grid_5 alpha", placeholder: "Individual or couple" %>
+<% else %>
+    <%= form.text_field :name, class: "grid_5 alpha" %>
+<% end %>
+<span class="grid_4 field_with_errors"><%= user.errors[:name].join(", ") %></span>
+<div class="clear"></div>
+
+<% if type == :student || user.school.present? || user.studying.present? %>
+    <%= form.label :school, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= form.text_field :school, class: "grid_5 alpha", placeholder: "College, university or high school" %>
+    <span class="grid_4 field_with_errors"><%= user.errors[:school].join(", ") %></span>
+    <div class="clear"></div>
+
+    <%= form.label :studying, class: "grid_5 alpha" %><div class="clear"></div>
+    <%= form.text_field :studying, class: "grid_5 alpha", placeholder: "E.g.: architecture, philosophy, business" %>
+    <span class="grid_4 field_with_errors"><%= user.errors[:studying].join(", ") %></span>
+    <div class="clear"></div>
+<% end %>
+
+<%= form.label :location_name, "Location", class: "grid_5 alpha" %><div class="clear"></div>
+<%= form.text_field :location_name, class: "grid_5 alpha", placeholder: "City and state or country" %>
+<span class="grid_4 field_with_errors"><%= user.errors[:location_name].join(", ") %></span>
+<div class="clear"></div>

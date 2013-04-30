@@ -29,6 +29,8 @@ class ProfileControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'h1', "Howard Roark"
 
+    assert_select 'p', 'Studying architecture at Stanton Institute of Technology in New York, NY'
+
     assert_select '.request', /Atlas Shrugged/ do
       assert_select '.headline', /Atlas Shrugged/
       assert_select '.status', /We are looking for a donor/
@@ -158,6 +160,8 @@ class ProfileControllerTest < ActionController::TestCase
 
     get :show, params, session_for(user)
     assert_response :success
+
+    assert_select 'p', 'In Anytown, USA'
 
     assert_select '.pledge' do
       assert_select '.headline', /donate 5 books/

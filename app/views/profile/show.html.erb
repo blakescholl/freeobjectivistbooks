@@ -50,6 +50,8 @@
 <h1 class="grid_16"><%= @current_user.name %></h1>
 
 <div class="grid_12">
+    <p><%= user_tagline @current_user %></p>
+
     <% if @requests.any? %>
     <h2>Your <%= pluralize_omit_number @requests.count, 'request' %></h2>
     <% @requests.each do |request| %>

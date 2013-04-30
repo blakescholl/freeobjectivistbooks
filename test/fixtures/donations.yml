@@ -19,14 +19,14 @@ cameron_grants_frisco_wants_opar:
 hugh_grants_dagny_wants_cui:
   request: dagny_wants_cui
   user: hugh
-  flagged: true
+  flag: hugh_grants_dagny_wants_cui_flag
   thanked: true
   status: not_sent
 
 cameron_grants_hank_wants_atlas:
   request: hank_wants_atlas
   user: cameron
-  flagged: true
+  flag: cameron_grants_hank_wants_atlas_flag
   status: not_sent
 
 # Sent

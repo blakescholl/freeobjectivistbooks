@@ -13,6 +13,8 @@ class Donation < ActiveRecord::Base
   belongs_to :user
   belongs_to :pledge
   has_many :events, dependent: :destroy
+  belongs_to :flag
+  has_many :flags, dependent: :destroy
   belongs_to :order
   has_one :fulfillment
   has_one :review
@@ -58,8 +60,8 @@ class Donation < ActiveRecord::Base
   scope :thanked, active.where(thanked: true)
   scope :not_thanked, active.where(thanked: false)
 
-  scope :flagged, active.where(flagged: true)
-  scope :not_flagged, active.where(flagged: false)
+  scope :flagged, active.where('flag_id is not null')
+  scope :not_flagged, active.where(flag_id: nil)
 
   scope :paid, active.where(paid: true)
   scope :unpaid, active.where(paid: false)
@@ -83,7 +85,7 @@ class Donation < ActiveRecord::Base
 
   def self.no_donor_action
     t = arel_table
-    flagged = t[:flagged].eq true
+    flagged = t[:flag_id].not_eq nil
     paid = t[:paid].eq true
     sent = t[:status].not_eq 'not_sent'
     active.where(flagged.or paid.or sent)
@@ -171,6 +173,22 @@ class Donation < ActiveRecord::Base
   # True if the book has been read.
   def read?
     status.read?
+  end
+
+  def flagged
+    self[:flag_id].present?
+  end
+
+  def flagged=(flagged)
+    if flagged.to_bool
+      self.create_flag unless self[:flag_id]
+    else
+      self.flag_id = nil
+    end
+  end
+
+  def flagged?
+    flagged
   end
 
   # Whether we're going to require the student to enter an address the next time they update the

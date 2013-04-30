@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130424013619) do
+ActiveRecord::Schema.define(:version => 20130430200729) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -81,17 +81,18 @@ ActiveRecord::Schema.define(:version => 20130424013619) do
     t.integer  "request_id"
     t.integer  "user_id"
     t.string   "status"
-    t.boolean  "flagged",           :default => false,        :null => false
-    t.boolean  "thanked",           :default => false,        :null => false
-    t.boolean  "canceled",          :default => false,        :null => false
+    t.boolean  "flagged_deprecated", :default => false,        :null => false
+    t.boolean  "thanked",            :default => false,        :null => false
+    t.boolean  "canceled",           :default => false,        :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "status_updated_at"
     t.integer  "price_cents"
-    t.boolean  "paid",              :default => false,        :null => false
-    t.string   "donor_mode",        :default => "send_books", :null => false
+    t.boolean  "paid",               :default => false,        :null => false
+    t.string   "donor_mode",         :default => "send_books", :null => false
     t.integer  "order_id"
     t.integer  "pledge_id"
+    t.integer  "flag_id"
   end
 
   add_index "donations", ["order_id"], :name => "index_donations_on_order_id"
@@ -120,6 +121,19 @@ ActiveRecord::Schema.define(:version => 20130424013619) do
   add_index "events", ["pledge_id"], :name => "index_events_on_pledge_id"
   add_index "events", ["request_id"], :name => "index_events_on_request_id"
   add_index "events", ["user_id"], :name => "index_events_on_user_id"
+
+  create_table "flags", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "donation_id"
+    t.string   "type"
+    t.text     "message"
+    t.boolean  "fixed"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "flags", ["donation_id"], :name => "index_flags_on_donation_id"
+  add_index "flags", ["user_id"], :name => "index_flags_on_user_id"
 
   create_table "fulfillments", :force => true do |t|
     t.integer  "user_id"

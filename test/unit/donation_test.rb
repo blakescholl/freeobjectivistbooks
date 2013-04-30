@@ -205,9 +205,9 @@ class DonationTest < ActiveSupport::TestCase
   end
 
   test "can flag?" do
-    assert @quentin_donation_unsent.can_flag?
-    assert !@quentin_donation.can_flag?  # already sent
-    assert !@dagny_donation.can_flag?    # already flagged
+    assert @quentin_donation_unsent.can_flag?, "can't flag unsent donation"
+    assert !@quentin_donation.can_flag?, "can flag already-sent donation"
+    assert !@dagny_donation.can_flag?, "can flag already-flagged donation"
   end
 
   # Can send money

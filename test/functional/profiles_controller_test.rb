@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProfileControllerTest < ActionController::TestCase
+class ProfilesControllerTest < ActionController::TestCase
   def verify_new_request_link(present = true)
     verify_link 'request another', present
   end

@@ -1,5 +1,5 @@
 # Displays the logged-in-user homepage.
-class ProfileController < ApplicationController
+class ProfilesController < ApplicationController
   before_filter :require_login
 
   def show

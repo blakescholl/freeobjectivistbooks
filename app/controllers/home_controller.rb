@@ -1,7 +1,5 @@
 # Manages the unrecognized-user homepage.
 class HomeController < ApplicationController
-  before_filter :require_login, only: :profile
-
   def index
     if @current_user
       redirect_to profile_url

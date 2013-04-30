@@ -47,10 +47,10 @@
     <%= stylesheet_link_tag 'donations' %>
 <% end %>
 
-<h1 class="grid_16"><%= @current_user.name %></h1>
+<h1 class="grid_16"><%= @user %></h1>
 
 <div class="grid_12">
-    <p><%= user_tagline @current_user %></p>
+    <p><%= user_tagline @user %></p>
 
     <% if @requests.any? %>
     <h2>Your <%= pluralize_omit_number @requests.count, 'request' %></h2>
@@ -94,7 +94,7 @@
     </div>
     <% end %>
     <p class="multiple-books">
-        <% if @current_user.can_request? %>
+        <% if @user.can_request? %>
         <%= link_to 'Request another book', new_request_path %>
         <% else %>
         You can have one open request at a time. Want another book? You can request it when we find a donor for this one.

@@ -3,6 +3,7 @@ class Book < ActiveRecord::Base
   monetize :price_cents, allow_nil: true
 
   scope :featured, where(featured: true).order(:rank)
+  scope :with_asin, where('asin is not null')
   scope :with_prices, where('books.price_cents is not null').where('books.price_cents > 0')
 
   # The default book for new requests.

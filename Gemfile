@@ -14,6 +14,7 @@ gem 'pg'
 gem 'redcarpet'
 gem 'rest-client'
 gem 'thin'
+gem 'vacuum'
 gem 'valid_email'
 
 group :development, :test do

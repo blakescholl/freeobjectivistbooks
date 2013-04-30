@@ -18,3 +18,10 @@ namespace :pledge_monitor do
     PledgeMonitor.schedule
   end
 end
+
+namespace :price_checker do
+  desc "Schedule price checker to update prices on all eligible books"
+  task :schedule => :environment do
+    PriceChecker.schedule
+  end
+end

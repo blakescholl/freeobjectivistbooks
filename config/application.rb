@@ -59,6 +59,7 @@ module FreeBooks
 
     config.aws_access_key = ENV['AWS_ACCESS_KEY'] || "test-access-key"
     config.aws_secret_key = ENV['AWS_SECRET_KEY'] || "test-secret-key"
+    config.amazon_associates_tag = ENV['AMAZON_ASSOCIATES_TAG']
     config.aws_payments_live = false
 
     config.after_initialize do |app|

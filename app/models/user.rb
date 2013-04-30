@@ -11,6 +11,8 @@ class User < ActiveRecord::Base
 
   attr_reader :password
 
+  attr_accessible :name, :email, :password, :password_confirmation, :location_name, :school, :studying, :address
+
   monetize :balance_cents
   serialize :roles, JSON
 
@@ -63,7 +65,7 @@ class User < ActiveRecord::Base
   validates_presence_of :name, :location, :email
   validates_uniqueness_of :email, case_sensitive: false, message: "There is already an account with this email."
 
-  validate :name_must_have_proper_format, on: :create, if: lambda {|user| user.name.present? }
+  validate :name_must_have_proper_format, if: lambda {|user| user.name.present? && user.name_changed?}
   validates :email, email: {message: "is not a valid email address"}, allow_nil: true
 
   validates_presence_of :password, unless: "password_digest.present?"

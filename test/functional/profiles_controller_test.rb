@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class ProfilesControllerTest < ActionController::TestCase
+  # Show
+
   def verify_new_request_link(present = true)
     verify_link 'request another', present
   end
@@ -30,6 +32,7 @@ class ProfilesControllerTest < ActionController::TestCase
     assert_select 'h1', "Howard Roark"
 
     assert_select 'p', 'Studying architecture at Stanton Institute of Technology in New York, NY'
+    assert_select 'a', /Edit your profile/
 
     assert_select '.request', /Atlas Shrugged/ do
       assert_select '.headline', /Atlas Shrugged/
@@ -162,6 +165,7 @@ class ProfilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'p', 'In Anytown, USA'
+    assert_select 'a', /Edit your profile/
 
     assert_select '.pledge' do
       assert_select 'p', /donate 5 books/
@@ -264,17 +268,124 @@ class ProfilesControllerTest < ActionController::TestCase
 
   test "show requires login" do
     get :show
-    assert_response :unauthorized
-    assert_select 'h1', 'Log in'
+    verify_login_page
   end
 
-  # Blocked user
+  test "show to blocked user" do
+    user = create :user, blocked: true
 
-  test "blocked user" do
-    @stadler.update_attributes! blocked: true
-
-    get :show, params, session_for(@stadler)
+    get :show, params, session_for(user)
     assert_response :forbidden
     assert_select 'h1', 'Something is wrong with your account.'
+  end
+
+  # Edit
+
+  test "edit for student" do
+    user = create :student
+
+    get :edit, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h1', /profile/
+    assert_select 'form' do
+      assert_select 'input#user_name[value=?]', user.name
+      assert_select 'input#user_name[placeholder]', false
+      assert_select 'input#user_school[value=?]', user.school
+      assert_select 'input#user_studying[value=?]', user.studying
+      assert_select 'input#user_location_name[value=?]', user.location
+      assert_select 'input[type=submit]'
+    end
+
+    assert_select 'a', /Cancel/
+  end
+
+  test "edit for donor" do
+    user = create :donor, :with_pledge
+
+    get :edit, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h1', /profile/
+    assert_select 'form' do
+      assert_select 'input#user_name[value=?][placeholder]', user.name
+      assert_select 'input#user_location_name[value=?]', user.location
+      assert_select 'input#user_school', false
+      assert_select 'input#user_studying', false
+      assert_select 'input[type=submit]'
+    end
+
+    assert_select 'a', /Cancel/
+  end
+
+  test "edit for volunteer" do
+    user = create :donor
+
+    get :edit, params, session_for(user)
+    assert_response :success
+
+    assert_select 'h1', /profile/
+    assert_select 'form' do
+      assert_select 'input#user_name[value=?]', user.name
+      assert_select 'input#user_name[placeholder]', false
+      assert_select 'input#user_location_name[value=?]', user.location
+      assert_select 'input#user_school', false
+      assert_select 'input#user_studying', false
+      assert_select 'input[type=submit]'
+    end
+
+    assert_select 'a', /Cancel/
+  end
+
+  test "edit requires login" do
+    get :edit
+    verify_login_page
+  end
+
+  # Update
+
+  test "update" do
+    user = create :user
+
+    params = {name: "New Name", location_name: "New York, NY"}
+    put :update, {user: params}, session_for(user)
+    assert_redirected_to profile_path
+
+    user.reload
+    assert_equal "New Name", user.name
+    assert_equal "New York, NY", user.location.name
+  end
+
+  test "update requires valid name" do
+    user = create :user
+    name = user.name
+
+    params = {name: "User", location_name: user.location_name}
+    put :update, {user: params}, session_for(user)
+    assert_response :success
+
+    assert_select 'div.field_with_errors' do
+      assert_select 'input#user_name'
+    end
+
+    user.reload
+    assert_equal name, user.name
+  end
+
+  test "update is safe against mass-assignment attacks" do
+    user = create :user
+
+    params = {roles: ["admin"], balance_cents: 100000}
+    put :update, {user: params}, session_for(user)
+    assert_redirected_to profile_path
+
+    user.reload
+    assert !user.is_admin?, "user made themselves admin"
+    assert_equal 0, user.balance_cents
+  end
+
+  test "update requires login" do
+    put :update
+    verify_login_page
   end
 end

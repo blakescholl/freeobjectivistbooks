@@ -1,0 +1,25 @@
+<% content_for :title do %>Edit Your Profile<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+.button.update {
+    margin-top: 24px;
+}
+
+.cancel {
+    margin-top: 37px;
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Your public profile</h1>
+
+<div class="grid_12">
+<%= form_for @user, url: profile_path do |f| %>
+    <%= render partial: "profile_fields", locals: {form: f, user: @user, type: @type} %>
+
+    <%= f.submit "", class: "grid_3 alpha button update" %>
+    <%= link_to "Cancel", profile_path, class: "grid_2 cancel" %>
+    <div class="clear"></div>
+<% end %>
+</div>

@@ -9,7 +9,7 @@ FreeBooks::Application.routes.draw do
   get "terms" => "home#terms"
   get "privacy" => "home#privacy"
 
-  resource :profile, only: :show
+  resource :profile, only: [:show, :edit, :update]
 
   get "donate" => "requests#index"
   resources :requests do

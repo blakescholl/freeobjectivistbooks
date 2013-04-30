@@ -51,6 +51,7 @@
 
 <div class="grid_12">
     <p><%= user_tagline @user %></p>
+    <p><%= link_to "Edit your profile", edit_profile_path %></p>
 
     <% if @requests.any? %>
     <h2>Your <%= pluralize_omit_number @requests.count, 'request' %></h2>

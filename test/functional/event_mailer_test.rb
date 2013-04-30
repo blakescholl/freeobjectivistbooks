@@ -52,7 +52,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "flag by fulfiller, to student" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, @frisco
@@ -68,7 +68,7 @@ class EventMailerTest < ActionMailer::TestCase
 
   test "flag by fulfiller, to donor" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
     @frisco_donation.save!
 
     mail = EventMailer.mail_for_event event, @cameron

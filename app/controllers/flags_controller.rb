@@ -14,7 +14,7 @@ class FlagsController < ApplicationController
   end
 
   def create
-    @event = @donation.flag params[:event], @current_user
+    @event = @donation.add_flag params[:event], @current_user
     if save @donation, @event
       flash[:notice] = "The request has been flagged, and your message has been sent to #{@donation.student}."
       redirect_to params[:redirect] || @donation.request

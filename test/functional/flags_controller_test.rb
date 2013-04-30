@@ -178,7 +178,7 @@ class FlagsControllerTest < ActionController::TestCase
 
   test "destroy flagged by fulfiller" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
     @frisco_donation.save!
     event.save!
 

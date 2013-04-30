@@ -194,7 +194,7 @@ class EventTest < ActiveSupport::TestCase
 
   test "notify to multiple recipients" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.flag user: @kira, message: "Fix this"
+    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
     @frisco_donation.save!
 
     assert !event.notified?

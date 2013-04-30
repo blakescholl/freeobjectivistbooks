@@ -247,7 +247,7 @@ class DonationTest < ActiveSupport::TestCase
   end
 
   test "student can't cancel if flagged" do
-    event = @quentin_donation_unsent.flag message: "Bad"
+    event = @quentin_donation_unsent.add_flag message: "Bad"
     @quentin_donation_unsent.save! && event.save!
     assert !@quentin_donation_unsent.student_can_cancel?
   end
@@ -434,7 +434,7 @@ class DonationTest < ActiveSupport::TestCase
   # Flag
 
   test "flag" do
-    event = @quentin_donation.flag(message: "Is this address correct?")
+    event = @quentin_donation.add_flag message: "Is this address correct?"
     assert @quentin_donation.flagged?
     assert_equal "flag", event.type
     assert_equal "Is this address correct?", event.message

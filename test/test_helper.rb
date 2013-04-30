@@ -124,7 +124,10 @@ class ActiveSupport::TestCase
   def verify_scope(model_class, scope)
     models = model_class.send scope
     assert models.any?, "no #{model_class.name.pluralize} matched scope #{scope}"
-    models.each {|model| assert (yield model), "#{model_class.name} #{model.id} doesn't match scope #{scope}"}
+    models.each do |model|
+      matches = yield model
+      assert matches, "#{model_class.name} #{model.id} doesn't match scope #{scope}: #{model.inspect}"
+    end
   end
 
   def assert_open_at_is_recent(request)
@@ -206,7 +209,7 @@ class Donation
   def flag!(user = nil)
     user ||= sender
     params = {message: "Fix this"}
-    event = flag params, user
+    event = add_flag params, user
     save!
     event.save! if event
     event

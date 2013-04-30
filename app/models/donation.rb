@@ -176,14 +176,14 @@ class Donation < ActiveRecord::Base
   end
 
   def flagged
-    self[:flag_id].present?
+    flag.present?
   end
 
   def flagged=(flagged)
     if flagged.to_bool
-      self.create_flag unless self[:flag_id]
+      self.create_flag unless flagged?
     else
-      self.flag_id = nil
+      self.flag = nil
     end
   end
 
@@ -334,7 +334,7 @@ class Donation < ActiveRecord::Base
     event
   end
 
-  def flag(params, user = nil)
+  def add_flag(params, user = nil)
     self.flagged = true
     params = params.merge(user: user) if user
     flag_events.build params

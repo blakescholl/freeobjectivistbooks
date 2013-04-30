@@ -164,7 +164,7 @@ class ProfileControllerTest < ActionController::TestCase
     assert_select 'p', 'In Anytown, USA'
 
     assert_select '.pledge' do
-      assert_select '.headline', /donate 5 books/
+      assert_select 'p', /donate 5 books/
       assert_select 'a', /change/i
     end
 
@@ -214,7 +214,7 @@ class ProfileControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select '.pledge' do
-      assert_select '.headline', false
+      assert_select 'p', /None right now/
       assert_select 'a', /new/i
     end
 

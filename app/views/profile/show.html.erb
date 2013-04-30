@@ -104,9 +104,12 @@
 
     <% if @show_donations %>
     <div class="pledge">
+        <h2>Your pledge</h2>
         <% if @pledge %>
-            <p class="headline">You have <%= pledge_summary @pledge %></p>
+            <p>You have <%= pledge_summary @pledge %>.</p>
             <p><%= feedback_for @pledge %></p>
+        <% else %>
+            <p>None right now.</p>
         <% end %>
         <% if @pledge && @pledge.active? %>
             <p><%= link_to 'Find students to donate books to', donate_path %></p>

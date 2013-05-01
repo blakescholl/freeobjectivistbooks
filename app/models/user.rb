@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   attr_reader :password
 
   attr_accessible :name, :email, :password, :password_confirmation, :location_name, :school, :studying, :address
+  attr_accessible :balance, :roles, :is_volunteer, :is_admin, :blocked, as: :admin
 
   monetize :balance_cents
   serialize :roles, JSON

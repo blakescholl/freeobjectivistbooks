@@ -1,3 +1,10 @@
+# As per http://ejholmes.github.io/2012/04/22/handling-mass-assignment-with-active-admin.html
+module ActiveAdmin
+  class BaseController
+    with_role :admin
+  end
+end
+
 ActiveAdmin.setup do |config|
 
   # == Site Title

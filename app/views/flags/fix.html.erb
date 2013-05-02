@@ -35,7 +35,7 @@
     <%= f.label :address, "Mailing address", class: "grid_5 alpha" %><div class="clear"></div>
     <%= f.text_area :address, class: "grid_5 alpha", rows: 5 %>
     <div class="grid_4 omega">
-        <p>Only shared with <%= @flag.user %>.</p>
+        <p>Only shared with <%= @flag.donor %> or the volunteer who sends your book.</p>
         <p class="field_with_errors"><%= @flag.errors[:address].join(", ") %></p>
     </div>
     <div class="clear"></div>

@@ -182,6 +182,7 @@ class Event < ActiveRecord::Base
   # Sends a notification email for this event.
   def notify
     return if notified?
+    reload
     recipients.each do |recipient|
       mail = EventMailer.mail_for_event self, recipient
       Rails.logger.info "Sending notification for event #{id} (#{type} #{detail}) to #{recipient} (#{mail.to})"

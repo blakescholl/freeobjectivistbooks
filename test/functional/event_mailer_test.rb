@@ -86,7 +86,7 @@ class EventMailerTest < ActionMailer::TestCase
     end
   end
 
-  test "add address" do
+  test "fix missing address" do
     donation = create :donation_for_request_no_address
     event = donation.flag.fix! address: "123 Somewhere\nAnytown, USA", fix_message: "There you go"
 
@@ -102,6 +102,25 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /Please send Book \d+ to/
       assert_select 'p', /123 Somewhere/
       assert_select 'p', /Anytown, USA/
+      assert_select 'a', /Confirm/
+    end
+  end
+
+  test "fix with updated address" do
+    flag = create :flag
+    event = flag.fix! address: "123 New Address", fix_message: ""
+
+    mail = EventMailer.mail_for_event event, flag.donor
+    assert_match /Student \d+ updated shipping info for Book \d+/, mail.subject
+    assert_equal [flag.donor.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Donor \d+/
+      assert_select 'p', /You flagged Student \d+'s request/
+      assert_select 'p', /They have updated shipping info/
+      assert_select 'p', text: /They said/, count: 0
+      assert_select 'p', /Please send Book \d+ to/
+      assert_select 'p', /123 New Address/
       assert_select 'a', /Confirm/
     end
   end

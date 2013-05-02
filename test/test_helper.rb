@@ -225,7 +225,7 @@ class Donation
 
   def message!(user, attributes = {})
     attributes[:message] ||= "Hello"
-    message_events.create attributes.merge(user: user)
+    Event.create! attributes.merge(user: user, donation: self, type: 'message')
   end
 
   def thank!(message = "Thanks!")

@@ -165,7 +165,7 @@ class EventTest < ActiveSupport::TestCase
     @frisco_donation.save!
 
     assert !event.notified?
-    assert_difference("ActionMailer::Base.deliveries.count", 2) { event.notify }
+    assert_difference("ActionMailer::Base.deliveries.count", 2) { event.save }
     assert event.notified?
   end
 

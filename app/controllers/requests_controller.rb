@@ -41,7 +41,7 @@ class RequestsController < ApplicationController
 
   def fix_if_needed
     if @request.flagged?
-      redirect_to fix_donation_flag_url(@request.donation)
+      redirect_to fix_flag_url(@request.flag)
     end
   end
 

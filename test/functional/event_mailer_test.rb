@@ -39,100 +39,88 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "flag" do
-    mail = EventMailer.mail_for_event events(:hugh_flags_dagny), @dagny
-    assert_equal "Problem with your shipping info for Capitalism: The Unknown Ideal", mail.subject
-    assert_equal [@dagny.email], mail.to
+    donation = create :donation
+    event = donation.flag!
+
+    mail = EventMailer.mail_for_event event, donation.student
+    assert_match /Problem with your shipping info for Book \d+/, mail.subject
+    assert_equal [donation.student.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Dagny/
-      assert_select 'p', 'Hugh Akston (the donor) says: "Please add your full name and address"'
-      assert_select 'a', /Respond to get your copy of Capitalism: The Unknown Ideal/
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /Donor \d+ \(the donor\) says: "Fix this"/
+      assert_select 'a', /Respond to get your copy of Book \d+/
     end
   end
 
   test "flag by fulfiller, to student" do
-    @frisco_donation.fulfill @kira
-    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
-    @frisco_donation.save!
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.flag!
 
-    mail = EventMailer.mail_for_event event, @frisco
-    assert_equal "Problem with your shipping info for Objectivism: The Philosophy of Ayn Rand", mail.subject
-    assert_equal [@frisco.email], mail.to
+    mail = EventMailer.mail_for_event event, fulfillment.student
+    assert_match /Problem with your shipping info for Book \d+/, mail.subject
+    assert_equal [fulfillment.student.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Francisco/
-      assert_select 'p', 'Kira Argounova (Free Objectivist Books volunteer) says: "Fix this"'
-      assert_select 'a', /Respond to get your copy of Objectivism: The Philosophy of Ayn Rand/
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /Volunteer \d+ \(Free Objectivist Books volunteer\) says: "Fix this"/
+      assert_select 'a', /Respond to get your copy of Book \d+/
     end
   end
 
   test "flag by fulfiller, to donor" do
-    @frisco_donation.fulfill @kira
-    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
-    @frisco_donation.save!
+    fulfillment = create :fulfillment
+    event = fulfillment.donation.flag!
 
-    mail = EventMailer.mail_for_event event, @cameron
-    assert_equal "Delay in sending Objectivism: The Philosophy of Ayn Rand to Francisco d'Anconia", mail.subject
-    assert_equal [@cameron.email], mail.to
+    mail = EventMailer.mail_for_event event, fulfillment.donor
+    assert_match /Delay in sending Book \d+ to Student \d+/, mail.subject
+    assert_equal [fulfillment.donor.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Henry/
+      assert_select 'p', /Hi Donor \d+,/
       assert_select 'p', /FYI/
-      assert_select 'p', /your donation of Objectivism: The Philosophy of Ayn Rand to Francisco d&#x27;Anconia/
-      assert_select 'p', /Kira Argounova \(Free Objectivist Books volunteer\) has flagged/
-      assert_select 'p', /We'll follow up with Francisco/
+      assert_select 'p', /your donation of Book \d+ to Student \d+/
+      assert_select 'p', /Volunteer \d+ \(Free Objectivist Books volunteer\) has flagged/
+      assert_select 'p', /We'll follow up with Student \d+/
       assert_select 'a', text: /Respond/, count: 0
     end
   end
 
-  test "add name" do
-    mail = EventMailer.mail_for_event events(:quentin_adds_name), @hugh
-    assert_equal "Quentin Daniels added their full name for The Virtue of Selfishness", mail.subject
-    assert_equal [@hugh.email], mail.to
-
-    verify_mail_body mail do
-      assert_select 'p', /Hi Hugh/
-      assert_select 'p', /You flagged Quentin Daniels's request/
-      assert_select 'p', /They have added their full name./
-      assert_select 'p', text: /said/, count: 0
-      assert_select 'p', /Please send The Virtue of Selfishness to/
-      @quentin.address.split("\n").each do |line|
-        assert_select 'p', /#{line}/
-      end
-      assert_select 'a', /Confirm/
-    end
-  end
-
   test "add address" do
-    mail = EventMailer.mail_for_event events(:quentin_adds_address), @hugh
-    assert_equal "Quentin Daniels added a shipping address for The Virtue of Selfishness", mail.subject
-    assert_equal [@hugh.email], mail.to
+    donation = create :donation_for_request_no_address
+    event = donation.flag.fix! address: "123 Somewhere\nAnytown, USA", fix_message: "There you go"
+
+    mail = EventMailer.mail_for_event event, donation.user
+    assert_match /Student \d+ added a shipping address for Book \d+/, mail.subject
+    assert_equal [donation.user.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Hugh/
-      assert_select 'p', /You flagged Quentin Daniels's request/
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /You flagged Student \d+.+s request/
       assert_select 'p', /They have added a shipping address./
       assert_select 'p', /They said: "There you go"/
-      assert_select 'p', /Please send The Virtue of Selfishness to/
-      @quentin.address.split("\n").each do |line|
-        assert_select 'p', /#{line}/
-      end
+      assert_select 'p', /Please send Book \d+ to/
+      assert_select 'p', /123 Somewhere/
+      assert_select 'p', /Anytown, USA/
       assert_select 'a', /Confirm/
     end
   end
 
   test "fix with message" do
-    mail = EventMailer.mail_for_event events(:quentin_fixes), @hugh
-    assert_equal "Quentin Daniels responded to your flag for The Virtue of Selfishness", mail.subject
-    assert_equal [@hugh.email], mail.to
+    flag = create :flag
+    event = flag.fix! fix_message: "This is correct"
+
+    mail = EventMailer.mail_for_event event, flag.donor
+    assert_match /Student \d+ responded to your flag for Book \d+/, mail.subject
+    assert_equal [flag.donor.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Hugh/
-      assert_select 'p', /You flagged Quentin Daniels's request/
+      assert_select 'p', /Hi Donor \d+/
+      assert_select 'p', /You flagged Student \d+'s request/
       assert_select 'p', text: /They have /, count: 0
       assert_select 'p', /They said: "This is correct"/
-      assert_select 'p', /Please send The Virtue of Selfishness to/
-      @quentin.address.split("\n").each do |line|
+      assert_select 'p', /Please send Book \d+ to/
+      flag.address.split("\n").each do |line|
         assert_select 'p', /#{line}/
       end
       assert_select 'a', /Confirm/
@@ -346,27 +334,34 @@ class EventMailerTest < ActionMailer::TestCase
   end
 
   test "cancel donation not received" do
-    mail = EventMailer.mail_for_event events(:howard_cancels_stadler), @stadler
-    assert_equal "Your donation of Atlas Shrugged to Howard Roark has been canceled", mail.subject
-    assert_equal [@stadler.email], mail.to
+    donation = create :donation
+    Timecop.travel 1.month
+    event = donation.cancel! donation.student, detail: 'not_received'
+
+    mail = EventMailer.mail_for_event event, donation.user
+    assert_match /Your donation of Book \d+ to Student \d+ has been canceled/, mail.subject
+    assert_equal [donation.user.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Robert/
-      assert_select 'p', /Howard Roark says they have not yet received Atlas Shrugged/
-      assert_select 'p', /on Jan 20 \(.* ago\)/
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /Student \d+ says they have not yet received Book \d+/
+      assert_select 'p', /on [A-Z][a-z]{2} \d{1,2} \(about 1 month ago\)/
       assert_select 'p', /Yours,/
     end
   end
 
   test "cancel request" do
-    mail = EventMailer.mail_for_event events(:dagny_cancels), @hugh
-    assert_equal "Dagny has canceled their request for Atlas Shrugged", mail.subject
-    assert_equal [@hugh.email], mail.to
+    donation = create :donation
+    event = donation.request.cancel!
+
+    mail = EventMailer.mail_for_event event, donation.user
+    assert_match /Student \d+ has canceled their request for Book \d+/, mail.subject
+    assert_equal [donation.user.email], mail.to
 
     verify_mail_body mail do
-      assert_select 'p', /Hi Hugh/
-      assert_select 'p', /Dagny has canceled their request for Atlas Shrugged/
-      assert_select 'p', /They said: "I don&#x27;t need this anymore"/
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /Student \d+ has canceled their request for Book \d+/
+      assert_select 'p', /They said: "Do not need it anymore"/
       assert_select 'a', /Find more students/
       assert_select 'p', /Thanks,/
     end

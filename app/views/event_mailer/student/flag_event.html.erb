@@ -1,9 +1,7 @@
 <p>There seems to be a problem with your shipping info on Free Objectivist Books.</p>
 
-<p><%= @event.user %> (<%= role_description @event.user_role %>) says: "<%= format_block @event.message %>"</p>
+<p><%= @event.user %> (<%= role_description @event.user_role %>) says: "<%= format_block @flag.message %>"</p>
 
 <p><strong>
-    <%= link_to fix_donation_flag_url(@event.donation) do %>
-        Respond to get your copy of <i><%= @event.book %></i>
-    <% end %>
+    <%= link_to fix_flag_url(@flag) do %>Respond to get your copy of <i><%= @event.book %></i><% end %>
 </strong></p>

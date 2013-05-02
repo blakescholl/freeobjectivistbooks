@@ -16,5 +16,5 @@
 <% else %>
 <p>However, you haven't given us your address!</p>
 
-<p><strong><%= link_to 'Add your address to get your book', fix_donation_flag_url(@event.donation) %></strong></p>
+<p><strong><%= link_to 'Add your address to get your book', fix_flag_url(@event.donation.flag) %></strong></p>
 <% end %>

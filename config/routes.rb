@@ -31,10 +31,12 @@ FreeBooks::Application.routes.draw do
     resource :status, only: [:edit, :update]
     resources :messages, only: [:new, :create]
     resources :thanks, only: [:new, :create], controller: :messages, defaults: {is_thanks: true}
-    resource :flag, only: [:new, :create, :destroy] do
-      get "fix", on: :member
-    end
+    resource :flag, only: [:new, :create]
     resource :fulfillment, only: [:create]
+  end
+
+  resources :flags, only: [:destroy] do
+    get "fix", on: :member
   end
 
   resources :orders, only: [:create, :show] do

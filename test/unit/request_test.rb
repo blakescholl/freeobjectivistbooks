@@ -163,10 +163,6 @@ class RequestTest < ActiveSupport::TestCase
     assert !@dagny_request_canceled.needs_fix?, "dagny request canceled needs fix"
   end
 
-  test "flag message" do
-    assert_equal "Please add your full name and address", @dagny_request.flag_message
-  end
-
   test "review" do
     assert_nil @howard_request.review
     assert_nil @hank_request_received.review
@@ -266,13 +262,23 @@ class RequestTest < ActiveSupport::TestCase
     request = @howard_request
     event = request.grant @hugh
 
-    assert @howard_request.granted?
+    assert @howard_request.granted?, "request not granted"
     assert_equal @hugh, request.donor
-    assert request.flagged?
-    assert !request.sent?
+    assert request.flagged?, "request not flagged"
+    assert !request.sent?, "request already sent"
 
     request.save!
     event.save!
+
+    request.reload
+    donation = request.donation
+    assert_not_nil donation
+    assert_equal request, donation.request
+
+    flag = donation.flag
+    assert_not_nil flag
+    assert_equal donation, flag.donation
+
     verify_event request.donation, "grant", user: @hugh
   end
 

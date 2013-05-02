@@ -247,9 +247,8 @@ class DonationTest < ActiveSupport::TestCase
   end
 
   test "student can't cancel if flagged" do
-    event = @quentin_donation_unsent.add_flag message: "Bad"
-    @quentin_donation_unsent.save! && event.save!
-    assert !@quentin_donation_unsent.student_can_cancel?
+    flag = create :flag
+    assert !flag.donation.student_can_cancel?
   end
 
   test "student can't cancel if new" do
@@ -358,7 +357,7 @@ class DonationTest < ActiveSupport::TestCase
 
     assert @dagny_donation.sent?
     assert @dagny_donation.status_updated_at >= time
-    assert !@dagny_donation.flagged
+    assert !@dagny_donation.flagged?
 
     assert_equal @dagny_donation, event.donation
     assert_equal @dagny_request, event.request
@@ -437,51 +436,6 @@ class DonationTest < ActiveSupport::TestCase
     event = @quentin_donation.add_flag message: "Is this address correct?"
     assert @quentin_donation.flagged?
     assert_equal "flag", event.type
-    assert_equal "Is this address correct?", event.message
-  end
-
-  test "flag message" do
-    assert_equal "Please add your full name and address", @dagny_donation.flag_message
-  end
-
-  # Fix
-
-  test "fix: added address" do
-    @howard_request.grant @hugh
-    @howard_request.save!
-    donation = @howard_request.donation
-    assert donation.flagged?
-
-    event = donation.fix({student_name: "Howard Roark", address: "123 Independence St"}, {message: ""})
-    assert !donation.flagged?
-
-    assert_equal "fix", event.type
-    assert_equal "added a shipping address", event.detail
-    assert event.message.blank?, event.message.inspect
-  end
-
-  test "fix: updated info" do
-    attributes = {student_name: "Quentin Daniels", address: "123 Quantum Ln\nGalt's Gulch, CO"}
-    event = @quentin_donation.fix(attributes, {message: "I have a new address"})
-    assert !@quentin_donation.flagged?
-
-    assert_equal "fix", event.type
-    assert_equal "updated shipping info", event.detail
-    assert_equal "I have a new address", event.message
-  end
-
-  test "fix: message only" do
-    event = @quentin_donation.fix({student_name: @quentin.name, address: @quentin.address}, {message: "just a message"})
-    assert !@quentin_donation.flagged?
-
-    assert_equal @quentin, event.user
-    assert_equal "fix", event.type
-    assert !event.is_thanks?
-    assert_equal "just a message", event.message
-  end
-
-  test "fix requires address" do
-    event = @dagny_donation.fix({student_name: "Dagny Taggart", address: ""}, {message: "Here you go"})
-    assert !@dagny_donation.valid?
+    assert_equal "Is this address correct?", @quentin_donation.flag.message
   end
 end

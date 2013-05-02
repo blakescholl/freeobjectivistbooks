@@ -162,7 +162,7 @@ class Request
   end
 
   def cancel!
-    params = {event: {message: "Don't want it"}}
+    params = {event: {message: "Do not need it anymore"}}
     event = cancel params
     save!
     donation.save! if donation
@@ -208,25 +208,16 @@ class Donation
 
   def flag!(user = nil)
     user ||= sender
-    params = {message: "Fix this"}
+    params = {message: "Fix this", type: 'shipping_info'}
     event = add_flag params, user
     save!
     event.save! if event
     event
   end
 
-  def cancel!(user)
-    params = {event: {message: "Sorry"}}
-    event = cancel params, user
-    save!
-    event.save! if event
-    event
-  end
-
-  def fix!
-    attributes = {address: "12345 Main St"}
-    event_attributes = {message: "Fixed!"}
-    event = fix attributes, event_attributes
+  def cancel!(user, event_params = {})
+    event_params[:message] ||= "Sorry"
+    event = cancel({event: event_params}, user)
     save!
     event.save! if event
     event
@@ -244,5 +235,17 @@ class Donation
   def fulfill!(user = nil)
     user ||= FactoryGirl.create :volunteer
     fulfill user
+  end
+end
+
+class Flag
+  def fix!(attributes = {})
+    attributes[:fix_message] ||= "Fixed"
+    event = fix attributes
+    save!
+    donation.save!
+    event.save!
+    event.reload
+    event
   end
 end

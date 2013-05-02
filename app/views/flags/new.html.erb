@@ -24,14 +24,14 @@
 <h1 class="grid_16">Flag shipping info</h1>
 
 <div class="request grid_12">
-    <p class="name"><%= @donation.student.name %></p>
-    <p class="address"><%= format_address @donation.address %></p>
+    <p class="name"><%= @flag.student %></p>
+    <p class="address"><%= format_address @flag.address %></p>
 
-    <%= form_for @event, url: donation_flag_path(@donation) do |f| %>
+    <%= form_for @flag, url: donation_flag_path(@donation) do |f| %>
         <h2>What is the problem?</h2>
 
-        <p>We'll send your message to <%= @donation.student.name %> and ask them to fix it:</p>
-        <p class="field_with_errors"><%= @event.errors[:message].join(", ") %></p>
+        <p>We'll send your message to <%= @flag.student %> and ask them to fix it:</p>
+        <p class="field_with_errors"><%= @flag.errors[:message].join(", ") %></p>
         <%= f.text_area :message, rows: 6, cols: 60 %>
         <div class="clear"></div>
 

@@ -35,10 +35,10 @@
     <p class="headline">
         <% if @request.address.blank? %>
         We need your address to send you your book.
-        <%= link_to 'Add your address', fix_donation_flag_path(@request.donation) %>
+        <%= link_to 'Add your address', fix_flag_path(@request.flag) %>
         <% else %>
         There seems to be a problem with your shipping info.
-        <%= link_to 'Update your shipping info', fix_donation_flag_path(@request.donation) %>
+        <%= link_to 'Update your shipping info', fix_flag_path(@request.flag) %>
         <% end %>
     </p>
 </div>

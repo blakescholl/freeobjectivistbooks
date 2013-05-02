@@ -20,6 +20,7 @@ class Event < ActiveRecord::Base
   belongs_to :request
   belongs_to :donation
   belongs_to :pledge
+  belongs_to :flag
   belongs_to :recipient, class_name: "User"
   belongs_to :reply_to_event, class_name: "Event"
   has_one :testimonial, as: :source
@@ -30,27 +31,21 @@ class Event < ActiveRecord::Base
 
   validates_presence_of :type
   validates_presence_of :pledge, if: lambda {|e| e.type.in? %w{cancel_pledge}}
+  validates_presence_of :flag, if: lambda {|e| e.type.in? %w{flag fix}}
   validates_presence_of :request, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation cancel_request renew autocancel}}
   validates_presence_of :donation, if: lambda {|e| e.type.in? %w{grant flag fix message update_status cancel_donation}}
   validates_inclusion_of :type, in: TYPES
 
   validates_presence_of :message, if: :requires_message?, message: "Please enter a message."
   validates_inclusion_of :public, in: [true, false], if: :is_thanks?, message: 'Please choose "Yes" or "No".'
-  validate :message_or_detail_must_be_present, if: lambda {|e| e.type == "fix" && e.request.address.present?}
   validates_inclusion_of :recipient, in: lambda {|e| e.potential_recipients}, allow_nil: true, message: "Please choose a recipient."
   validate :reply_to_event_must_match, if: :reply_to_event
 
   def requires_message?
     case type
-    when "flag", "message" then true
+    when "message" then true
     when "cancel_donation" then detail != "not_received"
     else false
-    end
-  end
-
-  def message_or_detail_must_be_present
-    if detail.blank? && message.blank?
-      errors[:message] << "If you don't need to update your shipping info, please enter a message for your donor."
     end
   end
 
@@ -84,7 +79,9 @@ class Event < ActiveRecord::Base
   def populate
     unless id
       self.donation ||= request.donation if request
+      self.donation ||= flag.donation if flag
       self.request ||= donation.request if donation
+      self.flag ||= donation.flag if donation
       self.user ||= default_user
       self.happened_at ||= Time.now
     end
@@ -94,7 +91,8 @@ class Event < ActiveRecord::Base
     return pledge.user if pledge
 
     case type
-    when "grant", "flag" then donor
+    when "grant" then donor
+    when "flag" then flag.user
     when "update", "fix", "cancel_request", "renew" then student
     when "update_status"
       case detail
@@ -120,10 +118,10 @@ class Event < ActiveRecord::Base
   end
 
   def role_for(user)
-    case user
-    when student then :student
-    when donor then :donor
-    when fulfiller then :fulfiller
+    if donation
+      donation.role_for user
+    elsif request
+      request.role_for user
     end
   end
 

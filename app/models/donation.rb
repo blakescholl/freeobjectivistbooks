@@ -111,9 +111,7 @@ class Donation < ActiveRecord::Base
   # Derived attributes
   #++
 
-  delegate :book, :can_send_money?, to: :request
-  delegate :address, :address=, to: :student
-  delegate :name, :name=, to: :student, prefix: true
+  delegate :book, :can_send_money?, :address, to: :request
 
   # Whether the donation is still active, i.e., not canceled.
   def active?
@@ -175,20 +173,9 @@ class Donation < ActiveRecord::Base
     status.read?
   end
 
-  def flagged
-    flag.present?
-  end
-
-  def flagged=(flagged)
-    if flagged.to_bool
-      self.create_flag unless flagged?
-    else
-      self.flag = nil
-    end
-  end
-
+  # True if the donation has a current, active flag indicating a problem with shipping.
   def flagged?
-    flagged
+    flag.present?
   end
 
   # Whether we're going to require the student to enter an address the next time they update the
@@ -241,17 +228,6 @@ class Donation < ActiveRecord::Base
     end
   end
 
-  # The most recent flag event, if any.
-  def flag_event
-    flag_events.last
-  end
-
-  # The message from the donor the last time the donor flagged the request, if any.
-  def flag_message
-    event = flag_event
-    event.message if event
-  end
-
   def updated_at_for_status(status)
     return created_at if status == "not_sent"
 
@@ -277,6 +253,14 @@ class Donation < ActiveRecord::Base
   # The time the book was confirmed read, if any.
   def read_at
     updated_at_for_status "read"
+  end
+
+  def role_for(user)
+    case user
+    when student then :student
+    when donor then :donor
+    when fulfiller then :fulfiller
+    end
   end
 
   #--
@@ -311,7 +295,7 @@ class Donation < ActiveRecord::Base
   def update_status(params, user = nil, time = Time.now)
     self.status = params[:status]
     self.status_updated_at = time
-    self.flagged = false if sent?
+    self.flag = nil if sent?
 
     event_attributes = params[:event] || {}
     event_attributes = event_attributes.merge(user: user) if user
@@ -335,15 +319,9 @@ class Donation < ActiveRecord::Base
   end
 
   def add_flag(params, user = nil)
-    self.flagged = true
-    params = params.merge(user: user) if user
-    flag_events.build params
-  end
-
-  def fix(attributes, event_attributes = {})
-    self.attributes = attributes
-    self.flagged = false
-    fix_events.build event_attributes.merge(detail: student.update_detail)
+    params = params.merge user: user
+    self.flag = flags.build params
+    flag_events.build flag: self.flag
   end
 
   def cancel(params, user)
@@ -362,6 +340,6 @@ class Donation < ActiveRecord::Base
   #++
 
   def as_json(options = {})
-    hash_from_methods :id, :donor, :student, :book, :price_cents, :flagged, :can_send_money?
+    hash_from_methods :id, :donor, :student, :book, :price_cents, :can_send_money?
   end
 end

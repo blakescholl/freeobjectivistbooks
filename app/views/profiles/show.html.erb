@@ -74,10 +74,10 @@
             <% elsif request.needs_fix? %>
                 <% if request.address.blank? %>
                 <p class="flagged">We need your address to send you your book.</p>
-                <p><%= link_to 'Add your address', fix_donation_flag_path(request.donation) %></p>
+                <p><%= link_to 'Add your address', fix_flag_path(request.flag) %></p>
                 <% else %>
                 <p class="flagged">There seems to be a problem with your shipping info.</p>
-                <p><%= link_to 'Update your shipping info', fix_donation_flag_path(request.donation) %></p>
+                <p><%= link_to 'Update your shipping info', fix_flag_path(request.flag) %></p>
                 <% end %>
             <% elsif request.address.blank? %>
             <p><%= link_to 'Add your address', edit_request_path(request) %></p>

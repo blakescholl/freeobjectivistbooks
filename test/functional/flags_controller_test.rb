@@ -9,7 +9,7 @@ class FlagsControllerTest < ActionController::TestCase
     assert_select 'h1', /flag/i
     assert_select '.address', /123 Main St/
     assert_select 'p', /We'll send your message to Quentin/
-    assert_select 'textarea#event_message'
+    assert_select 'textarea#flag_message'
     assert_select 'input[type="submit"]'
   end
 
@@ -24,7 +24,7 @@ class FlagsControllerTest < ActionController::TestCase
     verify_login_page
   end
 
-  test "new requires donor or fulfiller" do
+  test "new requires sender" do
     get :new, {donation_id: @quentin_donation.id}, session_for(@howard)
     verify_wrong_login_page
   end
@@ -35,15 +35,18 @@ class FlagsControllerTest < ActionController::TestCase
     donation.reload
     assert donation.flagged?
 
-    donation.request.reload
-    assert donation.request.flagged?
+    flag = donation.flag
+    assert_equal user, flag.user
+    assert_equal donation, flag.donation
+    assert_equal 'shipping_info', flag.type
+    assert_equal message, flag.message
 
-    verify_event donation, "flag", user: user, message: message, notified?: true
+    verify_event donation, "flag", user: user, notified?: true
   end
 
   test "create" do
     assert_difference "@quentin_donation.events.count" do
-      post :create, {donation_id: @quentin_donation.id, event: {message: "Fix this"}}, session_for(@hugh)
+      post :create, {donation_id: @quentin_donation.id, flag: {message: "Fix this"}}, session_for(@hugh)
     end
 
     assert_redirected_to @quentin_request
@@ -55,7 +58,7 @@ class FlagsControllerTest < ActionController::TestCase
   test "create by fulfiller" do
     @frisco_donation.fulfill @kira
     assert_difference "@frisco_donation.events.count" do
-      params = {donation_id: @frisco_donation.id, event: {message: "Fix this"}, redirect: volunteer_url}
+      params = {donation_id: @frisco_donation.id, flag: {message: "Fix this"}, redirect: volunteer_url}
       post :create, params, session_for(@kira)
     end
 
@@ -67,7 +70,7 @@ class FlagsControllerTest < ActionController::TestCase
 
   test "create requires message" do
     assert_no_difference "@quentin_donation.events.count" do
-      post :create, {donation_id: @quentin_donation.id, event: {message: ""}}, session_for(@hugh)
+      post :create, {donation_id: @quentin_donation.id, flag: {message: ""}}, session_for(@hugh)
     end
 
     assert_response :success
@@ -75,150 +78,144 @@ class FlagsControllerTest < ActionController::TestCase
 
     @quentin_donation.reload
     assert !@quentin_donation.flagged?
-
-    @quentin_request.reload
-    assert !@quentin_request.flagged?
   end
 
   test "create requires login" do
-    post :create, {donation_id: @quentin_donation.id, event: {message: "Fix this"}}
+    post :create, {donation_id: @quentin_donation.id, flag: {message: "Fix this"}}
     verify_login_page
   end
 
   test "create requires donor" do
-    post :create, {donation_id: @quentin_donation.id, event: {message: "Fix this"}}, session_for(@howard)
+    post :create, {donation_id: @quentin_donation.id, flag: {message: "Fix this"}}, session_for(@howard)
     verify_wrong_login_page
   end
 
   # Fix
 
   test "fix" do
-    get :fix, {donation_id: @hank_donation.id}, session_for(@hank)
+    flag = create :flag
+    get :fix, {id: flag.id}, session_for(flag.student)
     assert_response :success
     assert_select '.message.error .headline', /problem/
-    assert_select '.message.error .detail', 'Henry Cameron says: "Is your address correct?"'
-    assert_select 'input#donation_student_name[value="Hank Rearden"]'
-    assert_select 'textarea#donation_address', @hank.address
-    assert_select 'textarea#event_message'
+    assert_select '.message.error .detail', /Donor \d+ says: "Please correct your address"/
+    assert_select 'input#flag_student_name[value=?]', flag.student_name
+    assert_select 'textarea#flag_address', flag.address
+    assert_select 'textarea#flag_fix_message'
     assert_select 'input[type="submit"]'
   end
 
   test "fix flag from fulfiller" do
-    @frisco_donation.fulfill @kira
-    @frisco_donation.flag! @kira
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+    flag = fulfillment.donation.flag
 
-    get :fix, {donation_id: @frisco_donation.id}, session_for(@frisco)
+    get :fix, {id: flag.id}, session_for(flag.student)
     assert_response :success
     assert_select '.message.error .headline', /problem/
-    assert_select '.message.error .detail', /Kira Argounova says: /
+    assert_select '.message.error .detail', /Volunteer \d+ says: /
   end
 
   test "fix requires login" do
-    get :fix, donation_id: @hank_donation.id
+    flag = create :flag
+    get :fix, id: flag.id
     verify_login_page
   end
 
   test "fix requires request owner" do
-    get :fix, {donation_id: @hank_donation.id}, session_for(@quentin)
+    flag = create :flag
+    get :fix, {id: flag.id}, session_for(flag.donor)
     verify_wrong_login_page
   end
 
   # Destroy
 
-  def destroy(donation, options)
-    donation_params = options.subhash :student_name, :address
-    event_params = options.subhash :message
-    params = {donation_id: donation.id, donation: donation_params, event: event_params}
-    current_user = options.has_key?(:current_user) ? options[:current_user] : donation.student
+  def destroy(flag, options)
+    flag_params = options.subhash :student_name, :address, :fix_message
+    params = {id: flag.id, flag: flag_params}
+    current_user = options.has_key?(:current_user) ? options[:current_user] : flag.student
 
-    assert_difference "donation.events.count", (options[:expect_events] || 1) do
+    assert_difference "flag.events.count", (options[:expect_events] || 1) do
       delete :destroy, params, session_for(current_user)
     end
   end
 
-  def verify_destroy(donation, params)
-    assert_redirected_to donation.request
+  def verify_destroy(flag, params)
+    assert_redirected_to flag.request
 
     expected_notice = params[:expected_notice]
     expected_notice ||= if params[:role] == :fulfiller
-      /notified #{donation.fulfiller} \(Free Objectivist Books volunteer\)/
+      /notified #{flag.fulfiller} \(Free Objectivist Books volunteer\)/
     else
-      /notified #{donation.user} \(the donor\)/
+      /notified #{flag.donor} \(the donor\)/
     end
     assert_match expected_notice, flash[:notice], flash.inspect
 
-    donation.reload
-    assert_equal params[:student_name], donation.student_name
-    assert_equal params[:address], donation.address
-  end
+    flag.reload
+    assert flag.fixed?
+    assert !flag.donation.flagged?
+    assert_equal params[:student_name], flag.student_name
+    assert_equal params[:address], flag.address
+    assert_equal params[:fix_type], flag.fix_type
+    assert_equal params[:fix_message], flag.fix_message
 
-  test "destroy add name" do
-    @dagny.address = "123 Somewhere Road"
-    @dagny.save!
-
-    options = {student_name: "Dagny Taggart", address: "123 Somewhere Road", message: "Added my full name"}
-    destroy @dagny_donation, options
-    verify_destroy @dagny_donation, options
-    verify_event @dagny_donation, "fix", detail: "added their full name", notified?: true
+    verify_event flag, "fix", notified?: true unless params[:expect_events] == 0
   end
 
   test "destroy update shipping info" do
-    options = {student_name: "Quentin Daniels", address: "123 Quantum Ln", message: ""}
-    destroy @quentin_donation, options
-    verify_destroy @quentin_donation, options
-    verify_event @quentin_donation, "fix", detail: "updated shipping info", notified?: true
+    flag = create :flag
+    options = {student_name: flag.student_name, address: "123 Quantum Ln", fix_message: "", fix_type: "updated shipping info"}
+    destroy flag, options
+    verify_destroy flag, options
   end
 
   test "destroy only message" do
-    options = {student_name: "Quentin Daniels", address: @quentin.address, message: "No changes here"}
-    destroy @quentin_donation, options
-    verify_destroy @quentin_donation, options
-    verify_event @quentin_donation, "fix", detail: nil, message: "No changes here", notified?: true
+    flag = create :flag
+    options = {student_name: flag.student_name, address: flag.address, fix_message: "No changes here", fix_type: nil}
+    destroy flag, options
+    verify_destroy flag, options
   end
 
   test "destroy flagged by fulfiller" do
-    @frisco_donation.fulfill @kira
-    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
-    @frisco_donation.save!
-    event.save!
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+    flag = fulfillment.donation.flag
 
-    options = {student_name: "Francisco d'Anconia", address: @frisco.address, message: "It's all good", role: :fulfiller}
-    destroy @frisco_donation, options
-    verify_destroy @frisco_donation, options
-    verify_event @frisco_donation, "fix", detail: nil, message: "It's all good", notified?: true
+    options = {student_name: flag.student_name, address: flag.address, fix_message: "It's all good", fix_type: nil, role: :fulfiller}
+    destroy flag, options
+    verify_destroy flag, options
   end
 
   test "destroy autoflag" do
     donation = create :donation_for_request_no_address
-    options = {student_name: donation.student.name, address: "123 Main St", message: "", expected_notice: /Thank you/}
-    destroy donation, options
-    verify_destroy donation, options
-    verify_event donation, "fix", detail: "added a shipping address"
+    flag = donation.flag
+    options = {student_name: flag.student_name, address: "123 Main St", fix_message: "", fix_type: "added a shipping address", expected_notice: /Thank you/}
+    destroy flag, options
+    verify_destroy flag, options
   end
 
   test "destroy requires address" do
-    options = {student_name: "Dagny Taggart", address: "", message: "Added my full name", expect_events: 0}
-    destroy @dagny_donation, options
+    flag = create :flag
+    destroy flag, student_name: flag.student_name, address: "", expect_events: 0
     assert_response :success
     assert_select '.field_with_errors', /We need your address/
   end
 
   test "destroy without change requires message" do
-    options = {student_name: "Quentin Daniels", address: @quentin.address, message: "", expect_events: 0}
-    destroy @quentin_donation, options
+    flag = create :flag
+    destroy flag, student_name: flag.student_name, address: flag.address, expect_events: 0
     assert_response :success
     assert_select '.field_with_errors', /enter a message/
   end
 
   test "destroy requires login" do
-    options = {student_name: "Quentin Daniels", address: "123 Quantum Ln", message: "", current_user: nil, expect_events: 0}
-    destroy @quentin_donation, options
+    flag = create :flag
+    destroy flag, student_name: flag.student_name, address: flag.address, current_user: nil, expect_events: 0
     verify_login_page
   end
 
   test "destroy requires request owner" do
-    options = {student_name: "Quentin Daniels", address: "123 Quantum Ln", message: "", current_user: @hugh, expect_events: 0}
-    destroy @quentin_donation, options
+    flag = create :flag
+    destroy flag, student_name: flag.student_name, address: flag.address, current_user: flag.donor, expect_events: 0
     verify_wrong_login_page
   end
 end

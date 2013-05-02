@@ -448,7 +448,7 @@ class RequestActionsTest < ActionController::TestCase
   end
 
   test "no not-received link on flagged request" do
-    donation = create :donation, created_at: 30.days.ago, flagged: true
+    donation = create :donation, :flagged, created_at: 30.days.ago
     get :show, {id: donation.request.id}, session_for(donation.student)
     assert_response :success
     verify_not_received_link false

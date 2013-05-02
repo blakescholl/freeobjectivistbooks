@@ -37,6 +37,7 @@ class EventMailer < ApplicationMailer
 
   def flag_event(event, recipient)
     @event = event
+    @flag = event.flag
     subject = case @event.role_for(recipient)
     when :student then "Problem with your shipping info for #{@event.book}"
     when :donor then "Delay in sending #{@event.book} to #{@event.student}"
@@ -46,8 +47,9 @@ class EventMailer < ApplicationMailer
 
   def fix_event(event, recipient)
     @event = event
-    action = event.detail || "responded to your flag"
-    notification recipient, "#{@event.user.name} #{action} for #{@event.book}"
+    @flag = event.flag
+    action = event.flag.fix_type || "responded to your flag"
+    notification recipient, "#{@event.user} #{action} for #{@event.book}"
   end
 
   def message_event(event, recipient)

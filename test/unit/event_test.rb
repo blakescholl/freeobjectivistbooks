@@ -3,8 +3,6 @@ require 'test_helper'
 class EventTest < ActiveSupport::TestCase
   def setup
     super
-    @new_flag = @dagny_donation.flag_events.build message: "Problem here"
-    @new_fix = @hank_donation.fix_events.build detail: "updated shipping info", message: "Fixed"
     @new_message = @hank_donation.message_events.build user: @hank, message: "Info is correct"
     @new_thank = @quentin_donation.message_events.build user: @quentin, message: "Thanks!", is_thanks: true, public: false
     @new_cancel = @hank_donation.cancel_donation_events.build user: @cameron, message: "Sorry!"
@@ -37,37 +35,6 @@ class EventTest < ActiveSupport::TestCase
   end
 
   # Validations
-
-  test "valid flag" do
-    assert @new_flag.valid?, @new_flag.errors.inspect
-  end
-
-  test "flag requires message" do
-    @new_flag.message = ""
-    assert @new_flag.invalid?
-    assert @new_flag.errors[:message].any?
-  end
-
-  test "valid fix" do
-    assert @new_fix.valid?, @new_fix.errors.inspect
-  end
-
-  test "flag with detail doesn't need message" do
-    @new_fix.message = ""
-    assert @new_fix.valid?, @new_fix.errors.inspect
-  end
-
-  test "flag with message doesn't need detail" do
-    @new_fix.detail = nil
-    assert @new_fix.valid?, @new_fix.errors.inspect
-  end
-
-  test "flag requires detail or message" do
-    @new_fix.detail = nil
-    @new_fix.message = ""
-    assert @new_fix.invalid?
-    assert @new_fix.errors[:message].any?
-  end
 
   test "valid message" do
     assert @new_message.valid?, @new_message.errors.inspect
@@ -104,8 +71,8 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test "validates type" do
-    @new_flag.type = "random"
-    assert @new_flag.invalid?
+    @new_message.type = "random"
+    assert @new_message.invalid?
   end
 
   # Derived attributes
@@ -179,7 +146,7 @@ class EventTest < ActiveSupport::TestCase
     event = fulfillment.donation.flag!
     assert_equal [fulfillment.student, fulfillment.donor], event.recipients
 
-    event = fulfillment.donation.fix!
+    event = fulfillment.donation.flag.fix!
     assert_equal [fulfillment.user], event.recipients
   end
 
@@ -194,7 +161,7 @@ class EventTest < ActiveSupport::TestCase
 
   test "notify to multiple recipients" do
     @frisco_donation.fulfill @kira
-    event = @frisco_donation.add_flag user: @kira, message: "Fix this"
+    event = @frisco_donation.add_flag({type: 'shipping_info', message: "Fix this"}, @kira)
     @frisco_donation.save!
 
     assert !event.notified?
@@ -216,7 +183,7 @@ class EventTest < ActiveSupport::TestCase
     fulfillment.donation.flag!
 
     assert_difference("ActionMailer::Base.deliveries.count", 1) do
-      event = fulfillment.donation.fix!
+      event = fulfillment.donation.flag.fix!
       assert event.notified?
     end
   end

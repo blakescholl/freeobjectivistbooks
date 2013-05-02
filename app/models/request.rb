@@ -71,7 +71,7 @@ class Request < ActiveRecord::Base
   delegate :address, :address=, to: :user
   delegate :name, :name=, to: :user, prefix: true
   delegate :status, :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
-    :flag_message, :needs_fix?, :donor, :fulfiller, :sender, to: :donation, allow_nil: true
+    :flag, :needs_fix?, :donor, :fulfiller, :sender, to: :donation, allow_nil: true
 
   # Alias for the user who created the request.
   def student
@@ -145,6 +145,14 @@ class Request < ActiveRecord::Base
     Actions.new self, user, options
   end
 
+  def role_for(user)
+    case user
+    when student then :student
+    when donor then :donor
+    when fulfiller then :fulfiller
+    end
+  end
+
   # Display title, e.g., for admin detail page
   def title
     "#{user} wants #{book}"
@@ -156,7 +164,8 @@ class Request < ActiveRecord::Base
 
   # Grants the request, with the given user as the donor. Returns a new (unsaved) grant event.
   def grant(user)
-    self.donation = donations.build(user: user, flagged: address.blank?) unless donation && donor == user
+    self.donation = donations.build(user: user) unless donation && donor == user
+    donation.flag = donation.flags.build type: 'missing_address' if address.blank?
     event = donation.grant_events.last unless donation.new_record?
     event || grant_events.build(donation: donation)
   end

@@ -22,7 +22,7 @@
         <% if request.address.blank? %>
         Missing address flagged
         <% else %>
-        Shipping info flagged: "<%= format_block request.flag_message %>"
+        Shipping info flagged: "<%= format_block request.flag.message %>"
         <% end %>
     </p>
     <% end %>

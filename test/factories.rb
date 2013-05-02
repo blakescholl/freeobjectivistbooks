@@ -111,7 +111,23 @@ FactoryGirl.define do
 
     trait(:paid) {paid true}
     trait(:sent) {status 'sent'}
-    trait(:flagged) {flagged true}
+    trait(:flagged) do
+      after(:create) {|donation| donation.flag!}
+    end
+  end
+
+  factory :flag do
+    association :donation
+    type 'shipping_info'
+    message "Please correct your address"
+    after(:build) do |flag|
+      flag.user = flag.donation.user
+      flag.donation.flag = flag
+      flag.donation.flag_events.build user: flag.user
+    end
+    after(:create) {|flag| flag.donation.save!}
+
+    trait(:missing_address) {type 'missing_address'}
   end
 
   factory :fulfillment do

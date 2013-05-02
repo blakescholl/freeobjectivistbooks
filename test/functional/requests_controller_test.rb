@@ -355,8 +355,9 @@ class RequestsControllerTest < ActionController::TestCase
   end
 
   test "edit flagged redirects to fix" do
-    get :edit, {id: @hank_request.id}, session_for(@hank)
-    assert_redirected_to fix_donation_flag_url(@hank_donation)
+    flag = create :flag
+    get :edit, {id: flag.request.id}, session_for(flag.student)
+    assert_redirected_to fix_flag_url(flag)
   end
 
   test "edit requires login" do

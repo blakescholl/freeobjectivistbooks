@@ -41,6 +41,10 @@ class Hash
     pairs = keylist.map {|key| key.to_s.urlencode + "=" + self[key].to_s.urlencode}
     pairs.join "&"
   end
+
+  def self.from_keymap(*keys, &block)
+    keys.inject({}) {|hash,key| hash.merge(key => (yield key))}
+  end
 end
 
 class Time

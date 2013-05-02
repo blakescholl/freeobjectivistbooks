@@ -6,6 +6,8 @@ class CreateFlags < ActiveRecord::Migration
       t.string :type
       t.text :message
       t.boolean :fixed
+      t.string :fix_type
+      t.text :fix_message
 
       t.timestamps
     end
@@ -14,5 +16,8 @@ class CreateFlags < ActiveRecord::Migration
 
     add_column :donations, :flag_id, :integer
     rename_column :donations, :flagged, :flagged_deprecated
+
+    add_column :events, :flag_id, :integer
+    add_index :events, :flag_id
   end
 end

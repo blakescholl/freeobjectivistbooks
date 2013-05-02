@@ -1,8 +1,8 @@
-<p>You flagged <%= @event.student.name %>'s request on Free Objectivist Books.</p>
+<p>You flagged <%= @event.student %>'s request on Free Objectivist Books.</p>
 
 <p>
-    <% if @event.detail.present? %>They have <%= @event.detail %>.<% end %>
-    <% if @event.message.present? %>They said: "<%= @event.message %>"<% end %>
+    <% if @flag.fix_type.present? %>They have <%= @flag.fix_type %>.<% end %>
+    <% if @flag.fix_message.present? %>They said: "<%= @flag.fix_message %>"<% end %>
 </p>
 
 <p>Please send <i><%= @event.book %></i> to:</p>

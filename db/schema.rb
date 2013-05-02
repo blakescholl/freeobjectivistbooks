@@ -115,9 +115,11 @@ ActiveRecord::Schema.define(:version => 20130430200729) do
     t.integer  "recipient_id"
     t.integer  "reply_to_event_id"
     t.integer  "pledge_id"
+    t.integer  "flag_id"
   end
 
   add_index "events", ["donation_id"], :name => "index_events_on_donation_id"
+  add_index "events", ["flag_id"], :name => "index_events_on_flag_id"
   add_index "events", ["pledge_id"], :name => "index_events_on_pledge_id"
   add_index "events", ["request_id"], :name => "index_events_on_request_id"
   add_index "events", ["user_id"], :name => "index_events_on_user_id"
@@ -128,6 +130,8 @@ ActiveRecord::Schema.define(:version => 20130430200729) do
     t.string   "type"
     t.text     "message"
     t.boolean  "fixed"
+    t.string   "fix_type"
+    t.text     "fix_message"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

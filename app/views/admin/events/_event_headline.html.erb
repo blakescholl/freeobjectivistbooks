@@ -15,7 +15,12 @@
     <% when "flag" %>
         flagged <%= admin_user_link event.student %>'s request for
     <% when "fix" %>
-        responded to flag of
+        <% if event.flag && event.flag.fix_type %>
+            <%= event.flag.fix_type %> in response to
+        <% else %>
+            responded to
+        <% end %>
+        flag of
     <% when "message" %>
         <% if event.is_thanks? %>
         thanked <%= admin_user_links event.recipients %> for

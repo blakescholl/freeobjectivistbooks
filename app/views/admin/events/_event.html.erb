@@ -1,6 +1,14 @@
 <div class="event">
     <p class="headline"><%= render partial: "admin/events/event_headline", locals: {event: event} %></p>
-    <% if event.message.present? %><p><%= format_block event.message %></p><% end %>
+    <% if event.flag %>
+        <% if event.type == "flag" && event.flag.message.present? %>
+            <p><%= format_block event.flag.message %></p>
+        <% elsif event.type.in?(%w{fix update}) && event.flag.fix_message.present? %>
+            <p><%= format_block event.flag.fix_message %></p>
+        <% end %>
+    <% elsif event.message.present? %>
+        <p><%= format_block event.message %></p>
+    <% end %>
     <% if event.type == "update_status" && event.detail == "read" && event.donation.review %>
     <p><%= format_block event.donation.review.text %></p>
     <p><strong><%= event.donation.review.recommend? ? "Would" : "Would not" %></strong> recommend to others</p>

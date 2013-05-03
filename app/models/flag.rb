@@ -4,6 +4,8 @@ class Flag < ActiveRecord::Base
   belongs_to :user
   belongs_to :donation
   has_many :events
+  has_many :reminder_entities, as: :entity
+  has_many :reminders, through: :reminder_entities
 
   Event.create_associations self
 
@@ -18,7 +20,7 @@ class Flag < ActiveRecord::Base
     end
   end
 
-  delegate :request, :student, :donor, :fulfiller, :role_for, to: :donation, allow_nil: true
+  delegate :request, :student, :book, :donor, :fulfiller, :role_for, to: :donation, allow_nil: true
   delegate :address, :address=, to: :student, allow_nil: true
   delegate :name, :name=, to: :student, prefix: true
 

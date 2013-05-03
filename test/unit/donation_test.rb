@@ -107,6 +107,10 @@ class DonationTest < ActiveSupport::TestCase
     verify_scope(:needs_sending) {|donation| donation.active? && donation.needs_sending?}
   end
 
+  test "needs fix" do
+    verify_scope(:needs_fix) {|donation| donation.needs_fix?}
+  end
+
   test "needs fulfillment" do
     verify_scope(:needs_fulfillment) do |donation|
       donation.active? && donation.needs_sending? && donation.paid? && !donation.fulfilled?

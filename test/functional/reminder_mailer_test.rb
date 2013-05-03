@@ -274,6 +274,36 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "fix flag" do
+    flag = create :flag
+    Timecop.travel 1.week
+
+    reminder = Reminders::FixFlag.new_for_entity flag
+
+    verify_reminder reminder, /Problem with your shipping info for Book \d+/ do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /need your response to send your\s+copy of Book \d+/
+      assert_select 'p', /Donor \d+ \(the donor\) says: "Please correct your address"/
+      assert_select 'p', text: /need your address/, count: 0
+      assert_select 'a', /Respond to get your book/
+    end
+  end
+
+  test "fix flag for missing address" do
+    donation = create :donation_for_request_no_address
+    Timecop.travel 1.week
+
+    reminder = Reminders::FixFlag.new_for_entity donation.flag
+
+    verify_reminder reminder, /We need your shipping info for Book \d+/ do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /need your address to send your copy of Book \d+/
+      assert_select 'p', text: /problem with your shipping info/, count: 0
+      assert_select 'p', text: /says:/, count: 0
+      assert_select 'a', /Respond to get your book/
+    end
+  end
+
   test "honor can_send?" do
     Reminders::FulfillPledge.new_for_entity(@hugh_pledge).save!
 

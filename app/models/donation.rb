@@ -77,6 +77,7 @@ class Donation < ActiveRecord::Base
   scope :reading, active.scoped_by_status("received")
   scope :read, active.scoped_by_status("read")
 
+  scope :needs_fix, active.flagged.not_sent
   scope :needs_sending, active.not_flagged.not_sent
   scope :needs_thanks, active.received.not_thanked
   scope :needs_fulfillment, active.needs_sending.paid.unfulfilled

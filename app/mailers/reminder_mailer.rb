@@ -78,4 +78,12 @@ class ReminderMailer < ApplicationMailer
     @received_at = @donation.received_at
     reminder_mail "Have you finished reading #{@donation.book}?"
   end
+
+  def fix_flag(reminder)
+    @user = reminder.user
+    @flag = reminder.flag
+
+    what = @flag.type == 'missing_address' ? "We need" : "Problem with"
+    reminder_mail "Reminder: #{what} your shipping info for #{@flag.book}"
+  end
 end

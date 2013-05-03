@@ -1,0 +1,16 @@
+<% case @flag.type %>
+<% when 'missing_address' %>
+<p>
+  Reminder: We need your address to send your copy of <i><%= @flag.book %></i>! We've found a donor for you, and now
+  we're just waiting on you.
+</p>
+<% else %>
+<p>
+  Reminder: There is a problem with your shipping info on Free Objectivist Books. We need your response to send your
+  copy of <%= @flag.book %>.
+</p>
+
+<p><%= @flag.user %> (<%= role_description @flag.user_role %>) says: "<%= format_block @flag.message %>"</p>
+<% end %>
+
+<p><strong><%= link_to fix_flag_url(@flag) do %>Respond to get your book<% end %></strong></p>

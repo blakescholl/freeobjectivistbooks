@@ -16,6 +16,7 @@ class Reminder < ActiveRecord::Base
   has_many :pledges, through: :reminder_entities, source: :entity, source_type: 'Pledge'
   has_many :requests, through: :reminder_entities, source: :entity, source_type: 'Request'
   has_many :donations, through: :reminder_entities, source: :entity, source_type: 'Donation'
+  has_many :flags, through: :reminder_entities, source: :entity, source_type: 'Flag'
 
   #--
   # Scopes
@@ -93,6 +94,10 @@ class Reminder < ActiveRecord::Base
 
   def donation
     donations.first
+  end
+
+  def flag
+    flags.first
   end
 
   # The most recent reminder of this type sent for the key_entity.

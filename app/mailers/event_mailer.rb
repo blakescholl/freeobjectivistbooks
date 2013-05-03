@@ -97,7 +97,6 @@ class EventMailer < ApplicationMailer
 
   def autocancel_event(event, recipient)
     @event = event
-    @mention_donor_drive = Time.now < Time.parse("2013-04-10")  # limited-time postscript
     notification recipient, "We've canceled your request for #{@event.book}"
   end
 end

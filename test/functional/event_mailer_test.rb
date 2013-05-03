@@ -404,28 +404,4 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'a', /new book request/
     end
   end
-
-  test "autocancel before Apr 10 mentions new donor drive" do
-    Timecop.freeze "2013-04-08"
-    request = create :request, :autocancelable
-    event = request.autocancel_if_needed!
-
-    mail = EventMailer.mail_for_event event, request.user
-
-    verify_mail_body mail do
-      assert_select 'p', /new donor drive/
-    end
-  end
-
-  test "autocancel after Apr 10 doesn't mention new donor drive" do
-    Timecop.freeze "2013-04-12"
-    request = create :request, :autocancelable
-    event = request.autocancel_if_needed!
-
-    mail = EventMailer.mail_for_event event, request.user
-
-    verify_mail_body mail do
-      assert_select 'p', text: /new donor drive/, count: 0
-    end
-  end
 end

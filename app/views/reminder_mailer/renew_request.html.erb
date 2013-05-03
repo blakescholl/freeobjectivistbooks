@@ -12,9 +12,3 @@
   (If we don't hear back from you <% if @use_autocancel_at %>by <%= l @request.autocancel_at.to_date, format: :short %><% else %>soon<% end %>,
   we'll assume you're no longer interested and cancel your request automatically.)
 </p>
-
-<% if @mention_donor_drive %>
-<p>By the way, we'll be launching a new program soon and a new donor drive that I expect to bring a lot more donations.
-  So if may be worth renewing your request, even if it's been open for a long time.
-</p>
-<% end %>

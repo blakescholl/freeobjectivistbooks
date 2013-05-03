@@ -107,26 +107,6 @@ class ReminderMailerTest < ActionMailer::TestCase
     end
   end
 
-  test "renew request before Apr 10 mentions new donor drive" do
-    Timecop.freeze "2013-04-09"
-    request = create :request, :renewable
-    reminder = Reminders::RenewRequest.new_for_entity request
-
-    verify_reminder reminder do
-      assert_select 'p', /new donor drive/
-    end
-  end
-
-  test "renew request after Apr 10 doesn't mention new donor drive" do
-    Timecop.freeze "2013-04-11"
-    request = create :request, :renewable
-    reminder = Reminders::RenewRequest.new_for_entity request
-
-    verify_reminder reminder do
-      assert_select 'p', text: /new donor drive/, count: 0
-    end
-  end
-
   test "send books for donor with one outstanding donation" do
     donation = create :donation
 

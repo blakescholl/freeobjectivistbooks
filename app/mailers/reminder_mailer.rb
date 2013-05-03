@@ -38,7 +38,6 @@ class ReminderMailer < ApplicationMailer
     @user = reminder.user
     @request = reminder.request
     @use_autocancel_at = Time.until(@request.autocancel_at) > 3.days
-    @mention_donor_drive = Time.now < Time.parse("2013-04-10")  # limited-time postscript
     reminder_mail "Do you still want #{@request.book}?"
   end
 

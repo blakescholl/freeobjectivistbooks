@@ -19,7 +19,7 @@ namespace :backfill do
     limit = ENV['LIMIT'].to_i if ENV['LIMIT']
 
     Donation.find_each do |donation|
-      next if donation.flag_events.empty? && donation.fix_events.empty? && !donation.flagged?
+      next if donation.flag_events.empty? && donation.fix_events.empty? && !donation.flagged_deprecated?
 
       count += 1
       next if offset && count <= offset
@@ -70,11 +70,11 @@ namespace :backfill do
       if donation.flagged_deprecated?
         puts "  Donation flagged"
         if flag.nil?
-          if donation.address.blank?
+          if donation.address.blank? || donation.canceled?
             flag = donation.flags.create type: 'missing_address'
             puts "    no flag event; assuming missing address; created flag #{flag.id}"
           else
-            puts "    ERROR: address flagged, but no flag event!"
+            puts "    ERROR: active donation with address flagged, but no flag event!"
           end
         else
           puts "    active flag is #{flag.id} #{flag.type} #{flag.user}"

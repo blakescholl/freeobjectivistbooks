@@ -21,7 +21,7 @@ class PledgeMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hi Donor \d+,/
       yield block
       assert_select 'p', /There are \d+ students/
-      assert_select 'a[href=?]', Rails.application.routes.url_helpers.new_pledge_url
+      assert_select 'a[href=?]', url_helpers.new_pledge_url
       assert_select 'p', /Thanks for being a donor,/
     end
   end
@@ -92,8 +92,8 @@ class PledgeMailerTest < ActionMailer::TestCase
       assert_select 'p', /Hi Donor \d+,/
       yield block
       assert_select 'p', /There are \d+ students/
-      assert_select 'a[href=?]', Rails.application.routes.url_helpers.donate_url
-      assert_select 'a[href=?]', Rails.application.routes.url_helpers.edit_pledge_url(new_pledge)
+      assert_select 'a[href=?]', url_helpers.donate_url
+      assert_select 'a[href=?]', url_helpers.edit_pledge_url(new_pledge)
       assert_select 'p', /Thanks for being a donor,/
     end
   end

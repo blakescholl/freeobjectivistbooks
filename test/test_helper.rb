@@ -139,6 +139,10 @@ end
 
 class ActionMailer::TestCase
   include ActionDispatch::Assertions::SelectorAssertions
+
+  def url_helpers
+    Rails.application.routes.url_helpers
+  end
 end
 
 class User

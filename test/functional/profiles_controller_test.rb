@@ -210,6 +210,15 @@ class ProfilesControllerTest < ActionController::TestCase
     verify_volunteer_links false
   end
 
+  test "show for donor with balance" do
+    donor = create :donor, :with_pledge, balance: 20
+
+    get :show, params, session_for(donor)
+    assert_response :success
+
+    assert_select 'p', /\$20 to spend/
+  end
+
   test "show for donor with canceled pledge" do
     user = create :donor, :with_pledge
     user.cancel_pledge!

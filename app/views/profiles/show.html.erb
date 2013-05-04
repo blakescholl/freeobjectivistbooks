@@ -112,6 +112,9 @@
         <% else %>
             <p>None right now.</p>
         <% end %>
+        <% if @user.balance > 0 %>
+            <p>You have a credit of <span class="money"><%= humanized_money_with_symbol @user.balance %></span> to spend on book donations.</p>
+        <% end %>
         <% if @pledge && @pledge.active? %>
             <p><%= link_to 'Find students to donate books to', donate_path %></p>
             <p><%= link_to "Change this pledge", edit_pledge_path(@pledge) %></p>

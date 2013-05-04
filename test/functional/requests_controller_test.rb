@@ -51,6 +51,15 @@ class RequestsControllerTest < ActionController::TestCase
     assert_select '.sidebar p', /1 book flagged/
   end
 
+  test "index for user with balance" do
+    user = create :donor, balance: 20
+
+    get :index, params, session_for(user)
+    assert_response :success
+
+    assert_select '.sidebar p', /\$20 to spend/
+  end
+
   test "index requires login" do
     get :index
     verify_login_page

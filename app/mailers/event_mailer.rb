@@ -97,6 +97,21 @@ class EventMailer < ApplicationMailer
 
   def autocancel_event(event, recipient)
     @event = event
-    notification recipient, "We've canceled your request for #{@event.book}"
+    @flag = event.donation.flag if event.detail == 'flagged'
+
+    subject = if @event.role_for(recipient) == :student
+      "We've canceled your request for #{@event.book}"
+    elsif @event.detail == 'flagged'
+      verb = case @flag.type
+      when 'shipping_info' then "responded regarding their shipping info"
+      when 'missing_address' then "added their address"
+      end
+      "#{@event.student} hasn't #{verb} for #{@event.book}"
+    else
+      # Shouldn't happen
+      "We've canceled #{@event.student}'s request for #{@event.book}"
+    end
+
+    notification recipient, subject, template_basename: "autocancel_#{@event.detail}_event"
   end
 end

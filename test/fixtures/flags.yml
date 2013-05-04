@@ -1,5 +1,12 @@
 hugh_grants_dagny_wants_cui_flag:
+  user: hugh
   donation: hugh_grants_dagny_wants_cui
+  type: shipping_info
+  message: "Fix this"
 
 cameron_grants_hank_wants_atlas_flag:
+  user: cameron
   donation: cameron_grants_hank_wants_atlas
+  type: shipping_info
+  message: "Problem here"
+  created_at: <%= Time.now - 2.weeks %>

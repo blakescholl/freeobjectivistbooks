@@ -99,7 +99,7 @@ class ReminderMailerTest < ActionMailer::TestCase
   end
 
   test "renew request for very old request doesn't give cancel date" do
-    request = create :request, :autocancelable
+    request = create :request, :open_too_long
     reminder = Reminders::RenewRequest.new_for_entity request
 
     verify_reminder reminder do

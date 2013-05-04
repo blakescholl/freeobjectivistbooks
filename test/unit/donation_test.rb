@@ -131,6 +131,10 @@ class DonationTest < ActiveSupport::TestCase
     verify_scope(:no_donor_action) {|donation| !donation.needs_donor_action?}
   end
 
+  test "flagged too long" do
+    verify_scope(:flagged_too_long) {|donation| donation.needs_fix? && donation.request.can_autocancel?}
+  end
+
   # Callbacks
 
   test "default status is not_sent" do

@@ -17,7 +17,10 @@ class AutocancelJob
 
   # Performs autocancel on all eligible requests (invoked by the Delayed::Job subsystem).
   def perform
-    autocancel Request.autocancelable
+    canceled = []
+    canceled += autocancel Request.open_too_long
+    canceled += autocancel Request.flagged_too_long
+    canceled
   end
 
   # Schedules a Delayed::Job to send all reminders offline.

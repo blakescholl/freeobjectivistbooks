@@ -1,0 +1,13 @@
+<% if @flag.type == 'shipping_info' %>
+I'm sorry, but we haven't heard back from <%= @event.student %> regarding problems with their shipping info for <%= @event.book %> on Free Objectivist Books. Their address was flagged <%= distance_of_time_in_words_to_now @flag.created_at %> ago, so we've simply canceled their request.
+<% else %>
+I'm sorry, but <%= @event.student %> still hasn't added their shipping address for <%= @event.book %> on Free Objectivist Books. You granted their request <%= distance_of_time_in_words_to_now @event.donation.created_at %> ago, so we've simply canceled their request.
+<% end %>
+<% if @event.donation.refunded? %>
+
+Since you paid <%= humanized_money_with_symbol @event.donation.price %> for this book, we have given you a credit for that amount, which you can use to make another donation.
+<% end %>
+
+You can find another student to donate to here:
+
+<%= donate_url %>

@@ -62,7 +62,7 @@ FactoryGirl.define do
       open_at {5.weeks.ago}
     end
 
-    trait :autocancelable do
+    trait :open_too_long do
       created_at {9.weeks.ago}
       open_at {9.weeks.ago}
     end

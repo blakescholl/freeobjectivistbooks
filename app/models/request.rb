@@ -6,7 +6,8 @@ class Request < ActiveRecord::Base
   # (now - (now - 1.month)) is not necessarily equal to 1.month. Days are constant, as long as you do everything in UTC.
   # -Jason 27 Mar 2013
   RENEW_THRESHOLD = 30.days
-  AUTOCANCEL_THRESHOLD = 60.days
+  AUTOCANCEL_OPEN_THRESHOLD = 60.days
+  AUTOCANCEL_FLAG_THRESHOLD = 7.days
 
   #--
   # Associations
@@ -33,7 +34,7 @@ class Request < ActiveRecord::Base
   validates_presence_of :address, if: :address_required?, message: "We need your address to send you your book."
 
   #--
-  # Scopes
+  # Scopes and finders
   #++
 
   default_scope order("created_at desc")
@@ -48,7 +49,11 @@ class Request < ActiveRecord::Base
 
   scope :open_longer_than, lambda {|interval| not_granted.where('open_at < ?', Time.now - interval) }
   scope :renewable, open_longer_than(RENEW_THRESHOLD)
-  scope :autocancelable, open_longer_than(AUTOCANCEL_THRESHOLD)
+  scope :open_too_long, open_longer_than(AUTOCANCEL_OPEN_THRESHOLD)
+
+  def self.flagged_too_long
+    Donation.flagged_too_long.includes(:request).map {|donation| donation.request}
+  end
 
   #--
   # Callbacks
@@ -70,8 +75,8 @@ class Request < ActiveRecord::Base
 
   delegate :address, :address=, to: :user
   delegate :name, :name=, to: :user, prefix: true
-  delegate :status, :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :flagged?, :review,
-    :flag, :needs_fix?, :donor, :fulfiller, :sender, to: :donation, allow_nil: true
+  delegate :status, :thanked?, :sent?, :in_transit?, :received?, :reading?, :read?, :can_send?, :can_flag?, :review,
+    :flag, :flagged?, :flagged_at, :needs_fix?, :donor, :fulfiller, :sender, to: :donation, allow_nil: true
 
   # Alias for the user who created the request.
   def student
@@ -132,13 +137,32 @@ class Request < ActiveRecord::Base
     open? && Time.since(open_at) > RENEW_THRESHOLD
   end
 
-  def can_autocancel?
-    active? && open? && Time.since(open_at) > AUTOCANCEL_THRESHOLD
+  # What state this request is in that might subject it to autocancel rules, if any; nil if none.
+  # A non-nil value does not indicate that the request is autocancelable; only that it will be if
+  # it waits too long in its current state. The can_autocancel? method tells if the threshold has
+  # been reached.
+  def autocancel_type
+    # debugger
+    if active? && open?
+      :open
+    elsif needs_fix?
+      :flagged
+    end
   end
 
-  # When this request will be autocanceled (if not renewed).
+  # When this request will be autocanceled (if not renewed, for open requests; or unflagged/fixed,
+  # for flagged requests).
   def autocancel_at
-    open_at + AUTOCANCEL_THRESHOLD if active? && open?
+    case autocancel_type
+    when :open then open_at + AUTOCANCEL_OPEN_THRESHOLD
+    when :flagged then flagged_at + AUTOCANCEL_FLAG_THRESHOLD
+    end
+  end
+
+  # Whether the request is ready to be autocanceled.
+  def can_autocancel?
+    time = autocancel_at
+    time && time.past?
   end
 
   def actions_for(user, options)
@@ -191,22 +215,27 @@ class Request < ActiveRecord::Base
   # The request attributes are also updated if supplied, which gives the student a chance to
   # confirm their shipping info for old requests.
   def renew(attributes = {})
-    raise "Can't renew granted request" if !open?
+    raise "Can't renew granted request" if active? && granted?
 
     self.attributes = attributes
-    self.canceled = false if can_uncancel?
+    if can_uncancel?
+      self.canceled = false
+      self.donation = nil
+    end
     self.open_at = Time.now if can_renew? && attributes[:address].present?
 
     detail = renew_detail
     renew_events.build detail: detail if detail
   end
 
-  # Auto-cancels an open request if it is past the AUTOCANCEL_THRESHOLD.
+  # Auto-cancels an open request if it is past the AUTOCANCEL_OPEN_THRESHOLD.
   def autocancel_if_needed!
     return if canceled?
     return unless can_autocancel?
+    type = autocancel_type
     update_attributes! canceled: true
-    autocancel_events.create
+    donation.update_attributes! canceled: true if donation
+    autocancel_events.create detail: type.to_s
   end
 
   #--

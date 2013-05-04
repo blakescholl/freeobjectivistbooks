@@ -1,0 +1,9 @@
+<% if @flag.type == 'shipping_info' %>
+On <%= short_date @flag.created_at %>, <%= @flag.user %> flagged your shipping info for <%= @event.book %> on Free Objectivist Books. We haven't heard back from you, so we haven't been able to send your book.
+<% else %>
+On <%= short_date @flag.created_at %>, <%= @event.donor %> offered to send you <%= @event.book %> on Free Objectivist Books. However, we still don't have your address, so we haven't been able to send your book.
+<% end %>
+
+Since that was <%= distance_of_time_in_words_to_now @flag.created_at %> ago, we're not sure if you still want it anymore. So, we've canceled your request. If you still want the book, you can reopen it using this link (although we'll need to find a new donor for you):
+
+<%= renew_request_url @event.request %>

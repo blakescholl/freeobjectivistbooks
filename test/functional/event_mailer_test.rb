@@ -386,7 +386,7 @@ class EventMailerTest < ActionMailer::TestCase
     end
   end
 
-  test "autocancel" do
+  test "autocancel open" do
     Timecop.freeze "2013-03-28 12:00"
     created_at = Time.parse "2013-01-25 12:00"
     request = create :request, created_at: created_at, open_at: created_at
@@ -402,6 +402,152 @@ class EventMailerTest < ActionMailer::TestCase
       assert_select 'p', /on Jan 25 \(2 months ago\)/
       assert_select 'a', /Reopen your request for Book \d+/
       assert_select 'a', /new book request/
+    end
+  end
+
+  test "autocancel flagged, to student" do
+    Timecop.freeze "2013-03-28 12:00"
+    donation = create :donation, :flagged
+
+    Timecop.travel 10.days
+    event = donation.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, donation.student
+    assert_match /We've canceled your request for Book \d+/, mail.subject
+    assert_equal [donation.student.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /On Mar 28, Donor \d+ flagged/
+      assert_select 'p', /info for Book \d+/
+      assert_select 'p', /heard back/
+      assert_select 'p', /that was 10 days ago/
+      assert_select 'a[href=?]', url_helpers.renew_request_url(donation.request)
+    end
+  end
+
+  test "autocancel flagged, to donor" do
+    Timecop.freeze "2013-03-28 12:00"
+    donation = create :donation, :flagged
+
+    Timecop.travel 10.days
+    event = donation.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, donation.user
+    assert_match /Student \d+ hasn't responded regarding their shipping info for Book \d+/, mail.subject
+    assert_equal [donation.user.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /heard back from Student \d+/
+      assert_select 'p', /info for Book \d+/
+      assert_select 'p', /10 days ago/
+      assert_select 'a[href=?]', url_helpers.donate_url
+    end
+  end
+
+  test "autocancel flagged missing address, to student" do
+    Timecop.freeze "2013-03-28 12:00"
+    donation = create :donation_for_request_no_address
+
+    Timecop.travel 10.days
+    event = donation.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, donation.student
+    assert_match /We've canceled your request for Book \d+/, mail.subject
+    assert_equal [donation.student.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /On Mar 28, Donor \d+ offered to send you Book \d+/
+      assert_select 'p', /have your address/
+      assert_select 'p', /that was 10 days ago/
+      assert_select 'a[href=?]', url_helpers.renew_request_url(donation.request)
+    end
+  end
+
+  test "autocancel flagged missing address, to donor" do
+    Timecop.freeze "2013-03-28 12:00"
+    donation = create :donation_for_request_no_address
+
+    Timecop.travel 10.days
+    event = donation.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, donation.user
+    assert_match /Student \d+ hasn't added their address for Book \d+/, mail.subject
+    assert_equal [donation.user.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /Student \d+ still/
+      assert_select 'p', /address for Book \d+/
+      assert_select 'p', /10 days ago/
+      assert_select 'a[href=?]', url_helpers.donate_url
+    end
+  end
+
+  test "autocancel flagged by volunteer, to student" do
+    Timecop.freeze "2013-03-28 12:00"
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+
+    Timecop.travel 10.days
+    event = fulfillment.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, fulfillment.student
+    assert_match /We've canceled your request for Book \d+/, mail.subject
+    assert_equal [fulfillment.student.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Student \d+,/
+      assert_select 'p', /On Mar 28, Volunteer \d+ flagged/
+      assert_select 'p', /info for Book \d+/
+      assert_select 'p', /heard back/
+      assert_select 'p', /that was 10 days ago/
+      assert_select 'a[href=?]', url_helpers.renew_request_url(fulfillment.request)
+    end
+  end
+
+  test "autocancel flagged by volunteer, to donor" do
+    Timecop.freeze "2013-03-28 12:00"
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+
+    Timecop.travel 10.days
+    event = fulfillment.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, fulfillment.donor
+    assert_match /Student \d+ hasn't responded regarding their shipping info for Book \d+/, mail.subject
+    assert_equal [fulfillment.donor.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Donor \d+,/
+      assert_select 'p', /heard back from Student \d+/
+      assert_select 'p', /info for Book \d+/
+      assert_select 'p', /10 days ago/
+      assert_select 'p', /Since you paid \$10/
+      assert_select 'a[href=?]', url_helpers.donate_url
+    end
+  end
+
+  test "autocancel flagged by volunteer, to volunteer" do
+    Timecop.freeze "2013-03-28 12:00"
+    fulfillment = create :fulfillment
+    fulfillment.donation.flag!
+
+    Timecop.travel 10.days
+    event = fulfillment.request.autocancel_if_needed!
+
+    mail = EventMailer.mail_for_event event, fulfillment.user
+    assert_match /Student \d+ hasn't responded regarding their shipping info for Book \d+/, mail.subject
+    assert_equal [fulfillment.user.email], mail.to
+
+    verify_mail_body mail do
+      assert_select 'p', /Hi Volunteer \d+,/
+      assert_select 'p', /heard back from Student \d+/
+      assert_select 'p', /info for Book \d+/
+      assert_select 'p', /10 days ago/
+      assert_select 'p', /donor has been notified/
     end
   end
 end

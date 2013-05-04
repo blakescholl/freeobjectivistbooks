@@ -216,6 +216,7 @@ class Donation
     event = add_flag params, user
     save!
     event.save! if event
+    reload
     event
   end
 

@@ -84,6 +84,8 @@ class Donation < ActiveRecord::Base
 
   scope :needs_donor_action, active.unpaid.not_flagged.not_sent
 
+  scope :flagged_too_long, lambda {active.needs_fix.joins(:flag).where('flags.created_at < ?', Time.now - Request::AUTOCANCEL_FLAG_THRESHOLD)}
+
   def self.no_donor_action
     t = arel_table
     flagged = t[:flag_id].not_eq nil
@@ -177,6 +179,11 @@ class Donation < ActiveRecord::Base
   # True if the donation has a current, active flag indicating a problem with shipping.
   def flagged?
     flag.present?
+  end
+
+  # The (last) time the donation was flagged, if it is currently flagged; nil otherwise.
+  def flagged_at
+    flag.created_at if flag
   end
 
   # Whether we're going to require the student to enter an address the next time they update the

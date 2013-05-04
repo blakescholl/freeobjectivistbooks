@@ -94,8 +94,12 @@ class RequestTest < ActiveSupport::TestCase
     verify_scope(:renewable) {|request| request.active? && request.can_renew?}
   end
 
-  test "autocancelable" do
-    verify_scope(:autocancelable) {|request| request.active? && request.can_autocancel?}
+  test "open too long" do
+    verify_scope(:open_too_long) {|request| request.active? && request.can_autocancel?}
+  end
+
+  test "flagged too long" do
+    verify_scope(:flagged_too_long) {|request| request.flagged? && request.can_autocancel?}
   end
 
   # Derived attributes
@@ -224,11 +228,49 @@ class RequestTest < ActiveSupport::TestCase
     assert !request.can_uncancel?
   end
 
-  # Can autocancel?
+  # Autocancel attributes
+
+  test "autocancel type open" do
+    request = build :request
+    assert_equal :open, request.autocancel_type
+  end
+
+  test "autocancel type flagged" do
+    donation = create :donation, :flagged
+    assert_equal :flagged, donation.request.autocancel_type
+  end
+
+  test "autocancel type none" do
+    donation = create :donation
+    assert_nil donation.request.autocancel_type
+  end
+
+  test "autocancel at for open" do
+    Timecop.freeze
+    request = build :request
+    assert_equal Time.now + 60.days, request.autocancel_at
+  end
+
+  test "autocancel at for flagged" do
+    Timecop.freeze
+    donation = create :donation, :flagged
+    assert_equal Time.now + 7.days, donation.request.autocancel_at
+  end
+
+  test "autocancel at for ineligible request" do
+    donation = create :donation
+    assert_nil donation.request.autocancel_at
+  end
 
   test "can autocancel? true if open and old" do
     request = build :request, created_at: 9.weeks.ago, open_at: 9.weeks.ago
     assert request.can_autocancel?
+  end
+
+  test "can autocancel? true if flagged and old" do
+    donation = create :donation, :flagged
+    Timecop.travel 2.weeks
+    assert donation.request.can_autocancel?
   end
 
   test "can autocancel? false if recent" do
@@ -236,8 +278,13 @@ class RequestTest < ActiveSupport::TestCase
     assert !request.can_autocancel?
   end
 
+  test "can autocancel? false if flagged recently" do
+    donation = create :donation, :flagged
+    assert !donation.request.can_autocancel?
+  end
+
   test "can autocancel? false if granted" do
-    request = create :request, :autocancelable
+    request = create :request, :open_too_long
     request.grant!
     assert !request.can_autocancel?
   end
@@ -406,5 +453,49 @@ class RequestTest < ActiveSupport::TestCase
     assert request.active?
     assert_equal open_at.to_i, request.open_at.to_i
     assert_nil event
+  end
+
+  test "renew of an autocanceled request removes the old donation" do
+    donation = create :donation, :flagged
+    request = donation.request
+    Timecop.travel 2.weeks
+
+    request.autocancel_if_needed!
+    request.renew
+
+    assert request.active?, "request is not active"
+    assert request.open?, "request is not open"
+  end
+
+  # Autocancel action
+
+  test "autocancel if needed for open" do
+    request = build :request, :open_too_long
+    event = request.autocancel_if_needed!
+    assert request.canceled?
+    verify_event request, 'autocancel', detail: 'open'
+  end
+
+  test "autocancel if needed for flagged" do
+    donation = create :donation, :flagged
+    request = donation.request
+    Timecop.travel 2.weeks
+
+    event = request.autocancel_if_needed!
+    assert request.canceled?, "request not canceled"
+    assert request.donation.canceled?, "donation not canceled"
+    verify_event request, 'autocancel', detail: 'flagged'
+  end
+
+  test "autocancel is a no-op if not eligible" do
+    request = build :request
+    assert_nil request.autocancel_if_needed!
+    assert !request.canceled?
+  end
+
+  test "autocancel is a no-op if already canceled" do
+    request = build :request, :open_too_long, :canceled
+    assert_nil request.autocancel_if_needed!
+    assert request.canceled?
   end
 end

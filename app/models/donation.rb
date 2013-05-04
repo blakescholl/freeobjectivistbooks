@@ -280,6 +280,7 @@ class Donation < ActiveRecord::Base
     return if !paid?
     user.increment_balance! price
     self.paid = false
+    self.refunded = true
     save!
   end
 

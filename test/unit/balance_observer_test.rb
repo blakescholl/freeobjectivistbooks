@@ -48,6 +48,10 @@ class BalanceObserverTest < ActiveSupport::TestCase
       donation.request.cancel!
       @user.reload
     end
+
+    donation.reload
+    assert !donation.paid?, "donation still paid"
+    assert donation.refunded?, "donation not refunded"
   end
 
   test "balance unchanged when unpaid donation is canceled" do

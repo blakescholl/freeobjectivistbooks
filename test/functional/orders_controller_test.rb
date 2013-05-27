@@ -185,6 +185,22 @@ class OrdersControllerTest < ActionController::TestCase
     assert_select '.error .headline', false
   end
 
+  test "show requires login" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    get :show, {id: order.id}
+    verify_login_page
+  end
+
+  test "show requires order owner" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    get :show, {id: order.id}, session_for(donation.student)
+    verify_wrong_login_page
+  end
+
   # Payment return
 
   def amazon_params(user, amount, status = 'PS')
@@ -283,5 +299,35 @@ class OrdersControllerTest < ActionController::TestCase
     assert_select '.false', false
 
     verify_payment_footer :amazon
+  end
+
+  # Pay
+
+  test "pay" do
+    user = create :donor, balance: 10
+    donation = create :donation, user: user
+    order = user.orders.create donations: [donation]
+
+    put :pay, {id: order.id}, session_for(user)
+    assert_redirected_to order
+
+    order.reload
+    assert order.paid?
+  end
+
+  test "pay requires login" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    put :pay, {id: order.id}
+    verify_login_page
+  end
+
+  test "pay requires order owner" do
+    donation = create :donation
+    order = donation.user.orders.create donations: [donation]
+
+    put :pay, {id: order.id}, session_for(donation.student)
+    verify_wrong_login_page
   end
 end

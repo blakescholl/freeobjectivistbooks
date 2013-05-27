@@ -42,4 +42,9 @@ class OrdersController < ApplicationController
 
     @amazon_payment = new_amazon_payment(@order) if !@payment_success && @order.needs_contribution?
   end
+
+  def pay
+    @order.pay!
+    redirect_to @order
+  end
 end

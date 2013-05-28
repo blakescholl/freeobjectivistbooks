@@ -24,7 +24,7 @@ module PledgeHelper
           verb += " so far"
           evaluations = ["thanks!", "thank you!"]
         else
-          evaluations = ["not bad.", "not too shabby.", "better than nothing!"]
+          evaluations = ["not bad.", "not too shabby."]
         end
       end
 

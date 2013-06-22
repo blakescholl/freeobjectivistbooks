@@ -1,0 +1,31 @@
+<% content_for :title do %>Your Donation Stats<% end %>
+
+<% content_for :stylesheet do %>
+<style>
+h2 {
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+td, th {
+    padding-right: 12px;
+}
+
+.metric_header {
+    font-size: 0.9em;
+    width: 56px;
+}
+
+.overview {
+    font-size: 1.5em;
+    margin-bottom: 0;
+}
+</style>
+<% end %>
+
+<h1 class="grid_16">Your donation stats</h1>
+
+<div class="grid_12 overview">
+  <%= render partial: "admin/metrics", object: @metrics.donor_stats(@current_user) %>
+</div>
+<div class="clear"></div>

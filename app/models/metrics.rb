@@ -11,6 +11,17 @@ class Metrics
     ]
   end
 
+  def donor_stats(donor)
+    donations = donor.donations.active
+    calculate_metrics [
+      {name: 'Total donations',     value: donations.count},
+      {name: 'Sent to student',     value: donations.sent.count,     denominator_name: 'Total donations'},
+      {name: 'Received by student', value: donations.received.count, denominator_name: 'Sent to student'},
+      {name: 'Finished reading',    value: donations.read.count,     denominator_name: 'Received by student'},
+      {name: 'Address flagged',     value: donations.flagged.count,  denominator_name: 'Total donations'},
+    ]
+  end
+
   def send_money_pipeline
     calculate_metrics [
       {name: 'Paid',              value: Donation.paid.count,           denominator_name: 'Total granted', denominator_value: Donation.active.count},

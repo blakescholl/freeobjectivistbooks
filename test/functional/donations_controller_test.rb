@@ -182,6 +182,21 @@ class DonationsControllerTest < ActionController::TestCase
     verify_login_page
   end
 
+  # Stats
+
+  test "stats" do
+    user = create :donor
+    donations = create_list :donation, 3, user: user
+
+    get :stats, params, session_for(user)
+    assert_response :success
+  end
+
+  test "stats requires login" do
+    get :stats
+    verify_login_page
+  end
+
   # Create
 
   test "create" do

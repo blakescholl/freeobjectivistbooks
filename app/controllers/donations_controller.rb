@@ -51,6 +51,10 @@ class DonationsController < ApplicationController
     @any_eligible = @outstanding_donations.any? {|donation| donation.can_send_money?}
   end
 
+  def stats
+    @metrics = Metrics.new
+  end
+
   def create
     @event = @request.grant @current_user
     if save @request, @event

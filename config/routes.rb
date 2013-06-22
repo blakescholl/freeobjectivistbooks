@@ -27,6 +27,7 @@ FreeBooks::Application.routes.draw do
 
   resources :donations, only: [:index, :destroy] do
     get "send" => "donations#outstanding", on: :collection
+    get "stats", on: :collection
     get "cancel", on: :member
     resource :status, only: [:edit, :update]
     resources :messages, only: [:new, :create]

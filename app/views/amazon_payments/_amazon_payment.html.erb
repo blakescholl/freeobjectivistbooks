@@ -1,12 +1,23 @@
 <% if ENV['AMAZON_PAYMENTS_DISABLED'] %>
   <div class="message error">
-    <p class="headline">Payments are temporarily unavailable. This should be resolved in a matter of days.</p>
+    <p class="headline">Credit card payments are temporarily unavailable.</p>
     <p class="detail">
-      Owing to a temporary problem with Amazon Payments, we can't accept payments right now.
-      As soon as this is resolved, we'll let you know. I'm sorry for the trouble.
+      Owing to a problem with Amazon Payments, we can't accept payment via credit card right now.
+      I'm working to fix this and hope to have it resolved by Friday, July 5.
     </p>
     <p class="detail">
-      If you're impatient to make your contribution, please contact Jason for a workaround: <%= mail_to 'jason@rationalegoist.com' %>
+      In the meantime, a workaround is as follows:
+    </p>
+    <ol class="detail">
+      <li>
+        Go to Amazon and buy a gift certificate for <%= humanized_money_with_symbol amazon_payment.amount %>:
+        <%= link_to 'https://www.amazon.com/gp/product/B004LLIKVU', 'https://www.amazon.com/gp/product/B004LLIKVU' %>
+      </li>
+      <li><strong>Put your name on it so we know who it's from.</strong></li>
+      <li>Send it to: donations@freeobjectivistbooks.org</li>
+    </ol>
+    <p class="detail">
+      If you have any problems, contact Jason: <%= mail_to 'jason@rationalegoist.com' %>
     </p>
   </div>
 <% else %>

@@ -1,5 +1,14 @@
 # Manages Orders.
 class OrdersController < ApplicationController
+  def handle_unverified_request
+    # PayPal wants to POST data to us on the return URL, so we allow POST for the test action.
+    # Of course, PayPal doesn't have our CSRF token, so CSRF fails. Rails normally clears the
+    # session when this happens. We're preventing that here. This is justified because we don't
+    # actually create/modify any data in the test action; it might as well be a GET.
+    # -Jason 4 Jul 2013
+    super unless params[:action] == "show"
+  end
+
   def parse_params
     @abandoned = params[:abandoned].to_bool
   end

@@ -17,6 +17,14 @@ class Contribution < ActiveRecord::Base
     contribution
   end
 
+  def self.find_or_initialize_from_paypal_ipn(params)
+    return nil if !PaypalPayment.success_status?(params['payment_status'])
+    contribution = find_or_initialize_by_transaction_id params['txn_id']
+    contribution.user_id = params['custom'].to_i
+    contribution.amount = Money.parse params['payment_gross']
+    contribution
+  end
+
   def add_to_user_balance
     user.increment_balance! amount
   end

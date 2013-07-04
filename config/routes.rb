@@ -41,12 +41,14 @@ FreeBooks::Application.routes.draw do
   end
 
   resources :orders, only: [:create, :show] do
+    post "show", on: :member  # PayPal likes to POST returns
     put "pay", on: :member
     resources :contributions, only: [:create]
   end
 
   resources :contributions, only: [:create] do
     get "test", on: :collection
+    post "test", on: :collection  # PayPal likes to POST returns
   end
 
   resources :fulfillments, only: [:index, :show]

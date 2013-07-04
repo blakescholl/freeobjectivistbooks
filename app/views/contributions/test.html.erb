@@ -13,12 +13,6 @@
 
 <div class="main grid_12">
     <p>Test amount: <span class="money"><%= humanized_money_with_symbol @amount %></span></p>
-
-    <form action="<%= @amazon_payment.form_submit_url %>" method="post">
-        <% @amazon_payment.params.each do |key,value| %>
-        <%= hidden_field_tag key, value %>
-        <% end %>
-        <%= image_submit_tag "http://g-ecx.images-amazon.com/images/G/01/asp/beige_medium_paynow_withlogo_lightbg.gif" %>
-    </form>
+    <%= render @payment %>
 </div>
 <div class="clear"></div>

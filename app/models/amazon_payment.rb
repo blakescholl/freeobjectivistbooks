@@ -2,7 +2,7 @@
 # http://docs.aws.amazon.com/AmazonSimplePay/latest/ASPAdvancedUserGuide/Welcome.html
 #
 # Relies on aws_access_key and aws_secret_key being set in Rails.application.config. It will hit
-# the live payments environment if aws_payments_live is true; otherwise it will use the sandbox.
+# the live payments environment if payments_live is true; otherwise it will use the sandbox.
 class AmazonPayment
   extend ActiveModel::Naming
 
@@ -53,7 +53,7 @@ private
   end
 
   def form_submit_host
-    env = "-sandbox" if !is_live || !Rails.application.config.aws_payments_live
+    env = "-sandbox" if !is_live || !Rails.application.config.payments_live
     "authorize.payments#{env}.amazon.com"
   end
 

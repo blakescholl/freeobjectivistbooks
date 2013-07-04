@@ -34,7 +34,7 @@ private
   end
 
   def verification_url
-    payment = PaypalPayment.new is_live: sandbox?
+    payment = PaypalPayment.new is_live: !sandbox?
     base_url = payment.form_submit_url
     "#{base_url}?cmd=_notify-validate&#{@post}"
   end

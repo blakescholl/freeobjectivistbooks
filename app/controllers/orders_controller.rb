@@ -24,23 +24,23 @@ class OrdersController < ApplicationController
     redirect_to @order
   end
 
-  def new_amazon_payment(order)
-    AmazonPayment.new order.payment_options.merge(
-        ipn_url: order_contributions_url(order),
-        return_url: order_url(order),
-        abandon_url: order_url(order, abandoned: true)
+  def new_paypal_payment(order)
+    PaypalPayment.new order.paypal_payment_options.merge(
+        notify_url: order_contributions_url(order),
+        return: order_url(order),
+        cancel_return: order_url(order, abandoned: true)
     )
   end
 
   def show
-    if params['status'] && params['referenceId']
+    if (params['payment_status'] && params['txn_id']) || @abandoned
       @is_payment_return = true
-      @payment_success = AmazonPayment.success_status?(params['status'])
-      @payment_pending = AmazonPayment.pending_status?(params['status'])
-      @contribution = Contribution.find_by_transaction_id params['transactionId'] if params['transactionId']
+      @payment_success = PaypalPayment.success_status?(params['payment_status'])
+      @payment_pending = PaypalPayment.pending_status?(params['payment_status'])
+      @contribution = Contribution.find_by_transaction_id params['txn_id'] if params['txn_id']
     end
 
-    @amazon_payment = new_amazon_payment(@order) if !@payment_success && @order.needs_contribution?
+    @payment = new_paypal_payment(@order) if !@payment_success && @order.needs_contribution?
   end
 
   def pay

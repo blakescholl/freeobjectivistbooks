@@ -67,8 +67,13 @@ class Order < ActiveRecord::Base
   end
 
   # Options to be passed to an AmazonPayment.
-  def payment_options
+  def amazon_payment_options
     {amount: contribution, reference_id: user.id, description: description}
+  end
+
+  # Options to be passed to a PaypalPayment.
+  def paypal_payment_options
+    {amount: contribution, invoice: id, custom: user.id, item_name: description}
   end
 
   # Pays for all donations, or as many as are covered by the user's current balance.

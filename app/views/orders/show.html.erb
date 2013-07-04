@@ -42,7 +42,7 @@
               <% if @contribution %>
                   We received your contribution of <%= humanized_money_with_symbol @contribution.amount %>.
               <% elsif @payment_pending %>
-                  Your contribution has been delayed by Amazon. Please check back in 24 hours to verify that your books have been paid for.
+                  Your contribution has been delayed. Please check back in 24 hours to verify that your books have been paid for.
                   <strong>There is no need to make another contribution for these books.</strong>
                   <%= mail_to 'jason@rationalegoist.com', "Contact Jason" %> if your books don't show as paid by tomorrow.
               <% else %>
@@ -126,7 +126,7 @@
         <p class="summary">All these books have been paid for, thanks! A volunteer will send them soon.</p>
     <% elsif !@payment_success %>
         <% if @order.needs_contribution? %>
-            <%= render @amazon_payment %>
+            <%= render @payment %>
         <% else %>
             <p class="summary">These donations are covered by your existing balance. No new contribution is needed.</p>
             <%= form_for @order, url: pay_order_path(@order) do |f| %>

@@ -9,7 +9,7 @@ class PaypalPayment
 
   def self.success_status?(status)
     # https://developer.paypal.com/webapps/developer/docs/classic/ipn/integration-guide/IPNandPDTVariables/
-    status.in? %w{Completed Created Processed}
+    status.in? %w{Completed Created Processed Pending}
   end
 
   def self.pending_status?(status)

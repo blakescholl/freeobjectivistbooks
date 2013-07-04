@@ -33,7 +33,7 @@ class ContributionsControllerTest < ActionController::TestCase
       "payer_id" => "N4V6TG6NJXWBL",
       "item_number" => "",
       "handling_amount" => "0.00",
-      "payment_status" => "Created",
+      "payment_status" => "Completed",
       "shipping" => "0.00",
       "mc_gross" => "10.00",
       "custom" => @donor.id.to_s,

@@ -62,8 +62,8 @@ class OrdersControllerTest < ActionController::TestCase
 
   def verify_payment_footer(which)
     assert_select '#payment' do
-      assert_select 'form', (which.in? [:amazon, :balance])
-      assert_select 'form[action*="amazon.com"]', (which == :amazon)
+      assert_select 'form', (which.in? [:paypal, :balance])
+      assert_select 'form[action*="paypal.com"]', (which == :paypal)
       assert_select '.summary', text: /existing balance/, count: (which == :balance ? 1 : 0)
       assert_select 'form[action^="/orders"]', (which == :balance)
       assert_select '.summary', text: /books have been paid for/, count: (which == :paid ? 1 : 0)
@@ -93,7 +93,7 @@ class OrdersControllerTest < ActionController::TestCase
     assert_select '#balance', false
     assert_select '#contribution', false
 
-    verify_payment_footer :amazon
+    verify_payment_footer :paypal
   end
 
   test "show with partial balance" do
@@ -119,7 +119,7 @@ class OrdersControllerTest < ActionController::TestCase
       assert_select '.money', "$8"
     end
 
-    verify_payment_footer :amazon
+    verify_payment_footer :paypal
   end
 
   test "show with full balance" do
@@ -165,26 +165,6 @@ class OrdersControllerTest < ActionController::TestCase
     verify_payment_footer :paid
   end
 
-  test "show gives warning to Chrome users" do
-    donation = create :donation
-    order = donation.user.orders.create donations: [donation]
-
-    @request.user_agent = user_agent_for :chrome
-    get :show, {id: order.id}, session_for(donation.user)
-    assert_response :success
-    assert_select '.error .headline', /Chrome/
-  end
-
-  test "new doesn't show warning to Safari users" do
-    donation = create :donation
-    order = donation.user.orders.create donations: [donation]
-
-    @request.user_agent = user_agent_for :safari
-    get :show, {id: order.id}, session_for(donation.user)
-    assert_response :success
-    assert_select '.error .headline', false
-  end
-
   test "show requires login" do
     donation = create :donation
     order = donation.user.orders.create donations: [donation]
@@ -203,12 +183,12 @@ class OrdersControllerTest < ActionController::TestCase
 
   # Payment return
 
-  def amazon_params(user, amount, status = 'PS')
+  def paypal_params(user, amount, status = 'Completed')
     {
-        'status' => status,
-        'transactionId' => "17O7NM3S2524Z32Q53J7KRD8R4JLQQ2ZQGV",
-        'referenceId' => user.id.to_s,
-        'transactionAmount' => amount.to_money.to_s,
+        'payment_status' => status,
+        'txn_id' => "5DW252222B671151W",
+        'custom' => user.id.to_s,
+        'payment_gross' => amount.to_money.to_s,
     }
   end
 
@@ -216,10 +196,10 @@ class OrdersControllerTest < ActionController::TestCase
     user = create :donor
     donations = create_list :donation, 1, user: user
     order = user.orders.create donations: donations
-    amazon_params = amazon_params(user, 10)
-    order.contributions << Contribution.find_or_initialize_from_amazon_ipn(amazon_params)
+    paypal_params = paypal_params(user, 10)
+    order.contributions << Contribution.find_or_initialize_from_paypal_ipn(paypal_params)
 
-    get :show, amazon_params.merge(id: order.id), session_for(user)
+    get :show, paypal_params.merge(id: order.id), session_for(user)
     assert_response :success
 
     assert_select '.notice' do
@@ -235,9 +215,9 @@ class OrdersControllerTest < ActionController::TestCase
     user = create :donor
     donations = create_list :donation, 1, user: user
     order = user.orders.create donations: donations
-    amazon_params = amazon_params(user, 10)
+    paypal_params = paypal_params(user, 10)
 
-    get :show, amazon_params.merge(id: order.id), session_for(user)
+    get :show, paypal_params.merge(id: order.id), session_for(user)
     assert_response :success
 
     assert_select '.notice' do
@@ -253,9 +233,9 @@ class OrdersControllerTest < ActionController::TestCase
     user = create :donor
     donations = create_list :donation, 1, user: user
     order = user.orders.create donations: donations
-    amazon_params = amazon_params(user, 10, 'PI')
+    paypal_params = paypal_params(user, 10, 'Pending')
 
-    get :show, amazon_params.merge(id: order.id), session_for(user)
+    get :show, paypal_params.merge(id: order.id), session_for(user)
     assert_response :success
 
     assert_select '.notice' do
@@ -271,9 +251,8 @@ class OrdersControllerTest < ActionController::TestCase
     user = create :donor
     donations = create_list :donation, 1, user: user
     order = user.orders.create donations: donations
-    amazon_params = amazon_params(user, 10, 'A')
 
-    get :show, amazon_params.merge(id: order.id, abandoned: true), session_for(user)
+    get :show, {id: order.id, abandoned: true}, session_for(user)
     assert_response :success
 
     assert_select '.error' do
@@ -281,16 +260,16 @@ class OrdersControllerTest < ActionController::TestCase
     end
     assert_select '.false', false
 
-    verify_payment_footer :amazon
+    verify_payment_footer :paypal
   end
 
   test "show payment error" do
     user = create :donor
     donations = create_list :donation, 1, user: user
     order = user.orders.create donations: donations
-    amazon_params = amazon_params(user, 10, 'PF')
+    paypal_params = paypal_params(user, 10, 'Failed')
 
-    get :show, amazon_params.merge(id: order.id), session_for(user)
+    get :show, paypal_params.merge(id: order.id), session_for(user)
     assert_response :success
 
     assert_select '.error' do
@@ -298,7 +277,7 @@ class OrdersControllerTest < ActionController::TestCase
     end
     assert_select '.false', false
 
-    verify_payment_footer :amazon
+    verify_payment_footer :paypal
   end
 
   # Pay

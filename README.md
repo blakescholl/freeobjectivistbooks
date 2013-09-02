@@ -27,7 +27,8 @@ Here's how to get yourself set up to develop the app:
 3. Fork the repo at https://github.com/jasoncrawford/freeobjectivistbooks, then clone it with `git clone`.
 4. Once you have the repo locally, you should be able to run `bundle` in the project directory, and it will install all the dependencies (including Rails 3.1.3 if you don't already have it).
 5. Install Foreman if needed: `gem install foreman`. Then you can run the app using `foreman start`. That runs both the server and a delayed_jobs worker thread. (This will run the app at **port 5000, not 3000** as is the default when you run `rails server`.) Go to http://localhost:5000 to see the app.
-6. To make sure everything is working, run `rake test` to run all the tests.
+6. Run `rake db:setup` to create the database and load the schema. (This is preferable to running `rake db:migrate`, since that will run all migrations from the very beginning, which is inefficient and error-prone compared to just loading the latest schema.)
+7. To make sure everything is working, run `rake test` to run all the tests.
 
 Let me know if you have any trouble at all getting set up; I'm happy to help, and I'll update these instructions for the next developer, as well.
 

@@ -36,6 +36,13 @@ module ApplicationHelper
     number_with_precision number, precision: precision, significant: true, strip_insignificant_zeros: true, delimiter: ","
   end
 
+  def format_value(value)
+    case value
+    when Numeric then format_number value
+    else value.to_s
+    end
+  end
+
   def pluralize_omit_number(count, noun)
     count == 1 ? noun : noun.pluralize
   end

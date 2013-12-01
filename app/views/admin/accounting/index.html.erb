@@ -1,0 +1,19 @@
+<% content_for :title do %>Accounting – Admin<% end %>
+
+<% content_for :stylesheet do%>
+<style>
+  td, th {
+      padding-right: 12px;
+  }
+
+  td.value {
+      text-align: right;
+  }
+</style>
+<% end %>
+
+<h1 class="grid_16">Accounting</h1>
+
+<div class="grid_12">
+  <%= render partial: "admin/metrics_table", object: @metrics.table %>
+</div>

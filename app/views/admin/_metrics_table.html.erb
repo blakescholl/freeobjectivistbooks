@@ -15,7 +15,7 @@
             <% end %>
         </td>
         <% metrics_table.columns.each do |column| %>
-        <td class="value"><%= format_number metrics_table.value(row, column) %></td>
+        <td class="value"><%= format_value metrics_table.value(row, column) %></td>
         <% end %>
     </tr>
     <% end %>

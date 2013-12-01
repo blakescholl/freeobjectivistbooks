@@ -94,6 +94,7 @@ FreeBooks::Application.routes.draw do
     resources :referrals
     resources :testimonials
     resources :campaign_targets, only: [:index, :new, :create, :destroy]
+    resources :accounting, only: [:index]
   end
 
   # Workaround for ActiveAdmin problem as per https://github.com/gregbell/active_admin/issues/221

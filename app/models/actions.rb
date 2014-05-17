@@ -136,4 +136,8 @@ class Actions
   def any?
     prompted_status.present? || other_actions.any?
   end
+
+  def to_partial_path
+    'actions/actions'
+  end
 end

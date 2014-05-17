@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-ruby "1.9.2"
+ruby "2.0.0"
 
 gem 'rails', '3.1.12'
 
@@ -20,7 +20,6 @@ gem 'valid_email'
 
 group :development, :test do
   gem 'factory_girl_rails', '~> 4.0'
-  gem 'ruby-debug19', require: 'ruby-debug'
 end
 
 # Gems used only for assets and not required

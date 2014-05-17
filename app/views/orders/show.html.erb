@@ -72,7 +72,7 @@
     <% @order.donations.each do |donation| %>
         <div class="donation">
           <span class="grid_8 alpha">
-            <%= link_to donation.request, do %>
+            <%= link_to donation.request do %>
                 <%= title donation.book %> to <%= donation.student %> in <%= donation.student.location %>
             <% end %>
           </span>

@@ -44,4 +44,9 @@ FreeBooks::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  # If you don't give ExceptionNotifier a recipient, it causes test errors
+  # -Jason 17 May 2014
+  config.middleware.use ExceptionNotifier,
+    exception_recipients: %w{freeobjectivistbooks@example.com}
 end

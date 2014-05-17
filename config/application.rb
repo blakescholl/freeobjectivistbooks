@@ -51,6 +51,10 @@ module FreeBooks
     # https://devcenter.heroku.com/articles/rails3x-asset-pipeline-cedar#troubleshooting
     config.assets.initialize_on_precompile = false
 
+    # Avoid i18n deprecation warning:
+    # http://stackoverflow.com/questions/20361428/rails-i18n-validation-deprecation-warning
+    I18n.enforce_available_locales = true
+
     config.email_recipient_override = nil
 
     # A default value is needed here in all environments; the real value only really matters in prod,
